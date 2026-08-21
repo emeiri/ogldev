@@ -6,6 +6,7 @@
 
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 
+#include <algorithm>
 #include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -23,6 +24,7 @@ struct Vec2
     float y = 0.0f;
 };
 
+int PaddleDirection = 0; // -1 for up, 1 for down, 0 for no movement
 Uint64 TickCount = 0;
 
 
@@ -58,10 +60,24 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
     int NumKeys = 0;
     const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
+
     if (pKeys[SDL_SCANCODE_ESCAPE]) {
         SDL_Log("Escape key pressed, quitting");
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
+
+    if (pKeys[SDL_SCANCODE_W]) {
+        PaddleDirection -= 4; // Move paddle up
+        PaddleDirection = std::max(PaddleDirection, -20); // Clamp to -20
+    } 
+
+    if (pKeys[SDL_SCANCODE_S]) {
+        PaddleDirection += 4; // Move paddle down
+        PaddleDirection = std::min(PaddleDirection, 20); // Clamp to 20
+    } 
+
+  //  printf("PaddleDirection: %d\n", PaddleDirection);
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -82,8 +98,18 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     
-    SDL_FRect Wall(PaddlePos.x - PaddleWidth / 2.0f, PaddlePos.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
-    SDL_RenderFillRect(renderer, &Wall);
+    if (PaddleDirection != 0) {
+        PaddlePos.y += PaddleDirection * 50.0f * DeltaTime; // Move paddle at 500 pixels per second
+
+        if (PaddleDirection > 0) {
+            PaddleDirection -= 1; // Gradually reduce the direction to 0
+        } else {
+            PaddleDirection += 1; // Gradually reduce the direction to 0
+        }
+    }
+
+    SDL_FRect Paddle(PaddlePos.x - PaddleWidth / 2.0f, PaddlePos.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
+    SDL_RenderFillRect(renderer, &Paddle);
 
     SDL_FRect Ball(BallPos.x - BallSize / 2.0f, BallPos.y - BallSize / 2.0f, BallSize, BallSize);    
     SDL_RenderFillRect(renderer, &Ball);
