@@ -5,6 +5,8 @@
  */
 
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
+
+#include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -20,6 +22,9 @@ struct Vec2
     float x = 0.0f;
     float y = 0.0f;
 };
+
+Uint64 TickCount = 0;
+
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -67,6 +72,10 @@ float PaddleHeight = 300.0f;
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
+    Uint64 NewTickCount = SDL_GetTicks();
+    float DeltaTime = (NewTickCount - TickCount) / 1000.0f;
+    TickCount = NewTickCount;
+   // printf("DeltaTime: %f\n", DeltaTime);
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
