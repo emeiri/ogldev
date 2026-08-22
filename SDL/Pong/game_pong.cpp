@@ -1,7 +1,5 @@
 #include "game_pong.h"
 
-float BallSize = 20.0f;
-float HalfBallSize = BallSize / 2.0f;
 float PaddleSpeed = 600.0f; // Pixels per second
 float PaddleWidth = 30.0f;
 float HalfPaddleWidth = PaddleWidth / 2.0f;
@@ -41,8 +39,9 @@ void Ball::Update(float deltaTime)
     m_pos.x += m_velocity.x * deltaTime;
     m_pos.y += m_velocity.y * deltaTime;
 
-    bool BallHitsBottom = m_pos.y + HalfBallSize >= WINDOW_HEIGHT;
-    bool BallHitsTop = m_pos.y - HalfBallSize <= 0.0f;
+    bool BallHitsBottom = m_pos.y + m_halfSize >= WINDOW_HEIGHT;
+    bool BallHitsTop = m_pos.y - m_halfSize <= 0.0f;
+
     if ((BallHitsTop && (m_velocity.y < 0.0f)) ||
         (BallHitsBottom && (m_velocity.y > 0.0f))) {
         m_velocity.y = -m_velocity.y;
@@ -53,7 +52,7 @@ void Ball::Update(float deltaTime)
         m_velocity = { -200.0f, 235.0f }; // Reset speed
     }
 
-    if (m_pos.x + HalfBallSize >= WINDOW_WIDTH && m_velocity.x > 0.0f) {
+    if (m_pos.x + m_halfSize >= WINDOW_WIDTH && m_velocity.x > 0.0f) {
         m_velocity.x = -m_velocity.x;
     }
 }
@@ -63,7 +62,7 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
-    m_ball.Init({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
+    m_ball.Init(m_config.BallSize, { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
     m_paddleL.Init({ m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
     m_paddleR.Init({ WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
 
@@ -96,10 +95,10 @@ void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleR
 void Pong::ResolvePaddleBallCollision()
 {
     bool CollideWithPaddle =
-        (m_ball.GetPosition().x - HalfBallSize <= m_paddleL.GetPosition().x + HalfPaddleWidth) &&
-        (m_ball.GetPosition().x + HalfBallSize >= m_paddleL.GetPosition().x - HalfPaddleWidth) &&
-        (m_ball.GetPosition().y + HalfBallSize >= m_paddleL.GetPosition().y - HalfPaddleHeight) &&
-        (m_ball.GetPosition().y - HalfBallSize <= m_paddleL.GetPosition().y + HalfPaddleHeight);
+        (m_ball.GetPosition().x - m_ball.GetHalfSize() <= m_paddleL.GetPosition().x + m_config.PaddleWidth / 2.0f) &&
+        (m_ball.GetPosition().x + m_ball.GetHalfSize() >= m_paddleL.GetPosition().x - m_config.PaddleWidth / 2.0f) &&
+        (m_ball.GetPosition().y + m_ball.GetHalfSize() >= m_paddleL.GetPosition().y - m_config.PaddleHeight / 2.0f) &&
+        (m_ball.GetPosition().y - m_ball.GetHalfSize() <= m_paddleL.GetPosition().y + m_config.PaddleHeight / 2.0f);
 
     if (CollideWithPaddle && m_ball.GetVelocity().x < 0.0f) {
         Vec2 NewVelocity = m_ball.GetVelocity();

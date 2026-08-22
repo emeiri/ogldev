@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include <SDL3/SDL.h>
 
 #define WINDOW_WIDTH 1920
@@ -41,7 +42,13 @@ public:
 
     Ball() = default;
 
-    void Init(const Vec2& pos, const Vec2& velocity) { m_pos = pos; m_velocity = velocity; }
+    void Init(float Size, const Vec2& pos, const Vec2& velocity) { 
+        assert(Size > 0.0f);
+        m_size = Size; 
+        m_halfSize = Size / 2.0f;
+        m_pos = pos; 
+        m_velocity = velocity; 
+    }
 
     void Update(float deltaTime);
 
@@ -65,8 +72,15 @@ public:
         m_pos = pos;
     }
 
+    float GetHalfSize() const
+    {
+        return m_halfSize;
+    }
+
 private:
 
+    float m_size = 0.0f;
+    float m_halfSize = 0.0f;
     Vec2 m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
     Vec2 m_velocity = { -200.0f, 235.0f };
 };
