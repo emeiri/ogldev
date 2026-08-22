@@ -40,12 +40,20 @@ private:
     Uint64 m_tickCount = 0;
 };
 
+// Input State Struct to track paddle keys cleanly inside SDL3 Callbacks
+struct InputState {
+    bool PaddleLUp = false;
+    bool PaddleLDown = false;
+    bool PaddleRUp = false;
+    bool PaddleRDown = false;
+};
 
 static SDL_Window* pWindow = NULL;
 static SDL_Renderer* pRenderer = NULL;
 static SDL_Clock GameClock;
 static GameConfig Config;
 static Pong Game;
+static InputState Input;
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -82,10 +90,25 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
         return SDL_APP_SUCCESS;
     }
 
-    if ((event->type == SDL_EVENT_KEY_DOWN) && 
-        (event->key.scancode == SDL_SCANCODE_ESCAPE)) {
-        SDL_Log("Escape key pressed, quitting");
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.scancode) {
+        case SDL_SCANCODE_ESCAPE:
+            SDL_Log("Escape key pressed, quitting");
+            return SDL_APP_SUCCESS;
+        case SDL_SCANCODE_W: Input.PaddleLUp = true; break;
+        case SDL_SCANCODE_S: Input.PaddleLDown = true; break;
+        case SDL_SCANCODE_O: Input.PaddleRUp = true; break;
+        case SDL_SCANCODE_L: Input.PaddleRDown = true; break;
+        default: break;
+        }
+    } else if (event->type == SDL_EVENT_KEY_UP) {
+        switch (event->key.scancode) {
+        case SDL_SCANCODE_W: Input.PaddleLUp = false; break;
+        case SDL_SCANCODE_S: Input.PaddleLDown = false; break;
+        case SDL_SCANCODE_O: Input.PaddleRUp = false; break;
+        case SDL_SCANCODE_L: Input.PaddleRDown = false; break;
+        default: break;
+        }
     }
    
     return SDL_APP_CONTINUE;  /* carry on with the program! */
@@ -118,14 +141,7 @@ static void RenderGame()
 /* This function runs once per frame. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-
-   // printf("DeltaTime: %f\n", DeltaTime);
-    int NumKeys = 0;
-
-    bool PaddleLUp = pKeys[SDL_SCANCODE_W];
-    bool PaddleLDown = pKeys[SDL_SCANCODE_S];
-    bool PaddleRUp = pKeys[SDL_SCANCODE_O];
-    bool PaddleRDown = pKeys[SDL_SCANCODE_L];
+    float DeltaTime = GameClock.GetDeltaTime();
 
     // Game updates utilizing the Event-Driven clean input state flags
     Game.Update(Input.PaddleLUp, Input.PaddleLDown, Input.PaddleRUp, Input.PaddleRDown, DeltaTime);
