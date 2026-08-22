@@ -18,7 +18,20 @@ struct Rect
 };
 
 
-class Paddle {
+class BaseObject {
+    
+public:
+
+protected:
+
+    Vec2 m_pos;
+    Vec2 m_size;
+    Vec2 m_halfSize;
+    Vec2 m_windowSize;
+};
+
+
+class Paddle : public BaseObject {
 
 public:
 
@@ -52,10 +65,6 @@ public:
 
 private:
 
-    Vec2 m_pos;
-    Vec2 m_size;
-    Vec2 m_halfSize;
-    Vec2 m_windowSize;
     float m_speed = 0.0f;
 };
 
