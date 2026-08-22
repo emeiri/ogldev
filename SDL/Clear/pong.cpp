@@ -24,9 +24,12 @@ struct Vec2
     float y = 0.0f;
 };
 
+#define PADDLE_OFFSET 25.0f
+
 float BallSize = 20.0f;
 Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-Vec2 PaddlePosL = { 25.0f, WINDOW_HEIGHT / 2.0f };
+Vec2 PaddlePosL = { PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
+Vec2 PaddlePosR = { WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
 float PaddleWidth = 30.0f;
 float PaddleHeight = 300.0f;
 int PaddleDirection = 0; // -1 for up, 1 for down, 0 for no movement
@@ -54,6 +57,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     SDL_SetRenderVSync(renderer, 1);
 
+    TickCount = SDL_GetTicks();
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -64,26 +69,12 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
 
-    int NumKeys = 0;
-    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
-
-    if (pKeys[SDL_SCANCODE_ESCAPE]) {
+    if ((event->type == SDL_EVENT_KEY_DOWN) && 
+        (event->key.scancode == SDL_SCANCODE_ESCAPE)) {
         SDL_Log("Escape key pressed, quitting");
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
-
-    if (pKeys[SDL_SCANCODE_W]) {
-        PaddleDirection -= 4; // Move paddle up
-        PaddleDirection = std::max(PaddleDirection, -20); // Clamp to -20
-    } 
-
-    if (pKeys[SDL_SCANCODE_S]) {
-        PaddleDirection += 4; // Move paddle down
-        PaddleDirection = std::min(PaddleDirection, 20); // Clamp to 20
-    } 
-
-  //  printf("PaddleDirection: %d\n", PaddleDirection);
-
+   
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -94,55 +85,82 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     Uint64 NewTickCount = SDL_GetTicks();
     float DeltaTime = (NewTickCount - TickCount) / 1000.0f;
     TickCount = NewTickCount;
-   // printf("DeltaTime: %f\n", DeltaTime);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    
-    if (PaddleDirection != 0) {
-        PaddlePosL.y += PaddleDirection * 50.0f * DeltaTime; // Move paddle at 500 pixels per second
 
-        if (PaddleDirection > 0) {
-            PaddleDirection -= 1; // Gradually reduce the direction to 0
-        } else {
-            PaddleDirection += 1; // Gradually reduce the direction to 0
-        }
-        
-        if (PaddlePosL.y - PaddleHeight / 2.0f < 0) {
-            PaddlePosL.y = PaddleHeight / 2.0f + 1; // Clamp to top
-            PaddleDirection = 0; // Stop movement
-        } else if (PaddlePosL.y + PaddleHeight / 2.0f > WINDOW_HEIGHT) {
-            PaddlePosL.y = WINDOW_HEIGHT - PaddleHeight / 2.0f - 1; // Clamp to bottom
-            PaddleDirection = 0; // Stop movement
-        }
+    if (DeltaTime > 0.1f) {
+        DeltaTime = 0.1f; // Clamp to 100ms to avoid large jumps
     }
 
-    SDL_FRect Paddle(PaddlePosL.x - PaddleWidth / 2.0f, PaddlePosL.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
-    SDL_RenderFillRect(renderer, &Paddle);
+   // printf("DeltaTime: %f\n", DeltaTime);
+    SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
+    SDL_RenderClear(renderer);
 
+    int NumKeys = 0;
+    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
+
+    float PaddleSpeed = 600.0f; // Pixels per second
+    float CurrentPaddleVelocity = 0.0f;
+
+    if (pKeys[SDL_SCANCODE_W]) {
+        CurrentPaddleVelocity -= PaddleSpeed;
+    }
+    if (pKeys[SDL_SCANCODE_S]) {
+        CurrentPaddleVelocity += PaddleSpeed;
+    }
+
+    // 4. Update Paddle Positions via Time Delta
+    PaddlePosL.y += CurrentPaddleVelocity * DeltaTime;
+    
+    // 5. Clamp Paddle within Window Constraints safely
+    float HalfPaddleHeight = PaddleHeight / 2.0f;
+    if (PaddlePosL.y - HalfPaddleHeight < 0.0f) {
+        PaddlePosL.y = HalfPaddleHeight;
+    } else if (PaddlePosL.y + HalfPaddleHeight > WINDOW_HEIGHT) {
+        PaddlePosL.y = WINDOW_HEIGHT - HalfPaddleHeight;
+    }
+
+    // 6. Update Ball Mechanics via Time Delta
     BallPos.x += BallVelocity.x * DeltaTime;
     BallPos.y += BallVelocity.y * DeltaTime;
 
-    //printf("BallPos: (%f, %f)\n", BallPos.x, BallPos.y);
-    bool CollideWithTop = (BallPos.y + BallSize / 2.0f >= WINDOW_HEIGHT);
-    bool CollideWithBottom = (BallPos.y - BallSize / 2.0f <= 0);
-    if ((CollideWithBottom && (BallVelocity.y < 0)) ||
-        (CollideWithTop && (BallVelocity.y > 0))) {
+    // 7. Ball Ceiling / Floor Boundaries Collisions
+    float HalfBallSize = BallSize / 2.0f;
+    if ((BallPos.y - HalfBallSize <= 0.0f && BallVelocity.y < 0.0f) ||
+        (BallPos.y + HalfBallSize >= WINDOW_HEIGHT && BallVelocity.y > 0.0f)) {
         BallVelocity.y = -BallVelocity.y;
     }
 
-    bool CollideWithPaddle = (BallPos.x - BallSize / 2.0f <= PaddlePosL.x + PaddleWidth / 2.0f) &&
-        (BallPos.x + BallSize / 2.0f >= PaddlePosL.x - PaddleWidth / 2.0f) &&
-        (BallPos.y + BallSize / 2.0f >= PaddlePosL.y - PaddleHeight / 2.0f) &&
-        (BallPos.y - BallSize / 2.0f <= PaddlePosL.y + PaddleHeight / 2.0f);
+    // 8. Ball vs Paddle Precise Rect Collision Detection
+    bool CollideWithPaddle =
+        (BallPos.x - HalfBallSize <= PaddlePosL.x + PaddleWidth / 2.0f) &&
+        (BallPos.x + HalfBallSize >= PaddlePosL.x - PaddleWidth / 2.0f) &&
+        (BallPos.y + HalfBallSize >= PaddlePosL.y - HalfPaddleHeight) &&
+        (BallPos.y - HalfBallSize <= PaddlePosL.y + HalfPaddleHeight);
 
-    if (CollideWithPaddle && (BallVelocity.x < 0)) {
+    if (CollideWithPaddle && BallVelocity.x < 0.0f) {
+        BallVelocity.x = -BallVelocity.x;
+        // Optional: Slightly boost speed upon impact to increase difficulty
+        BallVelocity.x *= 1.05f;
+        BallVelocity.y *= 1.05f;
+    }
+
+    // 9. Reset Ball if it goes out of bounds (Left Wall Point Loss)
+    if (BallPos.x < 0.0f) {
+        BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+        BallVelocity = { -200.0f, 235.0f }; // Reset speed
+    }
+    // Bounce off right wall for now since AI/Right paddle isn't written yet
+    if (BallPos.x + HalfBallSize >= WINDOW_WIDTH && BallVelocity.x > 0.0f) {
         BallVelocity.x = -BallVelocity.x;
     }
 
-    SDL_FRect Ball(BallPos.x - BallSize / 2.0f, BallPos.y - BallSize / 2.0f, BallSize, BallSize);    
-    SDL_RenderFillRect(renderer, &Ball);
+    // 10. Render Geometries to screen
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+    SDL_FRect PaddleRect{ PaddlePosL.x - PaddleWidth / 2.0f, PaddlePosL.y - HalfPaddleHeight, PaddleWidth, PaddleHeight };
+    SDL_RenderFillRect(renderer, &PaddleRect);
+
+    SDL_FRect BallRect{ BallPos.x - HalfBallSize, BallPos.y - HalfBallSize, BallSize, BallSize };
+    SDL_RenderFillRect(renderer, &BallRect);
     SDL_RenderPresent(renderer);    
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
