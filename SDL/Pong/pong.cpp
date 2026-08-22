@@ -6,8 +6,6 @@
 
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 
-#include <algorithm>
-#include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include "game_pong.h"
@@ -16,7 +14,7 @@ class SDL_Clock {
 
 public:
 
-    SDL_Clock() {}
+    SDL_Clock() = default;
 
     void Init()
     {
@@ -26,11 +24,12 @@ public:
     float GetDeltaTime()
     {
         Uint64 CurrentTick = SDL_GetTicks();
-        float DeltaTime = (CurrentTick - m_tickCount) / 1000.0f; // Convert to seconds
+        float DeltaTime = (CurrentTick - m_tickCount) / 1000.0f;
         m_tickCount = CurrentTick;
 
+        // Clamp to 100ms max to prevent massive simulation jumps during lag spikes
         if (DeltaTime > 0.1f) {
-            DeltaTime = 0.1f; // Clamp to 100ms to avoid large jumps
+            DeltaTime = 0.1f;
         }
 
         return DeltaTime;
@@ -58,7 +57,7 @@ static InputState Input;
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-    SDL_SetAppMetadata("Pong", "1.0", "com.example.CATEGORY-NAME");
+    SDL_SetAppMetadata("Pong", "1.0", "www.ogldev.org");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
@@ -110,10 +109,9 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
         default: break;
         }
     }
-   
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
-}
 
+    return SDL_APP_CONTINUE;
+}
 
 static void RenderGame()
 {
@@ -148,12 +146,13 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     RenderGame();
 
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
+    return SDL_APP_CONTINUE;
 }
 
-/* This function runs once at shutdown. */
+/* Clean shutdown tracking */
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-    /* SDL will clean up the window/renderer for us. */
+    // SDL3 handles automatic structural destruction for window/renderer loops cleanly
+    SDL_Log("Application terminated successfully.");
 }
 
