@@ -1,7 +1,5 @@
-#include <algorithm>
-
 #include "game_pong.h"
-
+#include <cmath> // For std::abs
 
 void Paddle::HandleUpKey(float deltaTime)
 {
@@ -109,15 +107,12 @@ void Pong::ResolvePaddleBallCollision(Paddle& paddle)
     if (CollideWithPaddle) {
         Vec2 NewVelocity = m_ball.GetVelocity();
 
-        // If ball is on the left half of the screen, force velocity to be positive (go right)
-        // If ball is on the right half of the screen, force velocity to be negative (go left)
+        // Bounce ball outward based on which side of center it's on
         if (m_ball.GetPosition().x < m_halfWindowSize.x && NewVelocity.x < 0.0f) {
-            NewVelocity.x = std::abs(NewVelocity.x);
-            NewVelocity.x *= 1.05f;
+            NewVelocity.x = std::abs(NewVelocity.x) * 1.05f;
             NewVelocity.y *= 1.05f;
         } else if (m_ball.GetPosition().x > m_halfWindowSize.x && NewVelocity.x > 0.0f) {
-            NewVelocity.x = -std::abs(NewVelocity.x);
-            NewVelocity.x *= 1.05f;
+            NewVelocity.x = -std::abs(NewVelocity.x) * 1.05f;
             NewVelocity.y *= 1.05f;
         }
 
