@@ -92,6 +92,24 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 }
 
 
+static void RenderGame()
+{
+    SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_FRect PaddleRect{ Game.GetPaddleLPosition().x - Config.PaddleWidth / 2.0f,
+                          Game.GetPaddleLPosition().y - Config.PaddleHeight / 2.0f,
+                          Config.PaddleWidth, Config.PaddleHeight };
+    SDL_RenderFillRect(renderer, &PaddleRect);
+
+    SDL_FRect BallRect{ Game.GetBallPosition().x - Config.BallSize / 2.0f,
+                        Game.GetBallPosition().y - Config.BallSize / 2.0f,
+                        Config.BallSize, Config.BallSize };
+
+    SDL_RenderFillRect(renderer, &BallRect);
+    SDL_RenderPresent(renderer);
+}
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
@@ -99,9 +117,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     float DeltaTime = Clock.GetDeltaTime();
 
    // printf("DeltaTime: %f\n", DeltaTime);
-    SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
-    SDL_RenderClear(renderer);
-
     int NumKeys = 0;
     const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
 
@@ -112,18 +127,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     Game.Update(PaddleLUp, PaddleLDown, PaddleRUp, PaddleRDown, DeltaTime);    
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_FRect PaddleRect{ Game.GetPaddleLPosition().x - Config.PaddleWidth / 2.0f,
-                          Game.GetPaddleLPosition().y - Config.PaddleHeight / 2.0f, 
-                          Config.PaddleWidth, Config.PaddleHeight };
-    SDL_RenderFillRect(renderer, &PaddleRect);
-
-    SDL_FRect BallRect{ Game.GetBallPosition().x - Config.BallSize / 2.0f, 
-                        Game.GetBallPosition().y - Config.BallSize / 2.0f, 
-                        Config.BallSize, Config.BallSize };
-
-    SDL_RenderFillRect(renderer, &BallRect);
-    SDL_RenderPresent(renderer);
+    RenderGame();
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
