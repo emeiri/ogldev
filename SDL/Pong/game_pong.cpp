@@ -57,19 +57,18 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
-    float HalfWindowWidth = m_config.WindowSize.x / 2.0f;
-    float HalfWindowHeight = m_config.WindowSize.y / 2.0f;
+    m_halfWindowSize = { m_config.WindowSize.x / 2.0f, m_config.WindowSize.y / 2.0f };
 
     m_ball.Init(m_config.BallSize, 
-                { HalfWindowWidth, HalfWindowHeight }, 
+                { m_halfWindowSize.x, m_halfWindowSize.y }, 
                 { -200.0f, 235.0f }, m_config.WindowSize);
 
     m_paddleL.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, 
-                   { m_config.PaddleOffset, HalfWindowHeight }, 
+                   { m_config.PaddleOffset, m_halfWindowSize.y }, 
                    m_config.PaddleSpeed, m_config.WindowSize);
 
     m_paddleR.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, 
-                   { m_config.WindowSize.x - m_config.PaddleOffset, HalfWindowHeight }, 
+                   { m_config.WindowSize.x - m_config.PaddleOffset, m_halfWindowSize.y }, 
                    m_config.PaddleSpeed, m_config.WindowSize);
 }
 

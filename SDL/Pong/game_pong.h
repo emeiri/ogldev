@@ -141,4 +141,5 @@ private:
     Ball m_ball;
     Paddle m_paddleL;
     Paddle m_paddleR;
+    Vec2 m_halfWindowSize;
 };
