@@ -1,10 +1,6 @@
 #pragma once
 
 #include <assert.h>
-#include <SDL3/SDL.h>
-
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
 
 struct Vec2
 {
@@ -19,11 +15,12 @@ public:
 
     Paddle() = default;
 
-    void Init(float speed, const Vec2& pos, const Vec2& size) { 
+    void Init(const Vec2& size, const Vec2& pos, float speed, const Vec2& WindowSize) {
         m_speed = speed; 
         m_pos = pos; 
         m_size = size; 
         m_halfSize = { size.x / 2.0f, size.y / 2.0f };
+        m_windowSize = WindowSize;
     }
 
     void HandleUpKey(float deltaTime);
@@ -40,6 +37,7 @@ private:
     Vec2 m_pos;
     Vec2 m_size;
     Vec2 m_halfSize;
+    Vec2 m_windowSize;
     float m_speed = 0.0f;
 };
 
@@ -50,12 +48,13 @@ public:
 
     Ball() = default;
 
-    void Init(float Size, const Vec2& pos, const Vec2& velocity) { 
+    void Init(float Size, const Vec2& pos, const Vec2& velocity, const Vec2& WindowSize) { 
         assert(Size > 0.0f);
         m_size = Size; 
         m_halfSize = Size / 2.0f;
         m_pos = pos; 
         m_velocity = velocity; 
+        m_windowSize = WindowSize;
     }
 
     void Update(float deltaTime);
@@ -89,12 +88,14 @@ private:
 
     float m_size = 0.0f;
     float m_halfSize = 0.0f;
-    Vec2 m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+    Vec2 m_pos;
     Vec2 m_velocity = { -200.0f, 235.0f };
+    Vec2 m_windowSize;
 };
 
 
 struct GameConfig {
+    Vec2 WindowSize = { 1920.0f, 1080.0f };
     float BallSize = 20.0f;
     float PaddleSpeed = 600.0f; // Pixels per second
     float PaddleWidth = 30.0f;

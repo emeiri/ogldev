@@ -60,11 +60,12 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     SDL_Log("SDL initialized");
 
-    if (!SDL_CreateWindowAndRenderer("examples/CATEGORY/NAME", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("Pong", (int)Config.WindowSize.x, (int)Config.WindowSize.y, 
+                                     SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(renderer, (int)Config.WindowSize.x, (int)Config.WindowSize.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     SDL_SetRenderVSync(renderer, 1);
 

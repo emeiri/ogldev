@@ -23,8 +23,8 @@ void Paddle::HandleDownKey(float deltaTime)
 
     m_pos.y += CurrentPaddleVelocity * deltaTime;
 
-    if (m_pos.y + m_halfSize.y > WINDOW_HEIGHT) {
-        m_pos.y = WINDOW_HEIGHT - m_halfSize.y;
+    if (m_pos.y + m_halfSize.y > m_windowSize.y) {
+        m_pos.y = m_windowSize.y - m_halfSize.y;
     }
 }
 
@@ -34,7 +34,7 @@ void Ball::Update(float deltaTime)
     m_pos.x += m_velocity.x * deltaTime;
     m_pos.y += m_velocity.y * deltaTime;
 
-    bool BallHitsBottom = m_pos.y + m_halfSize >= WINDOW_HEIGHT;
+    bool BallHitsBottom = m_pos.y + m_halfSize >= m_windowSize.y;
     bool BallHitsTop = m_pos.y - m_halfSize <= 0.0f;
 
     if ((BallHitsTop && (m_velocity.y < 0.0f)) ||
@@ -43,11 +43,11 @@ void Ball::Update(float deltaTime)
     }
 
     if (m_pos.x < 0.0f) {
-        m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+        m_pos = { m_windowSize.x / 2.0f, m_windowSize.y / 2.0f };
         m_velocity = { -200.0f, 235.0f }; // Reset speed
     }
 
-    if (m_pos.x + m_halfSize >= WINDOW_WIDTH && m_velocity.x > 0.0f) {
+    if (m_pos.x + m_halfSize >= m_windowSize.x && m_velocity.x > 0.0f) {
         m_velocity.x = -m_velocity.x;
     }
 }
@@ -58,15 +58,16 @@ void Pong::Init(const GameConfig& config)
     m_config = config;
 
     m_ball.Init(m_config.BallSize, 
-                { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
+                { m_config.WindowSize.x / 2.0f, m_config.WindowSize.y / 2.0f }, 
+                { -200.0f, 235.0f }, m_config.WindowSize);
 
-    m_paddleL.Init(m_config.PaddleSpeed, 
-                   { m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f }, 
-                   { m_config.PaddleWidth, m_config.PaddleHeight });
+    m_paddleL.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, 
+                   { m_config.PaddleOffset, m_config.WindowSize.y / 2.0f }, 
+                   m_config.PaddleSpeed, m_config.WindowSize);
 
-    m_paddleR.Init(m_config.PaddleSpeed, 
-                   { WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f }, 
-                   { m_config.PaddleWidth, m_config.PaddleHeight });
+    m_paddleR.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, 
+                   { m_config.WindowSize.x - m_config.PaddleOffset, m_config.WindowSize.y / 2.0f }, 
+                   m_config.PaddleSpeed, m_config.WindowSize);
 }
 
 
