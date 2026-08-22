@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\SDL\Pong\game_pong.cpp" />
-    <ClCompile Include="..\..\..\..\SDL\Pong\pong.cpp" />
+    <ClCompile Include="..\..\..\..\SDL\Pong\sdl_pong.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\SDL\Pong\game_pong.h" />
