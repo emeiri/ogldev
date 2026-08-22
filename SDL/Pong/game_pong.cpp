@@ -39,13 +39,16 @@ void Ball::Update(float deltaTime)
         m_velocity.y = -m_velocity.y;
     }
 
-    if (m_pos.x < 0.0f) {
+    // --- Scoring & Reset States ---
+    // Left Wall Out-of-Bounds (Right Player Scores)
+    if (m_pos.x + m_halfSize.x < 0.0f) {
         m_pos = { m_halfWindowSize.x, m_halfWindowSize.y };
-        m_velocity = { -200.0f, 235.0f }; // Reset speed
+        m_velocity = { 200.0f, 235.0f }; // Serve towards player 2 this time
     }
-
-    if (m_pos.x + m_halfSize.x >= m_windowSize.x && m_velocity.x > 0.0f) {
-        m_velocity.x = -m_velocity.x;
+    // Right Wall Out-of-Bounds (Left Player Scores) - FIXED from bouncing wall
+    else if (m_pos.x - m_halfSize.x > m_windowSize.x) {
+        m_pos = { m_halfWindowSize.x, m_halfWindowSize.y };
+        m_velocity = { -200.0f, 235.0f }; // Serve towards player 1
     }
 }
 
