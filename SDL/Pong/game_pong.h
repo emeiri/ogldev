@@ -22,6 +22,26 @@ class BaseObject {
     
 public:
 
+    void Init(const Vec2& size, const Vec2& pos, float speed, const Vec2& WindowSize) {
+        m_pos = pos; 
+        m_size = size; 
+        m_halfSize = { size.x / 2.0f, size.y / 2.0f };
+        m_windowSize = WindowSize;
+    }
+
+    const Vec2& GetPosition() const
+    {
+        return m_pos;
+    }
+
+    void GetRect(Rect& rect) const
+    {
+        rect.x = m_pos.x - m_halfSize.x;
+        rect.y = m_pos.y - m_halfSize.y;
+        rect.w = m_size.x;
+        rect.h = m_size.y;
+    }
+
 protected:
 
     Vec2 m_pos;
@@ -38,30 +58,13 @@ public:
     Paddle() = default;
 
     void Init(const Vec2& size, const Vec2& pos, float speed, const Vec2& WindowSize) {
+        BaseObject::Init(size, pos, speed, WindowSize);
         m_speed = speed; 
-        m_pos = pos; 
-        m_size = size; 
-        m_halfSize = { size.x / 2.0f, size.y / 2.0f };
-        m_windowSize = WindowSize;
     }
 
     void HandleUpKey(float deltaTime);
 
     void HandleDownKey(float deltaTime);
-
-    const Vec2& GetPosition() const
-    {
-        return m_pos;
-    }
-
-    void GetRect(Rect& rect) const
-    {
-        rect.x = m_pos.x - m_halfSize.x;
-        rect.y = m_pos.y - m_halfSize.y;
-        rect.w = m_size.x;
-        rect.h = m_size.y;
-    }
-
 
 private:
 
@@ -69,7 +72,7 @@ private:
 };
 
 
-class Ball {
+class Ball : public BaseObject {
 
 public:
 
@@ -77,20 +80,13 @@ public:
 
     void Init(float Size, const Vec2& pos, const Vec2& velocity, const Vec2& WindowSize) { 
         assert(Size > 0.0f);
-        m_size = Size; 
-        m_halfSize = Size / 2.0f;
-        m_pos = pos; 
+        BaseObject::Init({ Size, Size }, pos, 0.0f, WindowSize);
         m_velocity = velocity; 
-        m_windowSize = WindowSize;
+        m_halfSize = Size / 2.0f;
         m_halfWindowSize = { WindowSize.x / 2.0f, WindowSize.y / 2.0f };
     }
 
     void Update(float deltaTime);
-
-    const Vec2& GetPosition() const
-    {
-        return m_pos;
-    }
 
     const Vec2& GetVelocity() const
     {
@@ -102,32 +98,16 @@ public:
         m_velocity = velocity;
     }
 
-    void SetPosition(const Vec2& pos)
-    {
-        m_pos = pos;
-    }
-
     float GetHalfSize() const
     {
         return m_halfSize;
     }
 
-    void GetRect(Rect& rect) const
-    {
-        rect.x = m_pos.x - m_halfSize;
-        rect.y = m_pos.y - m_halfSize;
-        rect.w = m_size;
-        rect.h = m_size;
-    }
-
 private:
 
-    float m_size = 0.0f;
-    float m_halfSize = 0.0f;
-    Vec2 m_pos;
     Vec2 m_velocity = { -200.0f, 235.0f };
-    Vec2 m_windowSize;
-    Vec2 m_halfWindowSize;
+    Vec2 m_halfWindowSize = { 0.0f, 0.0f };
+    float m_halfSize = 0.0f;
 };
 
 
@@ -153,17 +133,10 @@ public:
 
     void GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const;
 
-    Vec2 GetBallPosition() const { return m_ball.GetPosition(); }
-
-    Vec2 GetPaddleLPosition() const { return m_paddleL.GetPosition(); }
-
-    Vec2 GetPaddleRPosition() const { return m_paddleR.GetPosition(); }
-
 private:
 
     void ResolvePaddleBallCollision();
 
-    // Add private members here, such as the ball, paddles, and game state
     GameConfig m_config;
     Ball m_ball;
     Paddle m_paddleL;
