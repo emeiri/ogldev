@@ -31,8 +31,11 @@ void Ball::Update(float deltaTime)
     bool BallHitsBottom = m_pos.y + m_halfSize.y >= m_windowSize.y;
     bool BallHitsTop = m_pos.y - m_halfSize.y <= 0.0f;
 
-    if ((BallHitsTop && (m_velocity.y < 0.0f)) ||
-        (BallHitsBottom && (m_velocity.y > 0.0f))) {
+    if (BallHitsTop && m_velocity.y < 0.0f) {
+        m_pos.y = m_halfSize.y; // Positional correction to prevent wall trapping
+        m_velocity.y = -m_velocity.y;
+    } else if (BallHitsBottom && m_velocity.y > 0.0f) {
+        m_pos.y = m_windowSize.y - m_halfSize.y; // Positional correction
         m_velocity.y = -m_velocity.y;
     }
 
