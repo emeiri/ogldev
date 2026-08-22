@@ -10,34 +10,13 @@
 #include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include "game_pong.h"
 
- /* We will use this renderer to draw into this window every frame. */
-static SDL_Window* window = NULL;
-static SDL_Renderer* renderer = NULL;
-
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
-#define PADDLE_OFFSET 25.0f
-
-float BallSize = 20.0f;
-float HalfBallSize = BallSize / 2.0f;
-float PaddleSpeed = 600.0f; // Pixels per second
-float PaddleWidth = 30.0f;
-float HalfPaddleWidth = PaddleWidth / 2.0f;
-float PaddleHeight = 300.0f;
-float HalfPaddleHeight = PaddleHeight / 2.0f;
-
-struct Vec2
-{
-    float x = 0.0f;
-    float y = 0.0f;
-};
-
-class GameClock {
+class SDL_Clock {
 
 public:
 
-    GameClock() {}
+    SDL_Clock() {}
 
     void Init()
     {
@@ -62,129 +41,12 @@ private:
 };
 
 
-class Paddle {
-
-public:
-
-    Paddle(const Vec2& pos) : m_pos(pos) {}
-
-    void HandleUpKey(float deltaTime)
-    {
-        float CurrentPaddleVelocity = 0.0f;
-
-        CurrentPaddleVelocity += PaddleSpeed;
-
-        m_pos.y -= CurrentPaddleVelocity * deltaTime;
-
-        if (m_pos.y - HalfPaddleHeight < 0.0f) {
-            m_pos.y = HalfPaddleHeight;
-        }
-    }
-
-    void HandleDownKey(float deltaTime)
-    {
-        float CurrentPaddleVelocity = 0.0f;
-
-        CurrentPaddleVelocity += PaddleSpeed;
-
-        m_pos.y += CurrentPaddleVelocity * deltaTime;
-
-        if (m_pos.y + HalfPaddleHeight > WINDOW_HEIGHT) {
-            m_pos.y = WINDOW_HEIGHT - HalfPaddleHeight;
-        }
-    }
-
-
-    const Vec2& GetPosition() const
-    {
-        return m_pos;
-    }
-
-private:
-
-    Vec2 m_pos;
-};
-
-
-class Ball {
-
-public:
-
-    Ball(const Vec2& pos, const Vec2& velocity) : m_pos(pos), m_velocity(velocity) {}
-
-    void Update(float deltaTime)
-    {
-        m_pos.x += m_velocity.x * deltaTime;
-        m_pos.y += m_velocity.y * deltaTime;
-
-        bool BallHitsBottom = m_pos.y + HalfBallSize >= WINDOW_HEIGHT;
-        bool BallHitsTop = m_pos.y - HalfBallSize <= 0.0f;
-        if ((BallHitsTop && (m_velocity.y < 0.0f)) ||
-            (BallHitsBottom && (m_velocity.y > 0.0f))) {
-            m_velocity.y = -m_velocity.y;
-        }
-
-        if (m_pos.x < 0.0f) {
-            m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-            m_velocity = { -200.0f, 235.0f }; // Reset speed
-        }
-
-        if (m_pos.x + HalfBallSize >= WINDOW_WIDTH && m_velocity.x > 0.0f) {
-            m_velocity.x = -m_velocity.x;
-        }
-    }
-
-    const Vec2& GetPosition() const
-    {
-        return m_pos;
-    }
-
-    const Vec2& GetVelocity() const
-    {
-        return m_velocity;
-    }
-
-    void SetVelocity(const Vec2& velocity)
-    {
-        m_velocity = velocity;
-    }
-
-    void SetPosition(const Vec2& pos)
-    {
-        m_pos = pos;
-    }
-
-private:
-
-    Vec2 m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-    Vec2 m_velocity = { -200.0f, 235.0f };
-};
-
-GameClock Clock;
-Ball GameBall({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
-Paddle PaddleL({ PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
-Paddle PaddleR({ WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
-Uint64 TickCount = 0;
-
-
-void ResolvePaddleBallCollision(Ball& ball, const Paddle& paddle)
-{
-    bool CollideWithPaddle =
-        (ball.GetPosition().x - HalfBallSize <= paddle.GetPosition().x + HalfPaddleWidth) &&
-        (ball.GetPosition().x + HalfBallSize >= paddle.GetPosition().x - HalfPaddleWidth) &&
-        (ball.GetPosition().y + HalfBallSize >= paddle.GetPosition().y - HalfPaddleHeight) &&
-        (ball.GetPosition().y - HalfBallSize <= paddle.GetPosition().y + HalfPaddleHeight);
-
-    if (CollideWithPaddle && ball.GetVelocity().x < 0.0f) {
-        Vec2 NewVelocity = ball.GetVelocity();
-        NewVelocity.x = -NewVelocity.x;
-        // Optional: Slightly boost speed upon impact to increase difficulty
-        NewVelocity.x *= 1.05f;
-        NewVelocity.y *= 1.05f;
-        ball.SetVelocity(NewVelocity);
-    }
-}
-
+/* We will use this renderer to draw into this window every frame. */
+static SDL_Window* window = NULL;
+static SDL_Renderer* renderer = NULL;
+static SDL_Clock Clock;
+static GameConfig Config;
+static Pong Game;
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -206,7 +68,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     SDL_SetRenderVSync(renderer, 1);
 
-    TickCount = SDL_GetTicks();
+    Clock.Init();
+
+    Game.Init(Config);
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
@@ -228,19 +92,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 }
 
 
-void HandleKeys(float DeltaTime)
-{
-    int NumKeys = 0;
-    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
-
-    if (pKeys[SDL_SCANCODE_W]) {
-        PaddleL.HandleUpKey(DeltaTime);
-    }
-
-    if (pKeys[SDL_SCANCODE_S]) {
-        PaddleL.HandleDownKey(DeltaTime);
-    }
-}
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
@@ -251,19 +102,26 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
     SDL_RenderClear(renderer);
 
-    HandleKeys(DeltaTime);
-    
-    GameBall.Update(DeltaTime);
+    int NumKeys = 0;
+    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
 
-    ResolvePaddleBallCollision(GameBall, PaddleL);
+    bool PaddleLUp = pKeys[SDL_SCANCODE_W];
+    bool PaddleLDown = pKeys[SDL_SCANCODE_S];
+    bool PaddleRUp = pKeys[SDL_SCANCODE_O];
+    bool PaddleRDown = pKeys[SDL_SCANCODE_P];
+
+    Game.Update(PaddleLUp, PaddleLDown, PaddleRUp, PaddleRDown, DeltaTime);    
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_FRect PaddleRect{ PaddleL.GetPosition().x - HalfPaddleWidth, 
-                          PaddleL.GetPosition().y - HalfPaddleHeight, 
-                          PaddleWidth, PaddleHeight };
+    SDL_FRect PaddleRect{ Game.GetPaddleLPosition().x - Config.PaddleWidth / 2.0f,
+                          Game.GetPaddleLPosition().y - Config.PaddleHeight / 2.0f, 
+                          Config.PaddleWidth, Config.PaddleHeight };
     SDL_RenderFillRect(renderer, &PaddleRect);
 
-    SDL_FRect BallRect{ GameBall.GetPosition().x - HalfBallSize, GameBall.GetPosition().y - HalfBallSize, BallSize, BallSize };
+    SDL_FRect BallRect{ Game.GetBallPosition().x - Config.BallSize / 2.0f, 
+                        Game.GetBallPosition().y - Config.BallSize / 2.0f, 
+                        Config.BallSize, Config.BallSize };
+
     SDL_RenderFillRect(renderer, &BallRect);
     SDL_RenderPresent(renderer);
 
