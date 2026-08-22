@@ -9,8 +9,8 @@ void Paddle::HandleUpKey(float deltaTime)
 
     m_pos.y -= CurrentPaddleVelocity * deltaTime;
 
-    if (m_pos.y - m_size.y / 2.0f < 0.0f) {
-        m_pos.y = m_size.y / 2.0f;
+    if (m_pos.y - m_halfSize.y < 0.0f) {
+        m_pos.y = m_halfSize.y;
     }
 }
 
@@ -23,8 +23,8 @@ void Paddle::HandleDownKey(float deltaTime)
 
     m_pos.y += CurrentPaddleVelocity * deltaTime;
 
-    if (m_pos.y + m_size.y / 2.0f > WINDOW_HEIGHT) {
-        m_pos.y = WINDOW_HEIGHT - m_size.y / 2.0f;
+    if (m_pos.y + m_halfSize.y > WINDOW_HEIGHT) {
+        m_pos.y = WINDOW_HEIGHT - m_halfSize.y;
     }
 }
 
