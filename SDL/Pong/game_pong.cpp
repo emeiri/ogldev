@@ -1,10 +1,5 @@
 #include "game_pong.h"
 
-float PaddleWidth = 30.0f;
-float HalfPaddleWidth = PaddleWidth / 2.0f;
-float PaddleHeight = 300.0f;
-float HalfPaddleHeight = PaddleHeight / 2.0f;
-
 
 void Paddle::HandleUpKey(float deltaTime)
 {
@@ -14,8 +9,8 @@ void Paddle::HandleUpKey(float deltaTime)
 
     m_pos.y -= CurrentPaddleVelocity * deltaTime;
 
-    if (m_pos.y - HalfPaddleHeight < 0.0f) {
-        m_pos.y = HalfPaddleHeight;
+    if (m_pos.y - m_size.y / 2.0f < 0.0f) {
+        m_pos.y = m_size.y / 2.0f;
     }
 }
 
@@ -28,8 +23,8 @@ void Paddle::HandleDownKey(float deltaTime)
 
     m_pos.y += CurrentPaddleVelocity * deltaTime;
 
-    if (m_pos.y + HalfPaddleHeight > WINDOW_HEIGHT) {
-        m_pos.y = WINDOW_HEIGHT - HalfPaddleHeight;
+    if (m_pos.y + m_size.y / 2.0f > WINDOW_HEIGHT) {
+        m_pos.y = WINDOW_HEIGHT - m_size.y / 2.0f;
     }
 }
 
@@ -62,10 +57,16 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
-    m_ball.Init(m_config.BallSize, { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
-    m_paddleL.Init(m_config.PaddleSpeed, { m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
-    m_paddleR.Init(m_config.PaddleSpeed, { WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
+    m_ball.Init(m_config.BallSize, 
+                { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
 
+    m_paddleL.Init(m_config.PaddleSpeed, 
+                   { m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f }, 
+                   { m_config.PaddleWidth, m_config.PaddleHeight });
+
+    m_paddleR.Init(m_config.PaddleSpeed, 
+                   { WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f }, 
+                   { m_config.PaddleWidth, m_config.PaddleHeight });
 }
 
 

@@ -19,7 +19,7 @@ public:
 
     Paddle() = default;
 
-    void Init(float speed, const Vec2& pos) { m_speed = speed; m_pos = pos; }
+    void Init(float speed, const Vec2& pos, const Vec2& size) { m_speed = speed; m_pos = pos; m_size = size; }
 
     void HandleUpKey(float deltaTime);
 
@@ -33,6 +33,7 @@ public:
 private:
 
     Vec2 m_pos;
+    Vec2 m_size;
     float m_speed = 0.0f;
 };
 
