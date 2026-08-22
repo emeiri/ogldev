@@ -4,7 +4,6 @@
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
-#define PADDLE_OFFSET 25.0f
 
 struct Vec2
 {
@@ -17,7 +16,9 @@ class Paddle {
 
 public:
 
-    Paddle(const Vec2& pos) : m_pos(pos) {}
+    Paddle() = default;
+
+    void Init(const Vec2& pos) { m_pos = pos; }
 
     void HandleUpKey(float deltaTime);
 
@@ -38,7 +39,9 @@ class Ball {
 
 public:
 
-    Ball(const Vec2& pos, const Vec2& velocity) : m_pos(pos), m_velocity(velocity) {}
+    Ball() = default;
+
+    void Init(const Vec2& pos, const Vec2& velocity) { m_pos = pos; m_velocity = velocity; }
 
     void Update(float deltaTime);
 
@@ -74,6 +77,7 @@ struct GameConfig {
     float PaddleSpeed = 600.0f; // Pixels per second
     float PaddleWidth = 30.0f;
     float PaddleHeight = 300.0f;
+    float PaddleOffset = 25.0f; // Distance from the edge of the window
 };
 
 class Pong {
@@ -99,7 +103,7 @@ private:
 
     // Add private members here, such as the ball, paddles, and game state
     GameConfig m_config;
-    Ball m_ball = Ball({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
-    Paddle m_paddleL = Paddle({ PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
-    Paddle m_paddleR = Paddle({ WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
+    Ball m_ball;
+    Paddle m_paddleL;
+    Paddle m_paddleR;
 };

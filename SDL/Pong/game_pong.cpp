@@ -62,6 +62,11 @@ void Ball::Update(float deltaTime)
 void Pong::Init(const GameConfig& config)
 {
     m_config = config;
+
+    m_ball.Init({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
+    m_paddleL.Init({ m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
+    m_paddleR.Init({ WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
+
 }
 
 
