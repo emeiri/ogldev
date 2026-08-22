@@ -25,11 +25,41 @@ struct Vec2
     float y = 0.0f;
 };
 
+class GameClock {
+
+public:
+
+    GameClock() {}
+
+    void Init()
+    {
+        m_tickCount = SDL_GetTicks();
+    }
+
+    float GetDeltaTime()
+    {
+        Uint64 CurrentTick = SDL_GetTicks();
+        float DeltaTime = (CurrentTick - m_tickCount) / 1000.0f; // Convert to seconds
+        m_tickCount = CurrentTick;
+
+        if (DeltaTime > 0.1f) {
+            DeltaTime = 0.1f; // Clamp to 100ms to avoid large jumps
+        }
+
+        return DeltaTime;
+    }
+
+private:
+    Uint64 m_tickCount = 0;
+};
+
+
 
 float BallSize = 20.0f;
 float HalfBallSize = BallSize / 2.0f;
 Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
 Vec2 PaddlePosL = { PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
+GameClock Clock;
 Vec2 PaddlePosR = { WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
 float PaddleWidth = 30.0f;
 float PaddleHeight = 300.0f;
@@ -83,13 +113,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-    Uint64 NewTickCount = SDL_GetTicks();
-    float DeltaTime = (NewTickCount - TickCount) / 1000.0f;
-    TickCount = NewTickCount;
-
-    if (DeltaTime > 0.1f) {
-        DeltaTime = 0.1f; // Clamp to 100ms to avoid large jumps
-    }
+    float DeltaTime = Clock.GetDeltaTime();
 
    // printf("DeltaTime: %f\n", DeltaTime);
     SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
