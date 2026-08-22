@@ -123,6 +123,15 @@ public:
             (BallHitsBottom && (m_velocity.y > 0.0f))) {
             m_velocity.y = -m_velocity.y;
         }
+
+        if (m_pos.x < 0.0f) {
+            m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+            m_velocity = { -200.0f, 235.0f }; // Reset speed
+        }
+
+        if (m_pos.x + HalfBallSize >= WINDOW_WIDTH && m_velocity.x > 0.0f) {
+            m_velocity.x = -m_velocity.x;
+        }
     }
 
     const Vec2& GetPosition() const
@@ -229,8 +238,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     int NumKeys = 0;
     const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
 
-    float CurrentPaddleVelocity = 0.0f;
-
     if (pKeys[SDL_SCANCODE_W]) {
         PaddleL.HandleUpKey(DeltaTime);
     } 
@@ -243,20 +250,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     ResolvePaddleBallCollision(GameBall, PaddleL);
 
-    // 9. Reset Ball if it goes out of bounds (Left Wall Point Loss)
-    if (GameBall.GetPosition().x < 0.0f) {
-        GameBall.SetPosition({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f });
-        GameBall.SetVelocity({ -200.0f, 235.0f }); // Reset speed
-    }
-
-    // Bounce off right wall for now since AI/Right paddle isn't written yet
-    if (GameBall.GetPosition().x + HalfBallSize >= WINDOW_WIDTH && GameBall.GetVelocity().x > 0.0f) {
-        Vec2 NewVelocity = GameBall.GetVelocity();
-        NewVelocity.x = -NewVelocity.x;
-        GameBall.SetVelocity(NewVelocity);
-    }
-
-    // 10. Render Geometries to screen
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_FRect PaddleRect{ PaddleL.GetPosition().x - HalfPaddleWidth, 
