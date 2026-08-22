@@ -17,6 +17,7 @@ static SDL_Renderer* renderer = NULL;
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
+#define PADDLE_OFFSET 25.0f
 
 struct Vec2
 {
@@ -24,15 +25,15 @@ struct Vec2
     float y = 0.0f;
 };
 
-#define PADDLE_OFFSET 25.0f
 
 float BallSize = 20.0f;
+float HalfBallSize = BallSize / 2.0f;
 Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
 Vec2 PaddlePosL = { PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
 Vec2 PaddlePosR = { WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
 float PaddleWidth = 30.0f;
 float PaddleHeight = 300.0f;
-int PaddleDirection = 0; // -1 for up, 1 for down, 0 for no movement
+float HalfPaddleHeight = PaddleHeight / 2.0f;
 Uint64 TickCount = 0;
 Vec2 BallVelocity = { -200.0f, 235.0f }; // pixels per second
 
@@ -111,7 +112,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     PaddlePosL.y += CurrentPaddleVelocity * DeltaTime;
     
     // 5. Clamp Paddle within Window Constraints safely
-    float HalfPaddleHeight = PaddleHeight / 2.0f;
     if (PaddlePosL.y - HalfPaddleHeight < 0.0f) {
         PaddlePosL.y = HalfPaddleHeight;
     } else if (PaddlePosL.y + HalfPaddleHeight > WINDOW_HEIGHT) {
@@ -123,7 +123,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     BallPos.y += BallVelocity.y * DeltaTime;
 
     // 7. Ball Ceiling / Floor Boundaries Collisions
-    float HalfBallSize = BallSize / 2.0f;
     if ((BallPos.y - HalfBallSize <= 0.0f && BallVelocity.y < 0.0f) ||
         (BallPos.y + HalfBallSize >= WINDOW_HEIGHT && BallVelocity.y > 0.0f)) {
         BallVelocity.y = -BallVelocity.y;
