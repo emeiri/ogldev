@@ -120,6 +120,7 @@ struct GameConfig {
     float PaddleOffset = 25.0f; // Distance from the edge of the window
 };
 
+
 class Pong {
 
 public:
@@ -135,7 +136,7 @@ public:
 
 private:
 
-    void ResolvePaddleBallCollision();
+    void ResolvePaddleBallCollision(Paddle& paddle);
 
     GameConfig m_config;
     Ball m_ball;

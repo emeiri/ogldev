@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "game_pong.h"
 
 
@@ -85,24 +87,34 @@ void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleR
     
     m_ball.Update(DeltaTime);
 
-    ResolvePaddleBallCollision();
+    ResolvePaddleBallCollision(m_paddleL);
+    ResolvePaddleBallCollision(m_paddleR);
 }
 
 
-void Pong::ResolvePaddleBallCollision()
+void Pong::ResolvePaddleBallCollision(Paddle& paddle)
 {
     bool CollideWithPaddle =
-        (m_ball.GetPosition().x - m_ball.GetHalfSize() <= m_paddleL.GetPosition().x + m_config.PaddleWidth / 2.0f) &&
-        (m_ball.GetPosition().x + m_ball.GetHalfSize() >= m_paddleL.GetPosition().x - m_config.PaddleWidth / 2.0f) &&
-        (m_ball.GetPosition().y + m_ball.GetHalfSize() >= m_paddleL.GetPosition().y - m_config.PaddleHeight / 2.0f) &&
-        (m_ball.GetPosition().y - m_ball.GetHalfSize() <= m_paddleL.GetPosition().y + m_config.PaddleHeight / 2.0f);
+        (m_ball.GetPosition().x - m_ball.GetHalfSize() <= paddle.GetPosition().x + m_config.PaddleWidth / 2.0f) &&
+        (m_ball.GetPosition().x + m_ball.GetHalfSize() >= paddle.GetPosition().x - m_config.PaddleWidth / 2.0f) &&
+        (m_ball.GetPosition().y + m_ball.GetHalfSize() >= paddle.GetPosition().y - m_config.PaddleHeight / 2.0f) &&
+        (m_ball.GetPosition().y - m_ball.GetHalfSize() <= paddle.GetPosition().y + m_config.PaddleHeight / 2.0f);
 
-    if (CollideWithPaddle && m_ball.GetVelocity().x < 0.0f) {
+    if (CollideWithPaddle) {
         Vec2 NewVelocity = m_ball.GetVelocity();
-        NewVelocity.x = -NewVelocity.x;
-        // Optional: Slightly boost speed upon impact to increase difficulty
-        NewVelocity.x *= 1.05f;
-        NewVelocity.y *= 1.05f;
+
+        // If ball is on the left half of the screen, force velocity to be positive (go right)
+        // If ball is on the right half of the screen, force velocity to be negative (go left)
+        if (m_ball.GetPosition().x < m_halfWindowSize.x && NewVelocity.x < 0.0f) {
+            NewVelocity.x = std::abs(NewVelocity.x);
+            NewVelocity.x *= 1.05f;
+            NewVelocity.y *= 1.05f;
+        } else if (m_ball.GetPosition().x > m_halfWindowSize.x && NewVelocity.x > 0.0f) {
+            NewVelocity.x = -std::abs(NewVelocity.x);
+            NewVelocity.x *= 1.05f;
+            NewVelocity.y *= 1.05f;
+        }
+
         m_ball.SetVelocity(NewVelocity);
     }
 }

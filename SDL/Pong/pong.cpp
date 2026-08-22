@@ -108,6 +108,9 @@ static void RenderGame()
     SDL_FRect PaddleRect { PaddleLRect.x, PaddleLRect.y, PaddleLRect.w, PaddleLRect.h };
     SDL_RenderFillRect(renderer, &PaddleRect);
 
+    PaddleRect = { PaddleRRect.x, PaddleRRect.y, PaddleRRect.w, PaddleRRect.h };
+    SDL_RenderFillRect(renderer, &PaddleRect);
+
     SDL_FRect BallRectF { BallRect.x, BallRect.y, BallRect.w, BallRect.h };
     SDL_RenderFillRect(renderer, &BallRectF);
     SDL_RenderPresent(renderer);
@@ -125,7 +128,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     bool PaddleLUp = pKeys[SDL_SCANCODE_W];
     bool PaddleLDown = pKeys[SDL_SCANCODE_S];
     bool PaddleRUp = pKeys[SDL_SCANCODE_O];
-    bool PaddleRDown = pKeys[SDL_SCANCODE_P];
+    bool PaddleRDown = pKeys[SDL_SCANCODE_L];
 
     Game.Update(PaddleLUp, PaddleLDown, PaddleRUp, PaddleRDown, DeltaTime);    
 
