@@ -51,7 +51,7 @@ static Pong Game;
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-    SDL_SetAppMetadata("Example HUMAN READABLE NAME", "1.0", "com.example.CATEGORY-NAME");
+    SDL_SetAppMetadata("Pong", "1.0", "com.example.CATEGORY-NAME");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
@@ -65,7 +65,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    SDL_SetRenderLogicalPresentation(renderer, (int)Config.WindowSize.x, (int)Config.WindowSize.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+    SDL_SetRenderLogicalPresentation(renderer, (int)Config.WindowSize.x, 
+                                     (int)Config.WindowSize.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     SDL_SetRenderVSync(renderer, 1);
 
@@ -99,16 +101,15 @@ static void RenderGame()
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_FRect PaddleRect{ Game.GetPaddleLPosition().x - Config.PaddleWidth / 2.0f,
-                          Game.GetPaddleLPosition().y - Config.PaddleHeight / 2.0f,
-                          Config.PaddleWidth, Config.PaddleHeight };
+
+    Rect PaddleLRect, PaddleRRect, BallRect;
+    Game.GetRects(BallRect, PaddleLRect, PaddleRRect);
+
+    SDL_FRect PaddleRect { PaddleLRect.x, PaddleLRect.y, PaddleLRect.w, PaddleLRect.h };
     SDL_RenderFillRect(renderer, &PaddleRect);
 
-    SDL_FRect BallRect{ Game.GetBallPosition().x - Config.BallSize / 2.0f,
-                        Game.GetBallPosition().y - Config.BallSize / 2.0f,
-                        Config.BallSize, Config.BallSize };
-
-    SDL_RenderFillRect(renderer, &BallRect);
+    SDL_FRect BallRectF { BallRect.x, BallRect.y, BallRect.w, BallRect.h };
+    SDL_RenderFillRect(renderer, &BallRectF);
     SDL_RenderPresent(renderer);
 }
 

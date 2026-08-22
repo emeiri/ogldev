@@ -57,16 +57,19 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
+    float HalfWindowWidth = m_config.WindowSize.x / 2.0f;
+    float HalfWindowHeight = m_config.WindowSize.y / 2.0f;
+
     m_ball.Init(m_config.BallSize, 
-                { m_config.WindowSize.x / 2.0f, m_config.WindowSize.y / 2.0f }, 
+                { HalfWindowWidth, HalfWindowHeight }, 
                 { -200.0f, 235.0f }, m_config.WindowSize);
 
     m_paddleL.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, 
-                   { m_config.PaddleOffset, m_config.WindowSize.y / 2.0f }, 
+                   { m_config.PaddleOffset, HalfWindowHeight }, 
                    m_config.PaddleSpeed, m_config.WindowSize);
 
     m_paddleR.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, 
-                   { m_config.WindowSize.x - m_config.PaddleOffset, m_config.WindowSize.y / 2.0f }, 
+                   { m_config.WindowSize.x - m_config.PaddleOffset, HalfWindowHeight }, 
                    m_config.PaddleSpeed, m_config.WindowSize);
 }
 
@@ -110,4 +113,12 @@ void Pong::ResolvePaddleBallCollision()
         NewVelocity.y *= 1.05f;
         m_ball.SetVelocity(NewVelocity);
     }
+}
+
+
+void Pong::GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const
+{
+    m_ball.GetRect(BallRect);
+    m_paddleL.GetRect(PaddleLRect);
+    m_paddleR.GetRect(PaddleRRect);
 }

@@ -9,6 +9,15 @@ struct Vec2
 };
 
 
+struct Rect
+{
+    float x = 0.0f;
+    float y = 0.0f;
+    float w = 0.0f;
+    float h = 0.0f;
+};
+
+
 class Paddle {
 
 public:
@@ -31,6 +40,15 @@ public:
     {
         return m_pos;
     }
+
+    void GetRect(Rect& rect) const
+    {
+        rect.x = m_pos.x - m_halfSize.x;
+        rect.y = m_pos.y - m_halfSize.y;
+        rect.w = m_size.x;
+        rect.h = m_size.y;
+    }
+
 
 private:
 
@@ -85,6 +103,14 @@ public:
         return m_halfSize;
     }
 
+    void GetRect(Rect& rect) const
+    {
+        rect.x = m_pos.x - m_halfSize;
+        rect.y = m_pos.y - m_halfSize;
+        rect.w = m_size;
+        rect.h = m_size;
+    }
+
 private:
 
     float m_size = 0.0f;
@@ -115,6 +141,8 @@ public:
     void Init(const GameConfig& config);
 
     void Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown, float DeltaTime);
+
+    void GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const;
 
     Vec2 GetBallPosition() const { return m_ball.GetPosition(); }
 
