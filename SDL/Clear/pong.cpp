@@ -54,19 +54,19 @@ private:
 };
 
 
-
+GameClock Clock;
 float BallSize = 20.0f;
 float HalfBallSize = BallSize / 2.0f;
 Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
 Vec2 PaddlePosL = { PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
-GameClock Clock;
 Vec2 PaddlePosR = { WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
 float PaddleWidth = 30.0f;
+float HalfPaddleWidth = PaddleWidth / 2.0f;
 float PaddleHeight = 300.0f;
 float HalfPaddleHeight = PaddleHeight / 2.0f;
 Uint64 TickCount = 0;
 Vec2 BallVelocity = { -200.0f, 235.0f }; // pixels per second
-
+float PaddleSpeed = 600.0f; // Pixels per second
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -122,12 +122,12 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     int NumKeys = 0;
     const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
 
-    float PaddleSpeed = 600.0f; // Pixels per second
     float CurrentPaddleVelocity = 0.0f;
 
     if (pKeys[SDL_SCANCODE_W]) {
         CurrentPaddleVelocity -= PaddleSpeed;
-    }
+    } 
+
     if (pKeys[SDL_SCANCODE_S]) {
         CurrentPaddleVelocity += PaddleSpeed;
     }
@@ -147,15 +147,17 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     BallPos.y += BallVelocity.y * DeltaTime;
 
     // 7. Ball Ceiling / Floor Boundaries Collisions
-    if ((BallPos.y - HalfBallSize <= 0.0f && BallVelocity.y < 0.0f) ||
-        (BallPos.y + HalfBallSize >= WINDOW_HEIGHT && BallVelocity.y > 0.0f)) {
+    bool BallHitsBottom = BallPos.y + HalfBallSize >= WINDOW_HEIGHT;
+    bool BallHitsTop = BallPos.y - HalfBallSize <= 0.0f;
+    if ((BallHitsTop && (BallVelocity.y < 0.0f)) || 
+        (BallHitsBottom && (BallVelocity.y > 0.0f))) {
         BallVelocity.y = -BallVelocity.y;
     }
 
     // 8. Ball vs Paddle Precise Rect Collision Detection
     bool CollideWithPaddle =
-        (BallPos.x - HalfBallSize <= PaddlePosL.x + PaddleWidth / 2.0f) &&
-        (BallPos.x + HalfBallSize >= PaddlePosL.x - PaddleWidth / 2.0f) &&
+        (BallPos.x - HalfBallSize <= PaddlePosL.x + HalfPaddleWidth) &&
+        (BallPos.x + HalfBallSize >= PaddlePosL.x - HalfPaddleWidth) &&
         (BallPos.y + HalfBallSize >= PaddlePosL.y - HalfPaddleHeight) &&
         (BallPos.y - HalfBallSize <= PaddlePosL.y + HalfPaddleHeight);
 
@@ -171,6 +173,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
         BallVelocity = { -200.0f, 235.0f }; // Reset speed
     }
+
     // Bounce off right wall for now since AI/Right paddle isn't written yet
     if (BallPos.x + HalfBallSize >= WINDOW_WIDTH && BallVelocity.x > 0.0f) {
         BallVelocity.x = -BallVelocity.x;
@@ -179,7 +182,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     // 10. Render Geometries to screen
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_FRect PaddleRect{ PaddlePosL.x - PaddleWidth / 2.0f, PaddlePosL.y - HalfPaddleHeight, PaddleWidth, PaddleHeight };
+    SDL_FRect PaddleRect{ PaddlePosL.x - HalfPaddleWidth, PaddlePosL.y - HalfPaddleHeight, PaddleWidth, PaddleHeight };
     SDL_RenderFillRect(renderer, &PaddleRect);
 
     SDL_FRect BallRect{ BallPos.x - HalfBallSize, BallPos.y - HalfBallSize, BallSize, BallSize };
