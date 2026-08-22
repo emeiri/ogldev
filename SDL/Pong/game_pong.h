@@ -22,7 +22,7 @@ class BaseObject {
     
 public:
 
-    void Init(const Vec2& size, const Vec2& pos, float speed, const Vec2& WindowSize) {
+    void Init(const Vec2& size, const Vec2& pos, const Vec2& WindowSize) {
         m_pos = pos; 
         m_size = size; 
         m_halfSize = { size.x / 2.0f, size.y / 2.0f };
@@ -58,7 +58,7 @@ public:
     Paddle() = default;
 
     void Init(const Vec2& size, const Vec2& pos, float speed, const Vec2& WindowSize) {
-        BaseObject::Init(size, pos, speed, WindowSize);
+        BaseObject::Init(size, pos, WindowSize);
         m_speed = speed; 
     }
 
@@ -80,7 +80,7 @@ public:
 
     void Init(float Size, const Vec2& pos, const Vec2& velocity, const Vec2& WindowSize) { 
         assert(Size > 0.0f);
-        BaseObject::Init({ Size, Size }, pos, 0.0f, WindowSize);
+        BaseObject::Init({ Size, Size }, pos, WindowSize);
         m_velocity = velocity; 
         m_halfSize = Size / 2.0f;
         m_halfWindowSize = { WindowSize.x / 2.0f, WindowSize.y / 2.0f };
