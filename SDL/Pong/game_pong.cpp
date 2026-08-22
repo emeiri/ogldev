@@ -43,7 +43,7 @@ void Ball::Update(float deltaTime)
     }
 
     if (m_pos.x < 0.0f) {
-        m_pos = { m_windowSize.x / 2.0f, m_windowSize.y / 2.0f };
+        m_pos = { m_halfWindowSize.x, m_halfWindowSize.y };
         m_velocity = { -200.0f, 235.0f }; // Reset speed
     }
 

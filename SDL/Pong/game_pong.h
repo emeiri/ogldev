@@ -55,6 +55,7 @@ public:
         m_pos = pos; 
         m_velocity = velocity; 
         m_windowSize = WindowSize;
+        m_halfWindowSize = { WindowSize.x / 2.0f, WindowSize.y / 2.0f };
     }
 
     void Update(float deltaTime);
@@ -91,6 +92,7 @@ private:
     Vec2 m_pos;
     Vec2 m_velocity = { -200.0f, 235.0f };
     Vec2 m_windowSize;
+    Vec2 m_halfWindowSize;
 };
 
 
