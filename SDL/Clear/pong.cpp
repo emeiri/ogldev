@@ -19,6 +19,8 @@ static SDL_Renderer* renderer = NULL;
 #define WINDOW_HEIGHT 1080
 #define PADDLE_OFFSET 25.0f
 
+float BallSize = 20.0f;
+float HalfBallSize = BallSize / 2.0f;
 float PaddleSpeed = 600.0f; // Pixels per second
 float PaddleWidth = 30.0f;
 float HalfPaddleWidth = PaddleWidth / 2.0f;
@@ -114,7 +116,15 @@ public:
     {
         m_pos.x += m_velocity.x * deltaTime;
         m_pos.y += m_velocity.y * deltaTime;
+
+        bool BallHitsBottom = m_pos.y + HalfBallSize >= WINDOW_HEIGHT;
+        bool BallHitsTop = m_pos.y - HalfBallSize <= 0.0f;
+        if ((BallHitsTop && (m_velocity.y < 0.0f)) ||
+            (BallHitsBottom && (m_velocity.y > 0.0f))) {
+            m_velocity.y = -m_velocity.y;
+        }
     }
+
     const Vec2& GetPosition() const
     {
         return m_pos;
@@ -139,10 +149,7 @@ private:
     Vec2 m_velocity = { -200.0f, 235.0f };
 };
 
-
 GameClock Clock;
-float BallSize = 20.0f;
-float HalfBallSize = BallSize / 2.0f;
 Ball GameBall({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
 Paddle PaddleL({ PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
 Paddle PaddleR({ WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
@@ -215,14 +222,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     GameBall.Update(DeltaTime);
 
     // 7. Ball Ceiling / Floor Boundaries Collisions
-    bool BallHitsBottom = GameBall.GetPosition().y + HalfBallSize >= WINDOW_HEIGHT;
-    bool BallHitsTop = GameBall.GetPosition().y - HalfBallSize <= 0.0f;
-    if ((BallHitsTop && (GameBall.GetVelocity().y < 0.0f)) || 
-        (BallHitsBottom && (GameBall.GetVelocity().y > 0.0f))) {
-        Vec2 NewVelocity = GameBall.GetVelocity();
-        NewVelocity.y = -NewVelocity.y;
-        GameBall.SetVelocity(NewVelocity);
-    }
+  
 
     // 8. Ball vs Paddle Precise Rect Collision Detection
     bool CollideWithPaddle =
