@@ -138,10 +138,12 @@ public:
     {
         return m_pos;
     }
+
     const Vec2& GetVelocity() const
     {
         return m_velocity;
     }
+
     void SetVelocity(const Vec2& velocity)
     {
         m_velocity = velocity;
@@ -226,6 +228,20 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 }
 
 
+void HandleKeys(float DeltaTime)
+{
+    int NumKeys = 0;
+    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
+
+    if (pKeys[SDL_SCANCODE_W]) {
+        PaddleL.HandleUpKey(DeltaTime);
+    }
+
+    if (pKeys[SDL_SCANCODE_S]) {
+        PaddleL.HandleDownKey(DeltaTime);
+    }
+}
+
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
@@ -235,32 +251,22 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
     SDL_RenderClear(renderer);
 
-    int NumKeys = 0;
-    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
-
-    if (pKeys[SDL_SCANCODE_W]) {
-        PaddleL.HandleUpKey(DeltaTime);
-    } 
-
-    if (pKeys[SDL_SCANCODE_S]) {
-        PaddleL.HandleDownKey(DeltaTime);
-    }
+    HandleKeys(DeltaTime);
     
     GameBall.Update(DeltaTime);
 
     ResolvePaddleBallCollision(GameBall, PaddleL);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
     SDL_FRect PaddleRect{ PaddleL.GetPosition().x - HalfPaddleWidth, 
                           PaddleL.GetPosition().y - HalfPaddleHeight, 
                           PaddleWidth, PaddleHeight };
-
     SDL_RenderFillRect(renderer, &PaddleRect);
 
     SDL_FRect BallRect{ GameBall.GetPosition().x - HalfBallSize, GameBall.GetPosition().y - HalfBallSize, BallSize, BallSize };
     SDL_RenderFillRect(renderer, &BallRect);
-    SDL_RenderPresent(renderer);    
+    SDL_RenderPresent(renderer);
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
