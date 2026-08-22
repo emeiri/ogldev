@@ -155,6 +155,26 @@ Paddle PaddleL({ PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
 Paddle PaddleR({ WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
 Uint64 TickCount = 0;
 
+
+void ResolvePaddleBallCollision(Ball& ball, const Paddle& paddle)
+{
+    bool CollideWithPaddle =
+        (ball.GetPosition().x - HalfBallSize <= paddle.GetPosition().x + HalfPaddleWidth) &&
+        (ball.GetPosition().x + HalfBallSize >= paddle.GetPosition().x - HalfPaddleWidth) &&
+        (ball.GetPosition().y + HalfBallSize >= paddle.GetPosition().y - HalfPaddleHeight) &&
+        (ball.GetPosition().y - HalfBallSize <= paddle.GetPosition().y + HalfPaddleHeight);
+
+    if (CollideWithPaddle && ball.GetVelocity().x < 0.0f) {
+        Vec2 NewVelocity = ball.GetVelocity();
+        NewVelocity.x = -NewVelocity.x;
+        // Optional: Slightly boost speed upon impact to increase difficulty
+        NewVelocity.x *= 1.05f;
+        NewVelocity.y *= 1.05f;
+        ball.SetVelocity(NewVelocity);
+    }
+}
+
+
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -218,27 +238,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     if (pKeys[SDL_SCANCODE_S]) {
         PaddleL.HandleDownKey(DeltaTime);
     }
-
+    
     GameBall.Update(DeltaTime);
 
-    // 7. Ball Ceiling / Floor Boundaries Collisions
-  
-
-    // 8. Ball vs Paddle Precise Rect Collision Detection
-    bool CollideWithPaddle =
-        (GameBall.GetPosition().x - HalfBallSize <= PaddleL.GetPosition().x + HalfPaddleWidth) &&
-        (GameBall.GetPosition().x + HalfBallSize >= PaddleL.GetPosition().x - HalfPaddleWidth) &&
-        (GameBall.GetPosition().y + HalfBallSize >= PaddleL.GetPosition().y - HalfPaddleHeight) &&
-        (GameBall.GetPosition().y - HalfBallSize <= PaddleL.GetPosition().y + HalfPaddleHeight);
-
-    if (CollideWithPaddle && GameBall.GetVelocity().x < 0.0f) {
-        Vec2 NewVelocity = GameBall.GetVelocity();
-        NewVelocity.x = -NewVelocity.x;
-        // Optional: Slightly boost speed upon impact to increase difficulty
-        NewVelocity.x *= 1.05f;
-        NewVelocity.y *= 1.05f;
-        GameBall.SetVelocity(NewVelocity);
-    }
+    ResolvePaddleBallCollision(GameBall, PaddleL);
 
     // 9. Reset Ball if it goes out of bounds (Left Wall Point Loss)
     if (GameBall.GetPosition().x < 0.0f) {
