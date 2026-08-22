@@ -3,11 +3,7 @@
 
 void Paddle::HandleUpKey(float deltaTime)
 {
-    float CurrentPaddleVelocity = 0.0f;
-
-    CurrentPaddleVelocity += m_speed;
-
-    m_pos.y -= CurrentPaddleVelocity * deltaTime;
+    m_pos.y -= m_speed * deltaTime;
 
     if (m_pos.y - m_halfSize.y < 0.0f) {
         m_pos.y = m_halfSize.y;
@@ -17,11 +13,7 @@ void Paddle::HandleUpKey(float deltaTime)
 
 void Paddle::HandleDownKey(float deltaTime)
 {
-    float CurrentPaddleVelocity = 0.0f;
-
-    CurrentPaddleVelocity += m_speed;
-
-    m_pos.y += CurrentPaddleVelocity * deltaTime;
+    m_pos.y += m_speed * deltaTime;
 
     if (m_pos.y + m_halfSize.y > m_windowSize.y) {
         m_pos.y = m_windowSize.y - m_halfSize.y;
@@ -86,6 +78,7 @@ void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleR
     if (PaddleRUp) {
         m_paddleR.HandleUpKey(DeltaTime);
     }
+
     if (PaddleRDown) {
         m_paddleR.HandleDownKey(DeltaTime);
     }
