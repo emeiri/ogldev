@@ -1,6 +1,5 @@
 #include "game_pong.h"
 
-float PaddleSpeed = 600.0f; // Pixels per second
 float PaddleWidth = 30.0f;
 float HalfPaddleWidth = PaddleWidth / 2.0f;
 float PaddleHeight = 300.0f;
@@ -11,7 +10,7 @@ void Paddle::HandleUpKey(float deltaTime)
 {
     float CurrentPaddleVelocity = 0.0f;
 
-    CurrentPaddleVelocity += PaddleSpeed;
+    CurrentPaddleVelocity += m_speed;
 
     m_pos.y -= CurrentPaddleVelocity * deltaTime;
 
@@ -20,11 +19,12 @@ void Paddle::HandleUpKey(float deltaTime)
     }
 }
 
+
 void Paddle::HandleDownKey(float deltaTime)
 {
     float CurrentPaddleVelocity = 0.0f;
 
-    CurrentPaddleVelocity += PaddleSpeed;
+    CurrentPaddleVelocity += m_speed;
 
     m_pos.y += CurrentPaddleVelocity * deltaTime;
 
@@ -63,8 +63,8 @@ void Pong::Init(const GameConfig& config)
     m_config = config;
 
     m_ball.Init(m_config.BallSize, { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
-    m_paddleL.Init({ m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
-    m_paddleR.Init({ WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
+    m_paddleL.Init(m_config.PaddleSpeed, { m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
+    m_paddleR.Init(m_config.PaddleSpeed, { WINDOW_WIDTH - m_config.PaddleOffset, WINDOW_HEIGHT / 2.0f });
 
 }
 
