@@ -19,6 +19,12 @@ static SDL_Renderer* renderer = NULL;
 #define WINDOW_HEIGHT 1080
 #define PADDLE_OFFSET 25.0f
 
+float PaddleSpeed = 600.0f; // Pixels per second
+float PaddleWidth = 30.0f;
+float HalfPaddleWidth = PaddleWidth / 2.0f;
+float PaddleHeight = 300.0f;
+float HalfPaddleHeight = PaddleHeight / 2.0f;
+
 struct Vec2
 {
     float x = 0.0f;
@@ -54,19 +60,57 @@ private:
 };
 
 
+class Paddle {
+
+public:
+    Paddle(const Vec2& pos) : m_pos(pos) {}
+
+    void HandleUpKey(float deltaTime)
+    {
+        float CurrentPaddleVelocity = 0.0f;
+
+        CurrentPaddleVelocity += PaddleSpeed;
+
+        m_pos.y -= CurrentPaddleVelocity * deltaTime;
+
+        if (m_pos.y - HalfPaddleHeight < 0.0f) {
+            m_pos.y = HalfPaddleHeight;
+        }
+    }
+
+    void HandleDownKey(float deltaTime)
+    {
+        float CurrentPaddleVelocity = 0.0f;
+
+        CurrentPaddleVelocity += PaddleSpeed;
+
+        m_pos.y += CurrentPaddleVelocity * deltaTime;
+
+        if (m_pos.y + HalfPaddleHeight > WINDOW_HEIGHT) {
+            m_pos.y = WINDOW_HEIGHT - HalfPaddleHeight;
+        }
+    }
+
+
+    const Vec2& GetPosition() const
+    {
+        return m_pos;
+    }
+
+private:
+
+    Vec2 m_pos;
+};
+
+
 GameClock Clock;
 float BallSize = 20.0f;
 float HalfBallSize = BallSize / 2.0f;
 Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-Vec2 PaddlePosL = { PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
+Paddle PaddleL({ PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
 Vec2 PaddlePosR = { WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
-float PaddleWidth = 30.0f;
-float HalfPaddleWidth = PaddleWidth / 2.0f;
-float PaddleHeight = 300.0f;
-float HalfPaddleHeight = PaddleHeight / 2.0f;
 Uint64 TickCount = 0;
 Vec2 BallVelocity = { -200.0f, 235.0f }; // pixels per second
-float PaddleSpeed = 600.0f; // Pixels per second
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -125,21 +169,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     float CurrentPaddleVelocity = 0.0f;
 
     if (pKeys[SDL_SCANCODE_W]) {
-        CurrentPaddleVelocity -= PaddleSpeed;
+        PaddleL.HandleUpKey(DeltaTime);
     } 
 
     if (pKeys[SDL_SCANCODE_S]) {
-        CurrentPaddleVelocity += PaddleSpeed;
-    }
-
-    // 4. Update Paddle Positions via Time Delta
-    PaddlePosL.y += CurrentPaddleVelocity * DeltaTime;
-    
-    // 5. Clamp Paddle within Window Constraints safely
-    if (PaddlePosL.y - HalfPaddleHeight < 0.0f) {
-        PaddlePosL.y = HalfPaddleHeight;
-    } else if (PaddlePosL.y + HalfPaddleHeight > WINDOW_HEIGHT) {
-        PaddlePosL.y = WINDOW_HEIGHT - HalfPaddleHeight;
+        PaddleL.HandleDownKey(DeltaTime);
     }
 
     // 6. Update Ball Mechanics via Time Delta
@@ -156,10 +190,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     // 8. Ball vs Paddle Precise Rect Collision Detection
     bool CollideWithPaddle =
-        (BallPos.x - HalfBallSize <= PaddlePosL.x + HalfPaddleWidth) &&
-        (BallPos.x + HalfBallSize >= PaddlePosL.x - HalfPaddleWidth) &&
-        (BallPos.y + HalfBallSize >= PaddlePosL.y - HalfPaddleHeight) &&
-        (BallPos.y - HalfBallSize <= PaddlePosL.y + HalfPaddleHeight);
+        (BallPos.x - HalfBallSize <= PaddleL.GetPosition().x + HalfPaddleWidth) &&
+        (BallPos.x + HalfBallSize >= PaddleL.GetPosition().x - HalfPaddleWidth) &&
+        (BallPos.y + HalfBallSize >= PaddleL.GetPosition().y - HalfPaddleHeight) &&
+        (BallPos.y - HalfBallSize <= PaddleL.GetPosition().y + HalfPaddleHeight);
 
     if (CollideWithPaddle && BallVelocity.x < 0.0f) {
         BallVelocity.x = -BallVelocity.x;
@@ -182,7 +216,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     // 10. Render Geometries to screen
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_FRect PaddleRect{ PaddlePosL.x - HalfPaddleWidth, PaddlePosL.y - HalfPaddleHeight, PaddleWidth, PaddleHeight };
+    SDL_FRect PaddleRect{ PaddleL.GetPosition().x - HalfPaddleWidth, 
+                          PaddleL.GetPosition().y - HalfPaddleHeight, 
+                          PaddleWidth, PaddleHeight };
+
     SDL_RenderFillRect(renderer, &PaddleRect);
 
     SDL_FRect BallRect{ BallPos.x - HalfBallSize, BallPos.y - HalfBallSize, BallSize, BallSize };
