@@ -41,10 +41,9 @@ private:
 };
 
 
-/* We will use this renderer to draw into this window every frame. */
-static SDL_Window* window = NULL;
-static SDL_Renderer* renderer = NULL;
-static SDL_Clock Clock;
+static SDL_Window* pWindow = NULL;
+static SDL_Renderer* pRenderer = NULL;
+static SDL_Clock GameClock;
 static GameConfig Config;
 static Pong Game;
 
@@ -60,29 +59,27 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     SDL_Log("SDL initialized");
 
-    if (!SDL_CreateWindowAndRenderer("Pong", (int)Config.WindowSize.x, (int)Config.WindowSize.y, 
-                                     SDL_WINDOW_RESIZABLE, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("Pong", (int)(Config.WindowSize.x), (int)(Config.WindowSize.y),
+                                     SDL_WINDOW_RESIZABLE, &pWindow, &pRenderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    SDL_SetRenderLogicalPresentation(renderer, (int)Config.WindowSize.x, 
-                                     (int)Config.WindowSize.y, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(pRenderer, (int)(Config.WindowSize.x),
+                                    (int)(Config.WindowSize.y), SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    SDL_SetRenderVSync(renderer, 1);
-
-    Clock.Init();
-
+    SDL_SetRenderVSync(pRenderer, 1);
+    GameClock.Init();
     Game.Init(Config);
 
-    return SDL_APP_CONTINUE;  /* carry on with the program! */
+    return SDL_APP_CONTINUE;
 }
 
-/* This function runs when a new event (mouse input, keypresses, etc) occurs. */
+/* This function runs when a new event occurs (Safely handles Input Flags) */
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
     if (event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+        return SDL_APP_SUCCESS;
     }
 
     if ((event->type == SDL_EVENT_KEY_DOWN) && 
@@ -97,40 +94,41 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
 static void RenderGame()
 {
-    SDL_SetRenderDrawColor(renderer, 16, 16, 16, 255);
-    SDL_RenderClear(renderer);
+    // Draw background color
+    SDL_SetRenderDrawColor(pRenderer, 16, 16, 16, 255);
+    SDL_RenderClear(pRenderer);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    // Set entity drawing color to white
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
 
     Rect PaddleLRect, PaddleRRect, BallRect;
     Game.GetRects(BallRect, PaddleLRect, PaddleRRect);
 
     SDL_FRect PaddleRect { PaddleLRect.x, PaddleLRect.y, PaddleLRect.w, PaddleLRect.h };
-    SDL_RenderFillRect(renderer, &PaddleRect);
+    SDL_RenderFillRect(pRenderer, &PaddleRect);
 
     PaddleRect = { PaddleRRect.x, PaddleRRect.y, PaddleRRect.w, PaddleRRect.h };
-    SDL_RenderFillRect(renderer, &PaddleRect);
+    SDL_RenderFillRect(pRenderer, &PaddleRect);
 
     SDL_FRect BallRectF { BallRect.x, BallRect.y, BallRect.w, BallRect.h };
-    SDL_RenderFillRect(renderer, &BallRectF);
-    SDL_RenderPresent(renderer);
+    SDL_RenderFillRect(pRenderer, &BallRectF);
+    SDL_RenderPresent(pRenderer);
 }
 
-/* This function runs once per frame, and is the heart of the program. */
+/* This function runs once per frame. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-    float DeltaTime = Clock.GetDeltaTime();
 
    // printf("DeltaTime: %f\n", DeltaTime);
     int NumKeys = 0;
-    const bool* pKeys = SDL_GetKeyboardState(&NumKeys);
 
     bool PaddleLUp = pKeys[SDL_SCANCODE_W];
     bool PaddleLDown = pKeys[SDL_SCANCODE_S];
     bool PaddleRUp = pKeys[SDL_SCANCODE_O];
     bool PaddleRDown = pKeys[SDL_SCANCODE_L];
 
-    Game.Update(PaddleLUp, PaddleLDown, PaddleRUp, PaddleRDown, DeltaTime);    
+    // Game updates utilizing the Event-Driven clean input state flags
+    Game.Update(Input.PaddleLUp, Input.PaddleLDown, Input.PaddleRUp, Input.PaddleRDown, DeltaTime);
 
     RenderGame();
 
