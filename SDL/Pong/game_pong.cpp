@@ -28,8 +28,8 @@ void Ball::Update(float deltaTime)
     m_pos.x += m_velocity.x * deltaTime;
     m_pos.y += m_velocity.y * deltaTime;
 
-    bool BallHitsBottom = m_pos.y + m_halfSize >= m_windowSize.y;
-    bool BallHitsTop = m_pos.y - m_halfSize <= 0.0f;
+    bool BallHitsBottom = m_pos.y + m_halfSize.y >= m_windowSize.y;
+    bool BallHitsTop = m_pos.y - m_halfSize.y <= 0.0f;
 
     if ((BallHitsTop && (m_velocity.y < 0.0f)) ||
         (BallHitsBottom && (m_velocity.y > 0.0f))) {
@@ -41,7 +41,7 @@ void Ball::Update(float deltaTime)
         m_velocity = { -200.0f, 235.0f }; // Reset speed
     }
 
-    if (m_pos.x + m_halfSize >= m_windowSize.x && m_velocity.x > 0.0f) {
+    if (m_pos.x + m_halfSize.x >= m_windowSize.x && m_velocity.x > 0.0f) {
         m_velocity.x = -m_velocity.x;
     }
 }
@@ -95,10 +95,10 @@ void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleR
 void Pong::ResolvePaddleBallCollision(Paddle& paddle)
 {
     bool CollideWithPaddle =
-        (m_ball.GetPosition().x - m_ball.GetHalfSize() <= paddle.GetPosition().x + m_config.PaddleWidth / 2.0f) &&
-        (m_ball.GetPosition().x + m_ball.GetHalfSize() >= paddle.GetPosition().x - m_config.PaddleWidth / 2.0f) &&
-        (m_ball.GetPosition().y + m_ball.GetHalfSize() >= paddle.GetPosition().y - m_config.PaddleHeight / 2.0f) &&
-        (m_ball.GetPosition().y - m_ball.GetHalfSize() <= paddle.GetPosition().y + m_config.PaddleHeight / 2.0f);
+        (m_ball.GetPosition().x - m_ball.GetHalfSize().x <= paddle.GetPosition().x + m_config.PaddleWidth / 2.0f) &&
+        (m_ball.GetPosition().x + m_ball.GetHalfSize().x >= paddle.GetPosition().x - m_config.PaddleWidth / 2.0f) &&
+        (m_ball.GetPosition().y + m_ball.GetHalfSize().y >= paddle.GetPosition().y - m_config.PaddleHeight / 2.0f) &&
+        (m_ball.GetPosition().y - m_ball.GetHalfSize().y <= paddle.GetPosition().y + m_config.PaddleHeight / 2.0f);
 
     if (CollideWithPaddle) {
         Vec2 NewVelocity = m_ball.GetVelocity();
@@ -122,7 +122,7 @@ void Pong::ResolvePaddleBallCollision(Paddle& paddle)
 
 void Pong::GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const
 {
-    m_ball.GetRect(BallRect);
-    m_paddleL.GetRect(PaddleLRect);
-    m_paddleR.GetRect(PaddleRRect);
+    BallRect = m_ball.GetRect();
+    PaddleLRect = m_paddleL.GetRect();
+    PaddleRRect = m_paddleR.GetRect();
 }

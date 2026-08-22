@@ -34,12 +34,18 @@ public:
         return m_pos;
     }
 
-    void GetRect(Rect& rect) const
+    Rect GetRect() const {
+        return {
+            m_pos.x - m_halfSize.x,
+            m_pos.y - m_halfSize.y,
+            m_size.x,
+            m_size.y
+        };
+    }
+
+    Vec2 GetHalfSize() const
     {
-        rect.x = m_pos.x - m_halfSize.x;
-        rect.y = m_pos.y - m_halfSize.y;
-        rect.w = m_size.x;
-        rect.h = m_size.y;
+        return m_halfSize;
     }
 
 protected:
@@ -82,7 +88,6 @@ public:
         assert(Size > 0.0f);
         BaseObject::Init({ Size, Size }, pos, WindowSize);
         m_velocity = velocity; 
-        m_halfSize = Size / 2.0f;
         m_halfWindowSize = { WindowSize.x / 2.0f, WindowSize.y / 2.0f };
     }
 
@@ -98,16 +103,10 @@ public:
         m_velocity = velocity;
     }
 
-    float GetHalfSize() const
-    {
-        return m_halfSize;
-    }
-
 private:
 
     Vec2 m_velocity = { -200.0f, 235.0f };
     Vec2 m_halfWindowSize = { 0.0f, 0.0f };
-    float m_halfSize = 0.0f;
 };
 
 
