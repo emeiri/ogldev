@@ -63,6 +63,7 @@ private:
 class Paddle {
 
 public:
+
     Paddle(const Vec2& pos) : m_pos(pos) {}
 
     void HandleUpKey(float deltaTime)
@@ -103,14 +104,49 @@ private:
 };
 
 
+class Ball {
+
+public:
+
+    Ball(const Vec2& pos, const Vec2& velocity) : m_pos(pos), m_velocity(velocity) {}
+
+    void Update(float deltaTime)
+    {
+        m_pos.x += m_velocity.x * deltaTime;
+        m_pos.y += m_velocity.y * deltaTime;
+    }
+    const Vec2& GetPosition() const
+    {
+        return m_pos;
+    }
+    const Vec2& GetVelocity() const
+    {
+        return m_velocity;
+    }
+    void SetVelocity(const Vec2& velocity)
+    {
+        m_velocity = velocity;
+    }
+
+    void SetPosition(const Vec2& pos)
+    {
+        m_pos = pos;
+    }
+
+private:
+
+    Vec2 m_pos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+    Vec2 m_velocity = { -200.0f, 235.0f };
+};
+
+
 GameClock Clock;
 float BallSize = 20.0f;
 float HalfBallSize = BallSize / 2.0f;
-Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+Ball GameBall({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f }, { -200.0f, 235.0f });
 Paddle PaddleL({ PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
-Vec2 PaddlePosR = { WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f };
+Paddle PaddleR({ WINDOW_WIDTH - PADDLE_OFFSET, WINDOW_HEIGHT / 2.0f });
 Uint64 TickCount = 0;
-Vec2 BallVelocity = { -200.0f, 235.0f }; // pixels per second
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -176,41 +212,45 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         PaddleL.HandleDownKey(DeltaTime);
     }
 
-    // 6. Update Ball Mechanics via Time Delta
-    BallPos.x += BallVelocity.x * DeltaTime;
-    BallPos.y += BallVelocity.y * DeltaTime;
+    GameBall.Update(DeltaTime);
 
     // 7. Ball Ceiling / Floor Boundaries Collisions
-    bool BallHitsBottom = BallPos.y + HalfBallSize >= WINDOW_HEIGHT;
-    bool BallHitsTop = BallPos.y - HalfBallSize <= 0.0f;
-    if ((BallHitsTop && (BallVelocity.y < 0.0f)) || 
-        (BallHitsBottom && (BallVelocity.y > 0.0f))) {
-        BallVelocity.y = -BallVelocity.y;
+    bool BallHitsBottom = GameBall.GetPosition().y + HalfBallSize >= WINDOW_HEIGHT;
+    bool BallHitsTop = GameBall.GetPosition().y - HalfBallSize <= 0.0f;
+    if ((BallHitsTop && (GameBall.GetVelocity().y < 0.0f)) || 
+        (BallHitsBottom && (GameBall.GetVelocity().y > 0.0f))) {
+        Vec2 NewVelocity = GameBall.GetVelocity();
+        NewVelocity.y = -NewVelocity.y;
+        GameBall.SetVelocity(NewVelocity);
     }
 
     // 8. Ball vs Paddle Precise Rect Collision Detection
     bool CollideWithPaddle =
-        (BallPos.x - HalfBallSize <= PaddleL.GetPosition().x + HalfPaddleWidth) &&
-        (BallPos.x + HalfBallSize >= PaddleL.GetPosition().x - HalfPaddleWidth) &&
-        (BallPos.y + HalfBallSize >= PaddleL.GetPosition().y - HalfPaddleHeight) &&
-        (BallPos.y - HalfBallSize <= PaddleL.GetPosition().y + HalfPaddleHeight);
+        (GameBall.GetPosition().x - HalfBallSize <= PaddleL.GetPosition().x + HalfPaddleWidth) &&
+        (GameBall.GetPosition().x + HalfBallSize >= PaddleL.GetPosition().x - HalfPaddleWidth) &&
+        (GameBall.GetPosition().y + HalfBallSize >= PaddleL.GetPosition().y - HalfPaddleHeight) &&
+        (GameBall.GetPosition().y - HalfBallSize <= PaddleL.GetPosition().y + HalfPaddleHeight);
 
-    if (CollideWithPaddle && BallVelocity.x < 0.0f) {
-        BallVelocity.x = -BallVelocity.x;
+    if (CollideWithPaddle && GameBall.GetVelocity().x < 0.0f) {
+        Vec2 NewVelocity = GameBall.GetVelocity();
+        NewVelocity.x = -NewVelocity.x;
         // Optional: Slightly boost speed upon impact to increase difficulty
-        BallVelocity.x *= 1.05f;
-        BallVelocity.y *= 1.05f;
+        NewVelocity.x *= 1.05f;
+        NewVelocity.y *= 1.05f;
+        GameBall.SetVelocity(NewVelocity);
     }
 
     // 9. Reset Ball if it goes out of bounds (Left Wall Point Loss)
-    if (BallPos.x < 0.0f) {
-        BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-        BallVelocity = { -200.0f, 235.0f }; // Reset speed
+    if (GameBall.GetPosition().x < 0.0f) {
+        GameBall.SetPosition({ WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f });
+        GameBall.SetVelocity({ -200.0f, 235.0f }); // Reset speed
     }
 
     // Bounce off right wall for now since AI/Right paddle isn't written yet
-    if (BallPos.x + HalfBallSize >= WINDOW_WIDTH && BallVelocity.x > 0.0f) {
-        BallVelocity.x = -BallVelocity.x;
+    if (GameBall.GetPosition().x + HalfBallSize >= WINDOW_WIDTH && GameBall.GetVelocity().x > 0.0f) {
+        Vec2 NewVelocity = GameBall.GetVelocity();
+        NewVelocity.x = -NewVelocity.x;
+        GameBall.SetVelocity(NewVelocity);
     }
 
     // 10. Render Geometries to screen
@@ -222,7 +262,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     SDL_RenderFillRect(renderer, &PaddleRect);
 
-    SDL_FRect BallRect{ BallPos.x - HalfBallSize, BallPos.y - HalfBallSize, BallSize, BallSize };
+    SDL_FRect BallRect{ GameBall.GetPosition().x - HalfBallSize, GameBall.GetPosition().y - HalfBallSize, BallSize, BallSize };
     SDL_RenderFillRect(renderer, &BallRect);
     SDL_RenderPresent(renderer);    
     return SDL_APP_CONTINUE;  /* carry on with the program! */
