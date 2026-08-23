@@ -1,4 +1,4 @@
-#include "game_pong.h"
+#include "pong.h"
 #include <cmath> // For std::abs
 
 void Paddle::HandleUpKey(float deltaTime)

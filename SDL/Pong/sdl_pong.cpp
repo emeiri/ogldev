@@ -8,7 +8,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include "game_pong.h"
+#include "pong.h"
 
 class SDL_Clock {
 

@@ -18,12 +18,12 @@
     <ClCompile Include="..\..\..\..\SDL\Pong\sdl_pong.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\SDL\Pong\game_pong.cpp">
+    <ClCompile Include="..\..\..\..\Games\Pong\pong.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\SDL\Pong\game_pong.h">
+    <ClInclude Include="..\..\..\..\Games\Pong\pong.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
