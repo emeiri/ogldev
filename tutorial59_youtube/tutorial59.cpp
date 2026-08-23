@@ -110,7 +110,7 @@ private:
         std::vector<Texture> Textures(NUM_TOTAL_FILES, GL_TEXTURE_2D);
         std::vector<GLuint64> TextureHandles(NUM_TOTAL_FILES);
 
-        string CheckPath = IMAGE_BASE_DIR "/explosion0/explosion00-frame00.tga";
+        string CheckPath = IMAGE_BASE_DIR "/explosion0/explosion00-frame001.tga";
 
         if (!IsFileExists(CheckPath.c_str())) {
             OGLDEV_ERROR("Could not find file '%s'.\r\n"
