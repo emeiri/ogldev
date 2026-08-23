@@ -34,7 +34,8 @@ namespace OgldevVK {
 enum InitFlags {
     OGLDEV_VK_INIT_NONE = 0x0,
     OGLDEV_VK_INIT_DEPTH_ENABLED = 0x1,
-    OGLDEV_VK_INIT_COMPUTE_ENABLED = 0x2
+    OGLDEV_VK_INIT_COMPUTE_ENABLED = 0x2,
+    OGLDEV_VK_INIT_DISABLE_SWAPCHAIN_SRGB = 0x4
 };
 
 
@@ -142,7 +143,7 @@ private:
 	void CreateDebugCallback();
 	void CreateSurface();
 	void CreateDevice();
-	void CreateSwapChain();
+	void CreateSwapChain(bool DisableSRGB);
 	void CreateCommandBufferPool();	
 	BufferAndMemory CreateUniformBuffer(size_t Size);
 	void CreateDepthResources();

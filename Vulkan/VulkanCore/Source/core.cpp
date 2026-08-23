@@ -135,7 +135,8 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, InitFlags Flags
 	m_queueFamily = m_physDevices.SelectDevice(QueueFlags, true);
 	
 	CreateDevice();
-	CreateSwapChain();
+    bool DisableSRGB = (Flags & OGLDEV_VK_INIT_DISABLE_SWAPCHAIN_SRGB) != 0;
+	CreateSwapChain(DisableSRGB);
 	CreateCommandBufferPool();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
 	CreateCommandBuffers(1, &m_copyCmdBuf);
@@ -452,7 +453,7 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 }
 
 
-void VulkanCore::CreateSwapChain()
+void VulkanCore::CreateSwapChain(bool DisableSRGB)
 {
 	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.Selected().m_surfaceCaps;
 
@@ -463,8 +464,12 @@ void VulkanCore::CreateSwapChain()
 
     // Temporary workaround to allow a compute shader to render directly into the swapchain image. 
 	// This is not a good idea in general, but it works for this tutorial.
-	m_swapChainSurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;// = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
-    m_swapChainSurfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    if (DisableSRGB) {
+        m_swapChainSurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+        m_swapChainSurfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    } else {
+        m_swapChainSurfaceFormat = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
+    }
 
 	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,

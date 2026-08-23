@@ -95,7 +95,7 @@ void main()
 
         default:
             OutColor = vec4(1.0, 0.0, 0.0, 1.0);
-        }
+    }
 
     OutColor = vec4(pow(OutColor.rgb, vec3(1.0 / 2.2)), OutColor.a);
 }
