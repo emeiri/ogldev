@@ -22,7 +22,8 @@ LDFLAGS=`pkg-config --libs glfw3 vulkan`
 
 LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer"
 
-$CC *.cpp \
+$CC tutorial30.cpp lighting_program.cpp \
+    ../VulkanCore/Source/big_texture_array.cpp \
     ../VulkanCore/Source/core.cpp \
     ../VulkanCore/Source/spirv_reflect.c \
     ../VulkanCore/Source/util.cpp \

@@ -23,6 +23,7 @@ LDFLAGS=`pkg-config --libs glfw3 vulkan`
 LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer"
 
 $CC *.cpp \
+    ../VulkanCore/Source/big_texture_array.cpp \
     ../VulkanCore/Source/core.cpp \
     ../VulkanCore/Source/spirv_reflect.c \
     ../VulkanCore/Source/util.cpp \
@@ -56,4 +57,4 @@ $CC *.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_tables.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_widgets.cpp \
     ../../Common/3rdparty/ImGui/imGuIZMO.quat/imguizmo_quat.cpp \
-    $CPPFLAGS $LDFLAGS -o tutorial30
+    $CPPFLAGS $LDFLAGS -o tutorial32
