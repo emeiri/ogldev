@@ -43,13 +43,15 @@ public:
 
 	virtual void Destroy();
 
-	void Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet);
+	void Bind(VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet);
 
     void AllocDescSets(std::vector<VkDescriptorSet>& DescSets);
 
 	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
 							  const std::vector<VkImageView>& SwapChainImageViews,
 							  const std::vector<OfflineImage>& OfflineImages);
+
+    void RecordCommandBuffer(VkCommandBuffer CmdBuf);
 
 protected:
 

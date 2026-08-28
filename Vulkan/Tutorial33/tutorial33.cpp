@@ -46,7 +46,6 @@
 #include "ogldev_vulkan_big_texture_array.h"
 #include "Int/model_desc.h"
 #include "lighting_program.h"
-#include "postprocess_compute_pipeline.h"
 #include "tone_mapping_program.h"
 
 #define WINDOW_WIDTH 2560
@@ -139,9 +138,7 @@ public:
 		for (OgldevVK::LightingProgram& p : m_pipelines) {
 			p.Destroy();
 		}
-
-        m_postProcessPipeline.Destroy();
-
+        
         m_toneMappingPipeline.Destroy();
 
         for (int i = 0; i < (int)m_offlineImages.size(); i++) {
@@ -197,7 +194,7 @@ public:
 
 		// 2. Resolve Post-Processing and Presentation Chains
 		if (m_enablePostProcess) {
-			SubmissionCmdBufs.push_back(m_computePostProcessCmdBufs[ImageIndex]);
+			SubmissionCmdBufs.push_back(m_toneMappingCmdBufs[ImageIndex]);
 
 			if (m_showGui) {
 				UpdateGUI();
@@ -406,8 +403,8 @@ private:
             CreateDescriptorSets(i, ModelDescs[i]);
 		}
 
-		m_postProcessPipeline.AllocDescSets(m_numImages, m_postProcessDescSets);
-        m_postProcessPipeline.UpdateDescSets(m_postProcessDescSets, m_vkCore.GetImageViews(), m_offlineImages);
+		m_toneMappingPipeline.AllocDescSets(m_toneMappingDescSets);
+        m_toneMappingPipeline.UpdateDescriptorSets(m_toneMappingDescSets, m_vkCore.GetImageViews(), m_offlineImages);
 
         UpdateBaseTextureIndices(ModelDescs);
 
@@ -441,7 +438,6 @@ private:
 				                m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 		}
 
-        m_postProcessPipeline.Init(m_vkCore, m_descPool, "postprocess.comp");
         m_toneMappingPipeline.Init(m_vkCore, m_descPool);
 	}
 
@@ -487,7 +483,7 @@ private:
 		}
 
 		// 2. Bake your standalone post-process pipeline dispatches
-		InitComputePostProcessCommandBuffers();
+		InitToneMappingCommandBuffers();
 
 		// 3. Bake your standalone fallback image-copy transfers
 		InitFallbackCopyCommandBuffers();
@@ -592,13 +588,13 @@ private:
 	}
 
 
-	void InitComputePostProcessCommandBuffers()
+	void InitToneMappingCommandBuffers()
 	{
-		m_computePostProcessCmdBufs.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_computePostProcessCmdBufs.data());
+		m_toneMappingCmdBufs.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_toneMappingCmdBufs.data());
 
 		for (int i = 0; i < m_numImages; i++) {
-			VkCommandBuffer CmdBuf = m_computePostProcessCmdBufs[i];
+			VkCommandBuffer CmdBuf = m_toneMappingCmdBufs[i];
 			VkImage SwapchainImage = m_vkCore.GetImage(i);
 			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
 			VkFormat Format = m_vkCore.GetSwapChainFormat();
@@ -607,22 +603,21 @@ private:
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format, 
-									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
+									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 1, 0);
 
-			// 3. Transition Swapchain to GENERAL for compute writes
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
-									   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
+									   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 			VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent(); // Fetch actual dimensions!
 
-			u32 GroupCountX = (SwapchainExtent.width + 15) / 16;
-			u32 GroupCountY = (SwapchainExtent.height + 15) / 16;
-
-			m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, GroupCountX, GroupCountY, 1);
-
+			m_vkCore.BeginDynamicRenderingSwapChain(CmdBuf, i, NULL, NULL);
+            m_toneMappingPipeline.Bind(CmdBuf, m_toneMappingDescSets[i]);
+			m_toneMappingPipeline.RecordCommandBuffer(CmdBuf);
+            vkCmdEndRendering(CmdBuf);
+			
 			// 5. Transition Swapchain back to Color Attachment for ImGui
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
-									   VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
@@ -794,15 +789,14 @@ private:
     std::vector<std::vector<MeshCmdBufs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
 	std::vector<VkCommandBuffer> m_transitionCmdBufs;
 	std::vector<VkCommandBuffer> m_computeTransitionCmdBufs;
-	std::vector<VkCommandBuffer> m_computePostProcessCmdBufs;
+	std::vector<VkCommandBuffer> m_toneMappingCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
     OgldevVK::ToneMappingProgram m_toneMappingPipeline;
 	std::vector<ModelContext> m_modelContexts;
-    PostprocessComputePipeline m_postProcessPipeline;
-	std::vector<VkDescriptorSet> m_postProcessDescSets;
+	std::vector<VkDescriptorSet> m_toneMappingDescSets;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
@@ -811,7 +805,7 @@ private:
 
 	// GUI state
 	bool m_showGui = false;
-    bool m_enablePostProcess = false;
+    bool m_enablePostProcess = true;
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;

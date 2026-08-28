@@ -41,20 +41,20 @@ void ToneMappingProgram::Init(VulkanCore& vkCore, VkDescriptorPool DescPool)
 
 void ToneMappingProgram::AllocDescSets(std::vector<VkDescriptorSet>& DescSets)
 {
-	// The first descriptor set layout belongs to the global texture array.
-    // The second descriptor set layout belongs to the per-model data (vertex/index buffers, uniforms, etc). Here
-    // we allocate descriptor sets for the second layout, hence the index 1 in the call below.
-	GraphicsPipeline::AllocDescSets(m_numImages, DescSets, 1);
+	GraphicsPipeline::AllocDescSets(m_numImages, DescSets, 0);
 }
 
 
 void ToneMappingProgram::Destroy()
 {
+	vkDestroyShaderModule(m_device, m_vs, NULL);
+	vkDestroyShaderModule(m_device, m_fs, NULL);
+
 	GraphicsPipeline::Destroy(true);
 }
 
 
-void ToneMappingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet)
+void ToneMappingProgram::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet)
 {
 	std::vector<VkDescriptorSet> DescSets = { DescSet };
 	GraphicsPipeline::Bind(CmdBuf, DescSets);
@@ -141,6 +141,17 @@ void ToneMappingProgram::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Desc
 	}
 
 	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
+}
+
+
+void ToneMappingProgram::RecordCommandBuffer(VkCommandBuffer CmdBuf)
+{
+	u32 VertexCount = 3;
+	u32 InstanceCount = 1;
+	u32 BaseVertex = 0;
+	u32 FirstInstance = 0;
+
+	vkCmdDraw(CmdBuf, VertexCount, InstanceCount, BaseVertex, FirstInstance);
 }
 
 }
