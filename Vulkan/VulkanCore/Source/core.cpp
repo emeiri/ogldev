@@ -681,20 +681,32 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 }
 
 
-BufferAndMemory VulkanCore::CreateSSBO(const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateSSBO(const void* pData, size_t Size)
 {
-	return CreateBufferInternal(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | 
-		                        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_KHR, pVertices, Size);
+    VkBufferUsageFlags RequestedUsage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
+										VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_KHR;
+
+	return CreateBufferInternal(RequestedUsage, pData, Size, false);
 }
 
 
-BufferAndMemory VulkanCore::CreateIndirectBuffer(const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateSSBO(size_t Size)
 {
-	return CreateBufferInternal(VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, pVertices, Size);
+	VkBufferUsageFlags RequestedUsage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
+		VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_KHR;
+
+	return CreateBufferInternal(RequestedUsage, NULL, Size, true);
 }
 
 
-BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsage, const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateIndirectBuffer(const void* pData, size_t Size)
+{
+	return CreateBufferInternal(VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, pData, Size, false);
+}
+
+
+BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsage, const void* pData, size_t Size, 
+												 bool EnableMapping)
 {
 	// Step 1: create the staging buffer
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
@@ -702,7 +714,7 @@ BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsa
 									 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 	BufferAndMemory StagingVB;
 
-	if (pVertices) {
+	if (pData) {
 		StagingVB = CreateBuffer(Size, Usage, MemProps);
 
 		// Step 2: map the memory of the stage buffer
@@ -713,8 +725,8 @@ BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsa
 			                       StagingVB.m_allocationSize, Flags, &pMem);
 		CHECK_VK_RESULT(res, "vkMapMemory\n");
 
-		// Step 3: copy the vertices to the staging buffer
-		memcpy(pMem, pVertices, Size);
+		// Step 3: copy the data to the staging buffer
+		memcpy(pMem, pData, Size);
 
 		// Step 4: unmap/release the mapped memory
 		vkUnmapMemory(m_device, StagingVB.m_mem);
@@ -723,9 +735,14 @@ BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsa
 	// Step 5: create the final buffer
 	Usage = RequestedUsage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	MemProps = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+    if (EnableMapping) {
+        MemProps |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    }
+
 	BufferAndMemory VB = CreateBuffer(Size, Usage, MemProps);
 
-	if (pVertices) {
+	if (pData) {
 		// Step 6: copy the staging buffer to the final buffer
 		CopyBufferToBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
 
