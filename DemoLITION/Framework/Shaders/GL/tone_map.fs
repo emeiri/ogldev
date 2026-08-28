@@ -24,10 +24,6 @@ layout(location = 0) out vec4 FragColor;
 
 layout(binding = 0) uniform sampler2D gHDRSampler;
 
-layout(std430, binding = 1) buffer Result {
-    float Exposure[]; // One per workgroup
-};
-
 // Methods of tone mapping
 #define NO_TONE_MAPPING 0
 #define REINHARD        1
