@@ -33,5 +33,6 @@ void main()
     gl_Position = vec4(Pos, 0.0, 1.0);
 
     // Map from [-1,1] to [0,1]
-    TexCoords = Pos * 0.5 + 0.5;
+    vec2 PosFlippedY = vec2(Pos.x, -Pos.y);
+    TexCoords = PosFlippedY * 0.5 + 0.5;
 }
