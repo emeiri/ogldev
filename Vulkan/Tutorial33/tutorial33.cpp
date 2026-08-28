@@ -198,7 +198,8 @@ public:
 
 			if (m_showGui) {
 				UpdateGUI();
-				// Since compute left the swapchain in GENERAL, tell ImGui to transition from GENERAL to COLOR_ATTACHMENT_OPTIMAL
+				// Since compute left the swapchain in COLOR_ATTACHMENT_OPTIMAL, 
+				// tell ImGui to transition from COLOR_ATTACHMENT_OPTIMAL to COLOR_ATTACHMENT_OPTIMAL
 				VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
 				SubmissionCmdBufs.push_back(ImGUICmdBuf);
 			} else {
@@ -600,7 +601,6 @@ private:
 			VkImage SwapchainImage = m_vkCore.GetImage(i);
 			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
 			VkFormat Format = m_vkCore.GetSwapChainFormat();
-			VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
