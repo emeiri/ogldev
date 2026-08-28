@@ -265,9 +265,11 @@ public:
 
 	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods)
 	{
-		if (!IsMouseControlledByImGUI()) {
-			m_pGameCamera->HandleMouseButton(Button, Action, Mods);
-		}		
+		if (m_showGui && IsMouseControlledByImGUI()) {
+			return;
+		}
+		
+		m_pGameCamera->HandleMouseButton(Button, Action, Mods);
 	}
 	
 	
