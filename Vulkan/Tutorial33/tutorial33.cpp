@@ -543,40 +543,39 @@ private:
 	{
 		m_fallbackCopyCmdBufs.resize(m_numImages);
 		m_vkCore.CreateCommandBuffers(m_numImages, m_fallbackCopyCmdBufs.data());
+		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 
 		VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent();
 
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_fallbackCopyCmdBufs[i];
-			VkImage SwapchainImage = m_vkCore.GetImage(i);
-			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
-			VkFormat Format = m_vkCore.GetSwapChainFormat();
+			VkImage SwapChainImage = m_vkCore.GetImage(i);
+			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;			
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			// 1. Transition Offline to Source, Swapchain to Destination
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format,
+			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, SwapChainFormat,
 				                       VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 1, 0);
-			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
+			OgldevVK::ImageMemBarrier2(CmdBuf, SwapChainImage, SwapChainFormat,
 				                       VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, 1, 0);
 
 			// 2. Use BLIT instead of COPY to automatically scale 1440 down to 1415 gracefully
-			VkImageBlit blitRegion{};
-			blitRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-			blitRegion.srcOffsets[0] = { 0, 0, 0 };
-			blitRegion.srcOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 }; 
+			VkImageBlit BlitRegion{};
+			BlitRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+			BlitRegion.srcOffsets[0] = { 0, 0, 0 };
+			BlitRegion.srcOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 }; 
 
-			blitRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-			blitRegion.dstOffsets[0] = { 0, 0, 0 };
-			blitRegion.dstOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 };
+			BlitRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+			BlitRegion.dstOffsets[0] = { 0, 0, 0 };
+			BlitRegion.dstOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 };
 		
 			vkCmdBlitImage(CmdBuf,
 				OfflineImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-				SwapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-				1, &blitRegion, VK_FILTER_LINEAR); 
+				SwapChainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				1, &BlitRegion, VK_FILTER_LINEAR); 
 
-			// 3. Transition Swapchain back to COLOR_ATTACHMENT_OPTIMAL for ImGui
-			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
+			OgldevVK::ImageMemBarrier2(CmdBuf, SwapChainImage, SwapChainFormat,
 				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 			vkEndCommandBuffer(CmdBuf);
@@ -588,19 +587,19 @@ private:
 	{
 		m_toneMappingCmdBufs.resize(m_numImages);
 		m_vkCore.CreateCommandBuffers(m_numImages, m_toneMappingCmdBufs.data());
+		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_toneMappingCmdBufs[i];
-			VkImage SwapchainImage = m_vkCore.GetImage(i);
-			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
-			VkFormat Format = m_vkCore.GetSwapChainFormat();
+			VkImage SwapChainImage = m_vkCore.GetImage(i);
+			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;			
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format, 
+			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, SwapChainFormat, 
 									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 1, 0);
 
-			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
+			OgldevVK::ImageMemBarrier2(CmdBuf, SwapChainImage, SwapChainFormat,
 									   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 			m_vkCore.BeginDynamicRenderingSwapChain(CmdBuf, i, NULL, NULL);
@@ -618,11 +617,11 @@ private:
 	{
 		m_transitionCmdBufs.resize(m_numImages);
 		m_vkCore.CreateCommandBuffers(m_numImages, m_transitionCmdBufs.data());
+		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_transitionCmdBufs[i];
-			VkImage CurrentImage = m_vkCore.GetImage(i);
-			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+			VkImage CurrentImage = m_vkCore.GetImage(i);			
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
@@ -641,11 +640,11 @@ private:
 	{
 		m_toneMappingTransitionCmdBufs.resize(m_numImages);
 		m_vkCore.CreateCommandBuffers(m_numImages, m_toneMappingTransitionCmdBufs.data());
+		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_toneMappingTransitionCmdBufs[i];
-			VkImage CurrentImage = m_vkCore.GetImage(i);
-			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+			VkImage CurrentImage = m_vkCore.GetImage(i);			
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
