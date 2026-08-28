@@ -47,6 +47,7 @@
 #include "Int/model_desc.h"
 #include "lighting_program.h"
 #include "postprocess_compute_pipeline.h"
+#include "tone_mapping_program.h"
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
@@ -84,10 +85,10 @@ struct ModelConfig {
 };
 
 static std::vector<ModelConfig> Models = {
-	{ "G:/Models/McGuire/San_Miguel/san-miguel.obj", glm::vec3(0.0f), 1.0f }
+//	{ "G:/Models/McGuire/San_Miguel/san-miguel.obj", glm::vec3(0.0f), 1.0f }
 //	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
 //	,{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f}
-//	,{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
+	{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
 //	,{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f}
 //	,{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
 };
@@ -140,6 +141,8 @@ public:
 		}
 
         m_postProcessPipeline.Destroy();
+
+        m_toneMappingPipeline.Destroy();
 
         for (int i = 0; i < (int)m_offlineImages.size(); i++) {
             m_offlineImages[i].Destroy(m_device);
@@ -439,6 +442,7 @@ private:
 		}
 
         m_postProcessPipeline.Init(m_vkCore, m_descPool, "postprocess.comp");
+        m_toneMappingPipeline.Init(m_vkCore, m_descPool);
 	}
 
 
@@ -795,6 +799,7 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
+    OgldevVK::ToneMappingProgram m_toneMappingPipeline;
 	std::vector<ModelContext> m_modelContexts;
     PostprocessComputePipeline m_postProcessPipeline;
 	std::vector<VkDescriptorSet> m_postProcessDescSets;
