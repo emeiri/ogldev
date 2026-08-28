@@ -1,0 +1,49 @@
+/*
+		Copyright 2026 Etay Meiri
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+#version 460
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+// Binding 0: Read your 3D lighting pass scene from the Offline Image
+layout (binding = 0, rgba8) uniform readonly image2D inputImage;
+
+// Binding 1: Write the final post-processed grayscale pixels directly onto the Swapchain
+layout (binding = 1, rgba8) uniform writeonly image2D outputImage;
+
+void main() 
+{
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 Size = imageSize(inputImage);
+    
+    if (uv.x >= Size.x || uv.y >= Size.y) {
+        return;
+    }
+
+    // 1. Read from the Offline color texture channel
+    vec3 Color = imageLoad(inputImage, uv).rgb;
+
+    // 2. Process your grayscale transformation math
+    float GrayScale = dot(Color, vec3(0.2126, 0.7152, 0.0722));
+    vec3 GrayColor = vec3(GrayScale);
+
+    // 3. Write directly into your target Swapchain surface!
+    imageStore(outputImage, uv, vec4(GrayColor, 1.0));
+}
+
+
