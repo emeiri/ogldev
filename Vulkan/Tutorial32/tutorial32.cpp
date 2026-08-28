@@ -396,8 +396,8 @@ private:
         std::vector<OgldevVK::ModelDesc> ModelDescs(m_modelContexts.size());
 		
 		for (int i = 0; i < (int)m_modelContexts.size(); i++) {
-			m_modelContexts[i].m_pModel = new OgldevVK::VkModel(true);
-			m_modelContexts[i].m_pModel->Init(&m_vkCore);
+			m_modelContexts[i].m_pModel = new OgldevVK::VkModel();
+			m_modelContexts[i].m_pModel->Init(&m_vkCore, true, false);
 			m_modelContexts[i].m_pModel->LoadAssimpModel(Models[i].Path);
             CreateUniformBuffers(i);
             CreateDescriptorSets(i, ModelDescs[i]);

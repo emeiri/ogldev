@@ -34,13 +34,18 @@ class VkModel : public CoreModel
 {
 public:
 
-	VkModel(bool IsDescriptorIndexing) { m_isDescriptorIndexing = IsDescriptorIndexing; }
+    VkModel() = default;
 
     ~VkModel() { Destroy(); }
 
 	void Destroy();
 
-	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
+	void Init(VulkanCore* pVulkanCore, bool IsDescriptorIndexing, bool UseInternalUniformBuffers) 
+	{
+		m_pVulkanCore = pVulkanCore; 
+		m_isDescriptorIndexing = IsDescriptorIndexing;
+		m_useInternalUniformBuffers = UseInternalUniformBuffers;
+	}
 
 	virtual void ConvertToMesh(MeshData& mesh) { assert(0); }
 
@@ -92,6 +97,13 @@ private:
 
 	bool m_isDescriptorIndexing = false;
 
+    // This is a hack because in the first few tutorials the model class was responsible for creating its own uniform buffers, 
+	// but in later tutorials the uniform buffers are created by the application.
+	// If true, the model will create its own uniform buffers for each image.
+	// If false, the model will expect the user to provide uniform buffers.
+    // In a robust design, the model should not be responsible for creating its own uniform buffers, 
+	// but for the sake of simplicity in the first few tutorials, we do it.
+    bool m_useInternalUniformBuffers = false;
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
 	BufferAndMemory m_metaData;

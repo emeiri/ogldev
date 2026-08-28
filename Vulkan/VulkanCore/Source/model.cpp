@@ -165,7 +165,9 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_alignedIndices.pMem, IndexBufferSize);
 
-	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
+	if (m_useInternalUniformBuffers) {
+		m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
+	}
 
 	if (m_isDescriptorIndexing) {
 		CreateMetaData();
@@ -275,8 +277,10 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 
 	md.m_uniforms.resize(m_pVulkanCore->GetNumImages());
 
-	for (int ImageIndex = 0; ImageIndex < m_pVulkanCore->GetNumImages(); ImageIndex++) {
-		md.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
+	if (m_useInternalUniformBuffers) {
+		for (int ImageIndex = 0; ImageIndex < m_pVulkanCore->GetNumImages(); ImageIndex++) {
+			md.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
+		}
 	}
 
 	if (m_isDescriptorIndexing) {
@@ -409,6 +413,11 @@ void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf)
 
 void VkModel::Update(int ImageIndex, const glm::mat4& Transformation)
 {
+    if (!m_useInternalUniformBuffers) {
+        printf("VkModel::Update called but m_useInternalUniformBuffers is false\n");
+        assert(0);
+    }
+
 	std::vector<glm::mat4> Transformations(m_Meshes.size());
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < Transformations.size(); SubmeshIndex++) {

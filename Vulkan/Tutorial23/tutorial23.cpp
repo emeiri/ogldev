@@ -55,7 +55,7 @@ class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp(int WindowWidth, int WindowHeight) : m_model(false)
+	VulkanApp(int WindowWidth, int WindowHeight)
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
@@ -243,7 +243,7 @@ private:
 
 	void CreateMesh()
 	{
-		m_model.Init(&m_vkCore);
+		m_model.Init(&m_vkCore, false, true);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
