@@ -198,14 +198,10 @@ public:
 
 			if (m_showGui) {
 				UpdateGUI();
-				// Since compute left the swapchain in COLOR_ATTACHMENT_OPTIMAL, 
-				// tell ImGui to transition from COLOR_ATTACHMENT_OPTIMAL to COLOR_ATTACHMENT_OPTIMAL
 				VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
 				SubmissionCmdBufs.push_back(ImGUICmdBuf);
 			} else {
-				// THE FIX: Submit your specialized compute presentation barrier
-				// This links COMPUTE_SHADER_BIT directly to the presentation engine!
-				SubmissionCmdBufs.push_back(m_computeTransitionCmdBufs[ImageIndex]);
+				SubmissionCmdBufs.push_back(m_toneMappingTransitionCmdBufs[ImageIndex]);
 			}
 		} else {
 			// Fallback Blit Path
@@ -485,16 +481,13 @@ private:
 			}
 		}
 
-		// 2. Bake your standalone post-process pipeline dispatches
 		InitToneMappingCommandBuffers();
 
-		// 3. Bake your standalone fallback image-copy transfers
 		InitFallbackCopyCommandBuffers();
 
-		// 4. Bake your standalone layout transition handoffs
 		InitTransitionCommandBuffers();
 
-		InitComputeTransitionCommandBuffers();
+		InitToneMappingTransitionCommandBuffers();
 	}
 
 
@@ -610,8 +603,6 @@ private:
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
 									   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
-			VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent(); // Fetch actual dimensions!
-
 			m_vkCore.BeginDynamicRenderingSwapChain(CmdBuf, i, NULL, NULL);
             m_toneMappingPipeline.Bind(CmdBuf, m_toneMappingDescSets[i]);
 			m_toneMappingPipeline.RecordCommandBuffer(CmdBuf);
@@ -646,19 +637,18 @@ private:
 	}
 
 
-	void InitComputeTransitionCommandBuffers()
+	void InitToneMappingTransitionCommandBuffers()
 	{
-		m_computeTransitionCmdBufs.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_computeTransitionCmdBufs.data());
+		m_toneMappingTransitionCmdBufs.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_toneMappingTransitionCmdBufs.data());
 
 		for (int i = 0; i < m_numImages; i++) {
-			VkCommandBuffer CmdBuf = m_computeTransitionCmdBufs[i];
+			VkCommandBuffer CmdBuf = m_toneMappingTransitionCmdBufs[i];
 			VkImage CurrentImage = m_vkCore.GetImage(i);
 			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// FIXED: Transition directly from GENERAL (Compute Output) back into presentation source
 			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat,
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
@@ -785,7 +775,7 @@ private:
 	};
     std::vector<std::vector<MeshCmdBufs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
 	std::vector<VkCommandBuffer> m_transitionCmdBufs;
-	std::vector<VkCommandBuffer> m_computeTransitionCmdBufs;
+	std::vector<VkCommandBuffer> m_toneMappingTransitionCmdBufs;
 	std::vector<VkCommandBuffer> m_toneMappingCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
