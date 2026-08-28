@@ -444,17 +444,19 @@ private:
 
 	void CreateUniformBuffers(int MeshIndex)
 	{		
+        // VS uniform buffers (actually using SSBOs)
         size_t NumMeshes = m_modelContexts[MeshIndex].m_pModel->GetNumMeshes();
 		size_t UniformBufferSizeVS = OgldevVK::LightingProgram::GetUniformBufferSizeVS(NumMeshes);
-		size_t UniformBufferSizeFS = OgldevVK::LightingProgram::GetUniformBufferSizeFS();
 
         m_modelContexts[MeshIndex].m_uniformBuffersVS.resize(m_numImages);
-		m_modelContexts[MeshIndex].m_uniformBuffersFS.resize(m_numImages);
 
         for (int i = 0; i < m_numImages; i++) {
 			m_modelContexts[MeshIndex].m_uniformBuffersVS[i] = m_vkCore.CreateSSBO(UniformBufferSizeVS);
-			m_modelContexts[MeshIndex].m_uniformBuffersFS[i] = m_vkCore.CreateSSBO(UniformBufferSizeFS);
         }
+
+        // FS uniform buffers
+		size_t UniformBufferSizeFS = OgldevVK::LightingProgram::GetUniformBufferSizeFS();
+		m_modelContexts[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
 	}
 
 
