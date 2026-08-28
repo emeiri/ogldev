@@ -617,11 +617,6 @@ private:
 			m_toneMappingPipeline.RecordCommandBuffer(CmdBuf);
             vkCmdEndRendering(CmdBuf);
 			
-			// 5. Transition Swapchain back to Color Attachment for ImGui
-			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
-
-
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 			CHECK_VK_RESULT(res, "Failed to record compute post-process command buffer\n");
 		}
