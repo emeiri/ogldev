@@ -3,7 +3,9 @@
 #include "pong.h"
 
 class SFML_Clock {
+
 public:
+
     SFML_Clock() = default;
 
     void Init()
@@ -35,7 +37,6 @@ struct InputState {
     bool PaddleRDown = false;
 };
 
-// Global application state matching your setup
 static sf::RenderWindow Window;
 static SFML_Clock GameClock;
 static GameConfig Config;
@@ -45,8 +46,8 @@ static InputState Input;
 // Utility function to calculate letterbox view ratios dynamically on resize
 void UpdateLetterboxView(sf::RenderWindow& window, float targetWidth, float targetHeight)
 {
-    float windowWidth = static_cast<float>(window.getSize().x);
-    float windowHeight = static_cast<float>(window.getSize().y);
+    float windowWidth = (float)(window.getSize().x);
+    float windowHeight = (float)(window.getSize().y);
 
     float windowRatio = windowWidth / windowHeight;
     float targetRatio = targetWidth / targetHeight;
@@ -68,19 +69,14 @@ void UpdateLetterboxView(sf::RenderWindow& window, float targetWidth, float targ
         posY = (1.0f - sizeY) / 2.0f;
     }
 
-    // FIX: Use vector pairs for the viewport FloatRect: {posX, posY} and {sizeX, sizeY}
     view.setViewport(sf::FloatRect(sf::Vector2f{ posX, posY }, sf::Vector2f{ sizeX, sizeY }));
     window.setView(view);
 }
 
-/* This function handles standard application setup. Replacement for SDL_AppInit. */
+
 bool AppInit()
 {
-    // FIX: Force explicit construction of a single sf::Vector2u container object
-    sf::VideoMode videoMode(sf::Vector2u(
-        static_cast<unsigned int>(Config.WindowSize.x),
-        static_cast<unsigned int>(Config.WindowSize.y)
-    ));
+    sf::VideoMode videoMode(sf::Vector2u((unsigned int)(Config.WindowSize.x), (unsigned int)(Config.WindowSize.y)));
 
     // SFML 3 target window initializer 
     Window.create(videoMode, "Pong", sf::Style::Default);
@@ -101,13 +97,7 @@ bool AppInit()
     return true;
 }
 
-#include <SFML/Graphics.hpp>
-#include <iostream>
 
-// Helper to keep window aspect ratio correct (defined in previous conversion turn)
-void UpdateLetterboxView(sf::RenderWindow& window, float targetWidth, float targetHeight);
-
-/* This function maps cleanly to your SDL_AppEvent logic */
 void ProcessEvents()
 {
     // SFML 3 uses modern type-safe optional events instead of uninitialized structs
