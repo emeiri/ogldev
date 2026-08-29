@@ -36,6 +36,7 @@ enum Binding {
 
 
 void LightingProgram::Init(VulkanCore& vkCore,
+    VkFormat ColorFormat,
 	VkDescriptorPool DescPool,
 	VkDescriptorSetLayout TextureDescSetLayout,
 	VkDescriptorSet TextureDescSet,
@@ -60,7 +61,7 @@ void LightingProgram::Init(VulkanCore& vkCore,
 		.pData = &LightingMode
 	};
 
-	GraphicsPipeline::Init(vkCore, DescPool, vs, fs, NULL, &SpecInfo);
+	GraphicsPipeline::Init(vkCore, ColorFormat, DescPool, vs, fs, NULL, &SpecInfo);
 }
 
 

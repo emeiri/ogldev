@@ -93,6 +93,7 @@ static std::vector<ModelConfig> Models = {
 };
 
 
+VkFormat OfflineColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -364,7 +365,6 @@ private:
         m_offlineImages.resize(m_numImages);
 
 		VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
-		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
         VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 		VkImageUsageFlags ColorUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
 								  	   VK_IMAGE_USAGE_SAMPLED_BIT |
@@ -374,7 +374,7 @@ private:
 
         for (int i = 0; i < (int)m_offlineImages.size(); i++) {
             m_vkCore.CreateTexture(m_offlineImages[i].m_color, SwapChainExtent.width, SwapChainExtent.height, 
-								   ColorUsage, SwapChainFormat, false);
+								   ColorUsage, OfflineColorFormat, false);
 			
             m_vkCore.CreateTexture(m_offlineImages[i].m_depth, SwapChainExtent.width, SwapChainExtent.height, 
 								   DepthUsage, DepthFormat, false);
@@ -428,7 +428,7 @@ private:
 	void CreatePipeline()
 	{
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
-			m_pipelines[i].Init(m_vkCore, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
+			m_pipelines[i].Init(m_vkCore, OfflineColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
 				                m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 		}
 
@@ -489,7 +489,6 @@ private:
 	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, std::vector<VkCommandBuffer>& CmdBufs)
 	{
 		bool IsFirstMesh = (MeshIndex == 0);
-		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 		VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 		VkViewport viewport{};
 		viewport.x = 0.0f;
@@ -511,7 +510,7 @@ private:
 
 			VkImageLayout SrcColorLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-			OgldevVK::ImageMemBarrier2(CmdBuf, m_offlineImages[i].m_color.m_image, SwapChainFormat,
+			OgldevVK::ImageMemBarrier2(CmdBuf, m_offlineImages[i].m_color.m_image, OfflineColorFormat,
 				SrcColorLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 			// Depth handling (Remains untouched and safe from previous fixes)
@@ -539,7 +538,6 @@ private:
 		m_fallbackCopyCmdBufs.resize(m_numImages);
 		m_vkCore.CreateCommandBuffers(m_numImages, m_fallbackCopyCmdBufs.data());
 		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
-
 		VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent();
 
 		for (int i = 0; i < m_numImages; i++) {
@@ -550,7 +548,7 @@ private:
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			// 1. Transition Offline to Source, Swapchain to Destination
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, SwapChainFormat,
+			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, OfflineColorFormat,
 				                       VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 1, 0);
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapChainImage, SwapChainFormat,
 				                       VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, 1, 0);
@@ -591,7 +589,7 @@ private:
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, SwapChainFormat, 
+			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, OfflineColorFormat, 
 									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 1, 0);
 
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapChainImage, SwapChainFormat,
@@ -620,7 +618,6 @@ private:
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// FIXED: Accept GENERAL as the incoming layout, mapping it smoothly to PRESENT_SRC_KHR
 			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat,
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);

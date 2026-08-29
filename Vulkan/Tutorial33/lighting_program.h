@@ -47,6 +47,7 @@ public:
 	LightingProgram() {}
 
 	virtual void Init(VulkanCore& vkCore,
+        VkFormat ColorFormat,
 		VkDescriptorPool DescPool,
 		VkDescriptorSetLayout TextureDescSetLayout,
 		VkDescriptorSet TextureDescSet,
