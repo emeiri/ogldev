@@ -26,19 +26,38 @@ namespace OgldevVK {
 
 class VulkanCore;
 
-class VulkanTexture {
+
+class VulkanBaseImage {
+
+public:
+
+    VulkanBaseImage() = default;
+
+    void InitVulkanBaseImage(VkImageLayout Layout, VkFormat Format) { 
+		m_layout = Layout; 
+		m_format = Format; 
+	}
+
+    VkImageLayout GetLayout() const { return m_layout; }
+    
+	VkFormat GetFormat() const { return m_format; }
+
+	VkImage m_image = VK_NULL_HANDLE;
+	VkImageView m_view = VK_NULL_HANDLE;
+
+protected:
+	VkImageLayout m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    VkFormat m_format = VK_FORMAT_UNDEFINED;
+};
+
+class VulkanTexture : public VulkanBaseImage {
+
 public:
 	VulkanTexture() {}
 
 	VulkanTexture(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
-
-	VkImage m_image = VK_NULL_HANDLE;
-	VkDeviceMemory m_mem = VK_NULL_HANDLE;
-	VkImageView m_view = VK_NULL_HANDLE;
-	VkSampler m_sampler = VK_NULL_HANDLE;
-	VkImageLayout m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 	void Destroy(VkDevice Device);
 
@@ -52,6 +71,9 @@ public:
 							VkImageLayout newImageLayout,
 							VkPipelineStageFlags srcStageMask,
 							VkPipelineStageFlags dstStageMask);
+
+	VkDeviceMemory m_mem = VK_NULL_HANDLE;
+	VkSampler m_sampler = VK_NULL_HANDLE;
 
 private:
 
