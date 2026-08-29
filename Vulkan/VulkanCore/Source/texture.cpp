@@ -48,7 +48,13 @@ void VulkanBaseImage::Destroy(VkDevice Device)
 
 void VulkanBaseImage::TransitionLayout(VkCommandBuffer CmdBuf, VkImageLayout NewImageLayout)
 {
-	ImageMemBarrier2(CmdBuf, m_image, m_format,	m_layout, NewImageLayout, 1, 1, 0);
+    TransitionLayout(CmdBuf, m_layout, NewImageLayout);
+}
+
+
+void VulkanBaseImage::TransitionLayout(VkCommandBuffer CmdBuf, VkImageLayout OldImageLayout, VkImageLayout NewImageLayout)
+{
+	ImageMemBarrier2(CmdBuf, m_image, m_format, OldImageLayout, NewImageLayout, 1, 1, 0);
 	m_layout = NewImageLayout;
 }
 

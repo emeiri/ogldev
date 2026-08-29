@@ -43,6 +43,8 @@ public:
 
 	void TransitionLayout(VkCommandBuffer CmdBuf, VkImageLayout NewImageLayout);
 
+	void TransitionLayout(VkCommandBuffer CmdBuf, VkImageLayout OldImageLayout, VkImageLayout NewImageLayout);
+
     VkImageLayout GetLayout() const { return m_layout; }
     
 	VkFormat GetFormat() const { return m_format; }
