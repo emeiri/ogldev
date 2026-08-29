@@ -28,7 +28,16 @@
 #include "ogldev_vulkan_core.h"
 #include "Int/model_desc.h"
 #include "ogldev_vulkan_pipeline_program.h"
-#include "postprocess_compute_pipeline.h"	// TODO: remove this
+
+struct OfflineImage {
+	OgldevVK::VulkanTexture m_color;
+	OgldevVK::VulkanTexture m_depth;
+
+	void Destroy(VkDevice Device) {
+		m_color.Destroy(Device);
+		m_depth.Destroy(Device);
+	}
+};
 
 namespace OgldevVK {
 

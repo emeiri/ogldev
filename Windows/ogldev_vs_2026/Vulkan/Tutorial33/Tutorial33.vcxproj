@@ -20,20 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Vulkan\Tutorial33\full_screen_tri.vert" />
-    <None Include="..\..\..\..\Vulkan\Tutorial33\postprocess.comp" />
     <None Include="..\..\..\..\Vulkan\Tutorial33\test.frag" />
     <None Include="..\..\..\..\Vulkan\Tutorial33\test.vert" />
     <None Include="..\..\..\..\Vulkan\Tutorial33\tone_map.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\lighting_program.cpp" />
-    <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\postprocess_compute_pipeline.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\tone_mapping_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\tutorial33.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial33\lighting_program.h" />
-    <ClInclude Include="..\..\..\..\Vulkan\Tutorial33\postprocess_compute_pipeline.h" />
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial33\tone_mapping_program.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

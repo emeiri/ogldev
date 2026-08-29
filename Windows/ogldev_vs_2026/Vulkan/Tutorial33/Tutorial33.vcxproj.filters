@@ -24,9 +24,6 @@
     <None Include="..\..\..\..\Vulkan\Tutorial33\test.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\Vulkan\Tutorial33\postprocess.comp">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\..\..\..\Vulkan\Tutorial33\tone_map.frag">
       <Filter>Shaders</Filter>
     </None>
@@ -41,18 +38,12 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\lighting_program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\postprocess_compute_pipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial33\tone_mapping_program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial33\lighting_program.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Vulkan\Tutorial33\postprocess_compute_pipeline.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial33\tone_mapping_program.h">
