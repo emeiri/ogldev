@@ -74,13 +74,15 @@ public:
 
 	const PhysicalDevice& GetPhysicalDevice() { return m_physDevices.Selected(); }
 
-	int GetNumImages() const { return (int)m_images.size(); }
+	int GetNumImages() const { return (int)m_swapChainImages.size(); }
 
 	const VkImage& GetImage(int Index) const;
 
-	const VkImageView& GetImageView(int Index) const;
+    const VulkanBaseImage& GetSwapChainImage(int Index) const;
 
-	const std::vector<VkImageView>& GetImageViews() const { return m_imageViews; }
+    const std::vector<VulkanBaseImage>& GetSwapChainImages() const { return m_swapChainImages; }
+
+	const VkImageView& GetImageView(int Index) const;
 
 	const VkImageView& GetDepthView(int Index) const;
 
@@ -184,8 +186,7 @@ private:
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkSurfaceFormatKHR m_swapChainSurfaceFormat = {};
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
-	std::vector<VkImage> m_images;
-	std::vector<VkImageView> m_imageViews;
+    std::vector<VulkanBaseImage> m_swapChainImages;
 	std::vector<VulkanTexture> m_depthImages;
 	VkCommandPool m_cmdBufPool = VK_NULL_HANDLE;
 	VulkanQueue m_queue;

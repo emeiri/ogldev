@@ -29,6 +29,22 @@
 
 namespace OgldevVK {
 
+void VulkanBaseImage::Destroy(VkDevice Device)
+{
+    if (m_view != VK_NULL_HANDLE) {
+        vkDestroyImageView(Device, m_view, VK_NULL_HANDLE);
+        m_view = VK_NULL_HANDLE;
+    }
+
+    if (!m_isSwapChainImage) {
+		if (m_image != VK_NULL_HANDLE) {
+			vkDestroyImage(Device, m_image, VK_NULL_HANDLE);
+			m_image = VK_NULL_HANDLE;
+		}
+	}
+}
+
+
 void VulkanTexture::Load(unsigned int BufferSize, void* pData, bool IsRGB)
 {
 	assert(m_pVulkanCore);

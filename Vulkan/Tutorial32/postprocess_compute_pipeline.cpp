@@ -41,7 +41,7 @@ VkDescriptorSetLayout PostprocessComputePipeline::CreateDescSetLayout(OgldevVK::
 
 
 void PostprocessComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets,
-                                                const std::vector<VkImageView>& SwapChainImageViews,
+                                                const std::vector<OgldevVK::VulkanBaseImage>& SwapChainImages,
                                                 const std::vector<OfflineImage>& OfflineImages)
 {
     // We only have 1 descriptor write per swapchain image now
@@ -65,7 +65,7 @@ void PostprocessComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& De
 
         OutputInfo[i] = {
             .sampler = VK_NULL_HANDLE,           // Storage images do not use a sampler
-            .imageView = SwapChainImageViews[i],
+            .imageView = SwapChainImages[i].m_view,
             .imageLayout = VK_IMAGE_LAYOUT_GENERAL // Matches your Synchronization2 barrier layout
         };
 

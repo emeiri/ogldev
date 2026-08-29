@@ -93,16 +93,6 @@ static std::vector<ModelConfig> Models = {
 };
 
 
-/*struct OfflineImage {
-    OgldevVK::VulkanTexture m_color;
-    OgldevVK::VulkanTexture m_depth;
-
-    void Destroy(VkDevice Device) {
-        m_color.Destroy(Device);
-        m_depth.Destroy(Device);
-    }
-};*/
-
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -404,7 +394,7 @@ private:
 		}
 
 		m_postProcessPipeline.AllocDescSets(m_numImages, m_postProcessDescSets);
-        m_postProcessPipeline.UpdateDescSets(m_postProcessDescSets, m_vkCore.GetImageViews(), m_offlineImages);
+        m_postProcessPipeline.UpdateDescSets(m_postProcessDescSets, m_vkCore.GetSwapChainImages(), m_offlineImages);
 
         UpdateBaseTextureIndices(ModelDescs);
 

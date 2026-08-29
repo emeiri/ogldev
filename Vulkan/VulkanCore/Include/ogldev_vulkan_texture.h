@@ -33,10 +33,13 @@ public:
 
     VulkanBaseImage() = default;
 
-    void InitVulkanBaseImage(VkImageLayout Layout, VkFormat Format) { 
+    void InitVulkanBaseImage(VkImageLayout Layout, VkFormat Format, bool IsSwapChainImage = false) { 
 		m_layout = Layout; 
 		m_format = Format; 
+        m_isSwapChainImage = IsSwapChainImage;
 	}
+
+	virtual void Destroy(VkDevice Device);
 
     VkImageLayout GetLayout() const { return m_layout; }
     
@@ -48,6 +51,10 @@ public:
 protected:
 	VkImageLayout m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
     VkFormat m_format = VK_FORMAT_UNDEFINED;
+
+private:
+
+    bool m_isSwapChainImage = false;
 };
 
 class VulkanTexture : public VulkanBaseImage {
@@ -59,7 +66,7 @@ public:
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
-	void Destroy(VkDevice Device);
+	virtual void Destroy(VkDevice Device);
 
 	void Load(const std::string& Filename, bool IsRGB);
 

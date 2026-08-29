@@ -57,7 +57,6 @@ public:
     void AllocDescSets(std::vector<VkDescriptorSet>& DescSets);
 
 	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-							  const std::vector<VkImageView>& SwapChainImageViews,
 							  const std::vector<OfflineImage>& OfflineImages);
 
     void RecordCommandBuffer(VkCommandBuffer CmdBuf);

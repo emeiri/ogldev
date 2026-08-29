@@ -62,6 +62,7 @@ VulkanCore::VulkanCore()
 VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
+    printf("Destroying VulkanCore\n");
 
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
 
@@ -69,8 +70,8 @@ VulkanCore::~VulkanCore()
 
 	m_queue.Destroy();
 
-	for (int i = 0; i < m_imageViews.size(); i++) {
-		vkDestroyImageView(m_device, m_imageViews[i], NULL);
+	for (int i = 0; i < m_swapChainImages.size(); i++) {
+		m_swapChainImages[i].Destroy(m_device);
 	}
 
 	if (m_depthEnabled) {
@@ -148,24 +149,36 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, InitFlags Flags
 
 const VkImage& VulkanCore::GetImage(int Index) const
 {
-	if (Index >= m_images.size()) {
+	if (Index >= m_swapChainImages.size()) {
 		OGLDEV_ERROR("Invalid image index %d\n", Index);
 		exit(1);
 	}
 
-	return m_images[Index];
+	return m_swapChainImages[Index].m_image;
 }
 
 
 const VkImageView& VulkanCore::GetImageView(int Index) const
 {
-	if (Index >= m_imageViews.size()) {
+	if (Index >= m_swapChainImages.size()) {
 		OGLDEV_ERROR("Invalid image view index %d\n", Index);
 		exit(1);
 	}
 
-	return m_imageViews[Index];
+	return m_swapChainImages[Index].m_view;
 }
+
+
+const VulkanBaseImage& VulkanCore::GetSwapChainImage(int Index) const
+{
+	if (Index >= m_swapChainImages.size()) {
+		OGLDEV_ERROR("Invalid image index %d\n", Index);
+		exit(1);
+	}
+
+	return m_swapChainImages[Index];
+}
+
 
 const VkImageView& VulkanCore::GetDepthView(int Index) const
 {
@@ -506,16 +519,19 @@ void VulkanCore::CreateSwapChain(bool DisableSRGB)
 	
 	printf("Requested %d images, created %d images\n", NumImages, NumSwapChainImages);
 
-	m_images.resize(NumSwapChainImages);
+	m_swapChainImages.resize(NumSwapChainImages);
 
-	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, m_images.data());
+    std::vector<VkImage> Images(NumSwapChainImages);
+	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, Images.data());
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 
 	u32 MipLevels = 1;
-	m_imageViews.resize(NumSwapChainImages);
+
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
-		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format, 
-										  VK_IMAGE_ASPECT_COLOR_BIT, false, MipLevels);
+        m_swapChainImages[i].m_image = Images[i];
+		m_swapChainImages[i].m_view = CreateImageView(m_device, Images[i], m_swapChainSurfaceFormat.format, 
+													  VK_IMAGE_ASPECT_COLOR_BIT, false, MipLevels);
+        m_swapChainImages[i].InitVulkanBaseImage(VK_IMAGE_LAYOUT_UNDEFINED, m_swapChainSurfaceFormat.format, true);
 	}
 }
 
@@ -644,11 +660,11 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 std::vector<VkFramebuffer> VulkanCore::CreateFramebuffers(VkRenderPass RenderPass) const
 {
 	std::vector<VkFramebuffer> FrameBuffers;
-	FrameBuffers.resize(m_images.size());
+	FrameBuffers.resize(m_swapChainImages.size());
 
-	for (uint i = 0; i < m_images.size(); i++) {
+	for (uint i = 0; i < m_swapChainImages.size(); i++) {
 		std::vector<VkImageView> Attachments;
-		Attachments.push_back(m_imageViews[i]);
+		Attachments.push_back(m_swapChainImages[i].m_view);
 		if (m_depthEnabled) {
 			Attachments.push_back(m_depthImages[i].m_view);
 		}
@@ -988,18 +1004,12 @@ void VulkanTexture::Destroy(VkDevice Device)
 	if (m_sampler) {
 		vkDestroySampler(Device, m_sampler, NULL);
 	}
-	
-	if (m_view) {
-		vkDestroyImageView(Device, m_view, NULL);
-	}
-	
-	if (m_image) {
-		vkDestroyImage(Device, m_image, NULL);
-	}
 
 	if (m_mem) {
 		vkFreeMemory(Device, m_mem, NULL);
-	}	
+	}
+	
+    VulkanBaseImage::Destroy(Device);
 }
 
 
@@ -1404,7 +1414,7 @@ std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size)
 
 	std::vector<BufferAndMemory> UniformBuffers;
 
-	UniformBuffers.resize(m_images.size());
+	UniformBuffers.resize(m_swapChainImages.size());
 
 	for (int i = 0; i < UniformBuffers.size(); i++) {
 		UniformBuffers[i] = CreateUniformBuffer(Size);
@@ -1426,7 +1436,7 @@ void VulkanCore::SubmitCopyCommand()
 
 void VulkanCore::CreateDepthResources()
 {
-	int NumSwapChainImages = (int)m_images.size();
+	int NumSwapChainImages = (int)m_swapChainImages.size();
 
 	m_depthImages.resize(NumSwapChainImages);
 
@@ -1459,7 +1469,7 @@ const VkPhysicalDeviceLimits& VulkanCore::GetPhysicalDeviceLimits() const
 void VulkanCore::BeginDynamicRenderingSwapChain(VkCommandBuffer CmdBuf, int ImageIndex,
 												VkClearValue* pClearColor, VkClearValue* pDepthValue)
 {
-    VkImageView ColorView = m_imageViews[ImageIndex];
+    VkImageView ColorView = m_swapChainImages[ImageIndex].m_view;
 	VkImageView DepthView = m_depthEnabled ? m_depthImages[ImageIndex].m_view : VK_NULL_HANDLE;
     BeginDynamicRendering(CmdBuf, ColorView, pClearColor, DepthView, pDepthValue);
 }

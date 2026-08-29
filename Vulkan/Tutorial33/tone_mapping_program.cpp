@@ -107,7 +107,6 @@ std::vector<VkPushConstantRange> ToneMappingProgram::GetPushConstantRange()
 
 
 void ToneMappingProgram::UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-											  const std::vector<VkImageView>& SwapChainImageViews,
 											  const std::vector<OfflineImage>& OfflineImages)
 {
 	int DescCount = (int)DescriptorSets.size();
