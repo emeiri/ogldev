@@ -93,16 +93,6 @@ static std::vector<ModelConfig> Models = {
 };
 
 
-/*struct OfflineImage {
-    OgldevVK::VulkanTexture m_color;
-    OgldevVK::VulkanTexture m_depth;
-
-    void Destroy(VkDevice Device) {
-        m_color.Destroy(Device);
-        m_depth.Destroy(Device);
-    }
-};*/
-
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -373,16 +363,22 @@ private:
 	{
         m_offlineImages.resize(m_numImages);
 
-		VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent();
+		VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
+		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+        VkFormat DepthFormat = m_vkCore.GetDepthFormat();
+		VkImageUsageFlags ColorUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+								  	   VK_IMAGE_USAGE_SAMPLED_BIT |
+									   VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+									   VK_IMAGE_USAGE_STORAGE_BIT;
+		VkImageUsageFlags DepthUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
         for (int i = 0; i < (int)m_offlineImages.size(); i++) {
-			VkImageUsageFlags OfflineUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
-											 VK_IMAGE_USAGE_SAMPLED_BIT |
-											 VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-											 VK_IMAGE_USAGE_STORAGE_BIT;
-            m_vkCore.CreateTexture(m_offlineImages[i].m_color, SwapchainExtent.width, SwapchainExtent.height, OfflineUsage, m_vkCore.GetSwapChainFormat(), false);
-			OfflineUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-            m_vkCore.CreateTexture(m_offlineImages[i].m_depth, SwapchainExtent.width, SwapchainExtent.height, OfflineUsage, m_vkCore.GetDepthFormat(), false);
+            m_vkCore.CreateTexture(m_offlineImages[i].m_color, SwapChainExtent.width, SwapChainExtent.height, 
+								   ColorUsage, SwapChainFormat, false);
+			
+            m_vkCore.CreateTexture(m_offlineImages[i].m_depth, SwapChainExtent.width, SwapChainExtent.height, 
+								   DepthUsage, DepthFormat, false);
+
         }
 	}
 
