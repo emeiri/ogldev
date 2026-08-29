@@ -281,6 +281,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
                                            const glm::mat4& World,				
                                            const std::vector<glm::mat4>& SubmeshTransformations,
                                            const glm::vec4& AmbientLight,
+                                           const glm::vec4& DiffuseLight,
                                            const glm::vec3& LightDirection,
                                            BufferAndMemory& UniformBufferVS,
                                            BufferAndMemory& UniformBufferFS)
@@ -299,9 +300,9 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 	UniformBufferVS.Update(Device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
 
 	UniformDataFS UboDataFS = {
-		.AmbientLight = AmbientLight,
 		.LightDirection = glm::vec4(LightDirection, 0.0f),
-		.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+		.AmbientLight = AmbientLight,		
+		.DiffuseLight = DiffuseLight
 	};
 
 	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));	

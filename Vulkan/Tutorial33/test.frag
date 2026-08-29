@@ -41,9 +41,9 @@ layout(location = 0) out vec4 OutColor;
 layout(set = 0, binding = 0) uniform sampler2D Textures[];
 
 layout(set = 1, binding = 4) readonly uniform UniformBuffer { 
-    vec4 AmbientLight;      // .rgb = color, .w = intensity
-    vec4 LightDirection;    // .xyz = direction
-    vec4 LightColor;        // .rgb = color, .w = intensity
+    vec4 LightDirection;      // .xyz = direction
+    vec4 AmbientLight;        // .rgb = color, .w = intensity    
+    vec4 DiffuseLight;        // .rgb = color, .w = intensity
 } ubo;
 
 
@@ -86,7 +86,7 @@ void main()
             vec3 Ambient = BaseColor.rgb * ubo.AmbientLight.rgb * ubo.AmbientLight.w;
 
             // Diffuse: Base Texture * Light Color * Light Intensity * NdotL
-            vec3 Diffuse = BaseColor.rgb * ubo.LightColor.rgb * ubo.LightColor.w * NdotL;
+            vec3 Diffuse = BaseColor.rgb * ubo.DiffuseLight.rgb * ubo.DiffuseLight.w * NdotL;
 
             // 5. Final Output
             OutColor = vec4(Ambient + Diffuse, BaseColor.a);

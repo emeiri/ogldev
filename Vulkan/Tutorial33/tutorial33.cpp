@@ -717,16 +717,14 @@ private:
 
 		ImGui::gizmo3D("##Dir1", m_lightDir, 200.0f, imguiGizmo::modeDirection);
 
-		static int counter = 0;
+		ImGui::ColorEdit3("Light Color", (float*)&m_lightColor);
 
-		if (ImGui::Button("Button")) {
-			counter++;
-		}
+		ImGui::DragFloat("Ambient Light", &m_ambientLight, 0.01f, 0.0f, 2.0f, "%.2f");
 
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+		ImGui::DragFloat("Diffuse Light", &m_diffuseLight, 0.01f, 0.0f, 2.0f, "%.2f");
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
 		ImGui::End();
 
 		ImGui::Render();
@@ -745,7 +743,8 @@ private:
 
 		glm::mat4 WVP = VP * World;
 
-		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
+        glm::vec4 AmbientLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_ambientLight);
+        glm::vec4 DiffuseLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_diffuseLight);
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
         
@@ -754,6 +753,7 @@ private:
 														World, 
 														m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
 														AmbientLight,
+														DiffuseLight,
 														LightDirection, 
 														m_modelContexts[MeshIndex].m_uniformBuffersVS[ImageIndex],
 														m_modelContexts[MeshIndex].m_uniformBuffersFS[ImageIndex]);
@@ -794,6 +794,9 @@ private:
 	float m_scale = 0.1f;
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
 	vec3 m_lightDir = vec3(0.0f, 0.14f, 1.0f);
+    float m_ambientLight = 0.1f;
+    float m_diffuseLight = 1.0f;
+    vec3 m_lightColor = vec3(1.0f, 1.0f, 1.0f);
 };
 
 

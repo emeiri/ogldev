@@ -70,6 +70,7 @@ public:
 									 const glm::mat4& World,
 									 const std::vector<glm::mat4>& SubmeshTransformations,
 									 const glm::vec4& AmbientLight,
+									 const glm::vec4& DiffuseLight,
 									 const glm::vec3& LightDirection,
 									 BufferAndMemory& UniformBufferVS,
 									 BufferAndMemory& UniformBufferFS);
@@ -87,9 +88,9 @@ protected:
 private:
 
 	struct UniformDataFS {
-		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
 		glm::vec4 LightDirection;    // .xyz = direction
-		glm::vec4 LightColor;        // .rgb = color, .w = intensity
+		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
+		glm::vec4 DiffuseLight;      // .rgb = color, .w = intensity
 	};
 
 	struct UniformDataVS {
