@@ -41,6 +41,8 @@ public:
 
 	virtual void Destroy(VkDevice Device);
 
+	void TransitionLayout(VkCommandBuffer CmdBuf, VkImageLayout NewImageLayout);
+
     VkImageLayout GetLayout() const { return m_layout; }
     
 	VkFormat GetFormat() const { return m_format; }

@@ -23,6 +23,7 @@
 
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_texture.h"
+#include "ogldev_vulkan_wrapper.h"
 #include "3rdparty/stb_image.h"
 #include "3rdparty/stb_image_write.h"
 
@@ -42,6 +43,13 @@ void VulkanBaseImage::Destroy(VkDevice Device)
 			m_image = VK_NULL_HANDLE;
 		}
 	}
+}
+
+
+void VulkanBaseImage::TransitionLayout(VkCommandBuffer CmdBuf, VkImageLayout NewImageLayout)
+{
+	ImageMemBarrier2(CmdBuf, m_image, m_format,	m_layout, NewImageLayout, 1, 1, 0);
+	m_layout = NewImageLayout;
 }
 
 
