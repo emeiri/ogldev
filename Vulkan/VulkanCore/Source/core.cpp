@@ -169,7 +169,7 @@ const VkImageView& VulkanCore::GetImageView(int Index) const
 }
 
 
-const VulkanBaseImage& VulkanCore::GetSwapChainImage(int Index) const
+VulkanBaseImage& VulkanCore::GetSwapChainImage(int Index)
 {
 	if (Index >= m_swapChainImages.size()) {
 		OGLDEV_ERROR("Invalid image index %d\n", Index);

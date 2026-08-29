@@ -78,7 +78,7 @@ public:
 
 	const VkImage& GetImage(int Index) const;
 
-    const VulkanBaseImage& GetSwapChainImage(int Index) const;
+    VulkanBaseImage& GetSwapChainImage(int Index);
 
     const std::vector<VulkanBaseImage>& GetSwapChainImages() const { return m_swapChainImages; }
 
