@@ -130,6 +130,12 @@ public:
 
 protected:
 
+    // This is a hack for Vulkan that doesn't have a CoreWindowSystem pointer right now.
+    virtual void GetWindowSize(int& Width, int& Height) const
+    {
+        assert(0);
+    }
+
     virtual void AllocBuffers() = 0;
 
     virtual Texture* AllocTexture2D() = 0;

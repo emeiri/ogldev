@@ -427,4 +427,11 @@ void VkModel::Update(int ImageIndex, const glm::mat4& Transformation)
 	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), Transformations.data(), ARRAY_SIZE_IN_BYTES(Transformations));
 }
 
+
+void VkModel::GetWindowSize(int& Width, int& Height) const
+{
+	GLFWwindow* pWindow = m_pVulkanCore->GetWindow();
+	glfwGetFramebufferSize(pWindow, &Width, &Height);
+}
+
 }

@@ -1087,7 +1087,11 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     persProjInfo.zFar = pCamera->mClipPlaneFar;
 
     int WindowWidth, WindowHeight;
+#ifdef OGLDEV_VULKAN
+    GetWindowSize(WindowWidth, WindowHeight);
+#else
     m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+#endif
     persProjInfo.Width = (float)WindowWidth;
     persProjInfo.Height = (float)WindowHeight;
 

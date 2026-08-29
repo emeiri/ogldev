@@ -83,6 +83,8 @@ protected:
 
 	virtual void PopulateBuffers(std::vector<Vertex>& Vertices);
 
+	virtual void GetWindowSize(int& Width, int& Height) const;
+
 private:	
 
 	void UpdateAlignedMeshesArray();
