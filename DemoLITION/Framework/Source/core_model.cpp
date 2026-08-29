@@ -1075,6 +1075,7 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     Vector4f Target4D(0.0f, 0.0f, 1.0f, 0.0f);
     Target4D = FinalWorld * Target4D;
     Vector3f FinalTargetDir = Vector3f(Target4D.x, Target4D.y, Target4D.z).Normalize();
+    FinalTargetDir = FinalTargetDir.Normalize();
 
     // 5. Extract World Up (Blender Camera Up is +Y)
     Vector4f Up4D(0.0f, 1.0f, 0.0f, 0.0f);
