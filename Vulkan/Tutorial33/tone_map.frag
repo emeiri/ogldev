@@ -43,16 +43,35 @@ vec4 passthru()
     return ret;
 }
 
-vec4 reinhard()
-{             
-    vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
-  
+vec4 reinhard(vec3 hdrColor)
+{              
     vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
   
     vec4 ret = vec4(mapped, 1.0);
 
     return ret;
 }    
+
+
+vec4 ReinhardExtended(vec3 color, float W) 
+{
+    vec3 numerator = color * (1.0f + (color / (W * W)));
+    vec3 mapped = numerator / (1.0f + color);
+    return vec4(mapped, 1.0f);
+}
+
+
+
+vec4 ACESFilm(vec3 x) 
+{
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    vec3 mapped = clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0f, 1.0f);
+    return vec4(mapped, 1.0f);
+}
 
 
 void main()
@@ -65,7 +84,10 @@ void main()
             break;
 
         case REINHARD:
-            Color = reinhard();
+            vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
+            Color = reinhard(hdrColor);
+            //Color = ACESFilm(hdrColor);
+            //Color = ReinhardExtended(hdrColor, 1.0f);
             break;
     }
 
