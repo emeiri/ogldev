@@ -51,8 +51,9 @@ void UpdateLetterboxView(sf::RenderWindow& window, float targetWidth, float targ
     float windowRatio = windowWidth / windowHeight;
     float targetRatio = targetWidth / targetHeight;
 
-    // FIX: Pass position vector {0.f, 0.f} and size vector {targetWidth, targetHeight}
-    sf::View view(sf::Vector2f{ 0.f, 0.f }, sf::Vector2f{ targetWidth, targetHeight });
+    sf::View view;
+    view.setSize({ targetWidth, targetHeight });
+    view.setCenter({ targetWidth / 2.0f, targetHeight / 2.0f }); // Centers the camera on your game canvas
 
     float sizeX = 1.0f;
     float sizeY = 1.0f;
