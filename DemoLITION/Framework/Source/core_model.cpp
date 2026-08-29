@@ -1096,11 +1096,19 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     persProjInfo.Width = (float)WindowWidth;
     persProjInfo.Height = (float)WindowHeight;
 
-    // Blender FOV is horizontal; your Init usually wants half the field of view
-    persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV) / 2.0f;
+    float FullHorizontalDeg = ToDegree(pCamera->mHorizontalFOV);
 
-    // 7. Initialize Camera
-    // Your Init calls: glm::lookAt(Pos, Pos + Target, Up)
+    float AspectRatio = persProjInfo.Width / persProjInfo.Height;
+
+    // 3. Mathematical conversion: Full Horizontal FOV -> Full Vertical FOV
+    float FullVerticalRad = 2.0f * atan(tan(ToRadian(FullHorizontalDeg) / 2.0f) / AspectRatio);
+    float FullVerticalDeg = ToDegree(FullVerticalRad);
+
+    // 4. Assign the FULL vertical degree angle straight to your projection settings
+    // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
+    persProjInfo.FOV = FullVerticalDeg;
+
+    // 5. Initialize Camera
     m_cameras[Index].Init(
         FinalPos.ToGLM(),
         FinalTargetDir.ToGLM(),
