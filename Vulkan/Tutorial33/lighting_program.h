@@ -65,14 +65,14 @@ public:
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 
-	void UpdateUniformBuffers(int ImageIndex,
-							  const glm::mat4& WVP,
-							  const glm::mat4& World,
-							  const std::vector<glm::mat4>& SubmeshTransformations,
-							  const glm::vec4& AmbientLight,
-							  const glm::vec3& LightDirection,
-							  std::vector<BufferAndMemory>& UniformBuffersVS,
-							  std::vector<BufferAndMemory>& UniformBuffersFS);
+	static void UpdateUniformBuffers(VkDevice Device,
+									 const glm::mat4& WVP,
+									 const glm::mat4& World,
+									 const std::vector<glm::mat4>& SubmeshTransformations,
+									 const glm::vec4& AmbientLight,
+									 const glm::vec3& LightDirection,
+									 BufferAndMemory& UniformBufferVS,
+									 BufferAndMemory& UniformBufferFS);
 
 	static size_t GetUniformBufferSizeVS(size_t NumSubmeshes) { return NumSubmeshes * sizeof(UniformDataVS); }
 

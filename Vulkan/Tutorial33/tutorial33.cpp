@@ -748,13 +748,15 @@ private:
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
-        // We don't care which pipeline is used to update the uniform buffers
-		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, 
-									m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
-											AmbientLight,
-											LightDirection, 
-											m_modelContexts[MeshIndex].m_uniformBuffersVS, 
-											m_modelContexts[MeshIndex].m_uniformBuffersFS);
+        
+		OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
+														WVP, 
+														World, 
+														m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
+														AmbientLight,
+														LightDirection, 
+														m_modelContexts[MeshIndex].m_uniformBuffersVS[ImageIndex],
+														m_modelContexts[MeshIndex].m_uniformBuffersFS[ImageIndex]);
 	}
 
 	GLFWwindow* m_pWindow = NULL;

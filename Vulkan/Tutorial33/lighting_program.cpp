@@ -276,14 +276,14 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 }
 
 
-void LightingProgram::UpdateUniformBuffers(int ImageIndex, 
-                                            const glm::mat4& WVP, 
-                                            const glm::mat4& World,				
-                                            const std::vector<glm::mat4>& SubmeshTransformations,
-                                            const glm::vec4& AmbientLight,
-                                            const glm::vec3& LightDirection,
-                                            std::vector<BufferAndMemory>& UniformBuffersVS,
-                                            std::vector<BufferAndMemory>& UniformBuffersFS)
+void LightingProgram::UpdateUniformBuffers(VkDevice Device,
+                                           const glm::mat4& WVP, 
+                                           const glm::mat4& World,				
+                                           const std::vector<glm::mat4>& SubmeshTransformations,
+                                           const glm::vec4& AmbientLight,
+                                           const glm::vec3& LightDirection,
+                                           BufferAndMemory& UniformBufferVS,
+                                           BufferAndMemory& UniformBufferFS)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 
@@ -296,7 +296,7 @@ void LightingProgram::UpdateUniformBuffers(int ImageIndex,
 		UboDataVS[i].NormalMatrix = glm::mat4(NormalMatrix);
 	}
 
-	UniformBuffersVS[ImageIndex].Update(m_device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
+	UniformBufferVS.Update(Device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
 
 	UniformDataFS UboDataFS = {
 		.AmbientLight = AmbientLight,
@@ -304,7 +304,7 @@ void LightingProgram::UpdateUniformBuffers(int ImageIndex,
 		.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
 	};
 
-	UniformBuffersFS[ImageIndex].Update(m_device, &UboDataFS, sizeof(UboDataFS));	
+	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));	
 }
 
 
