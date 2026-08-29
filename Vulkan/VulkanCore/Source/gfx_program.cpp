@@ -37,6 +37,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const
 		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, NULL, NULL);
 }
 
+
 void GraphicsPipeline::Init(VulkanCore& vkCore, 
 							VkDescriptorPool DescPool, 
 							VkShaderModule vs, 
@@ -51,6 +52,25 @@ void GraphicsPipeline::Init(VulkanCore& vkCore,
 	m_descSetLayouts = CreateDescSetLayout(vkCore);
 
 	m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs,	vkCore.GetSwapChainFormat(), 
+		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, pSpecInfoVS, pSpecInfoFS);
+}
+
+
+void GraphicsPipeline::Init(VulkanCore& vkCore,
+							VkFormat ColorFormat,
+							VkDescriptorPool DescPool,
+							VkShaderModule vs,
+							VkShaderModule fs,
+							VkSpecializationInfo* pSpecInfoVS,
+							VkSpecializationInfo* pSpecInfoFS)
+{
+	m_descPool = DescPool;
+
+	m_device = vkCore.GetDevice();
+
+	m_descSetLayouts = CreateDescSetLayout(vkCore);
+
+	m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs, ColorFormat,
 		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, pSpecInfoVS, pSpecInfoFS);
 }
 

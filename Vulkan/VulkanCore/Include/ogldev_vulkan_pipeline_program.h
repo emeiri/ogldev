@@ -38,6 +38,14 @@ public:
 			  VkSpecializationInfo* pSpecInfoVS,
 			  VkSpecializationInfo* pSpecInfoFS);
 
+	void Init(VulkanCore& vkCore,
+			  VkFormat ColorFormat,
+			  VkDescriptorPool DescPool,
+			  VkShaderModule vs,
+			  VkShaderModule fs,
+			  VkSpecializationInfo* pSpecInfoVS,
+			  VkSpecializationInfo* pSpecInfoFS);	
+
 	void Destroy(bool DestroyLayouts = true);
 
 	void Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet);
