@@ -182,7 +182,7 @@ public:
 		}
 
 		// 2. Resolve Post-Processing and Presentation Chains
-		if (m_enablePostProcess) {
+		if (m_enableToneMapping) {
 			SubmissionCmdBufs.push_back(m_toneMappingCmdBufs[ImageIndex]);
 
 			if (m_showGui) {
@@ -708,7 +708,7 @@ private:
 			}
 		}
 
-        ImGui::Checkbox("Enable Post-Process", &m_enablePostProcess);
+        ImGui::Checkbox("Enable Tone Mapping", &m_enableToneMapping);
 
 		static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
@@ -788,7 +788,7 @@ private:
 
 	// GUI state
 	bool m_showGui = false;
-    bool m_enablePostProcess = true;
+    bool m_enableToneMapping = true;
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
