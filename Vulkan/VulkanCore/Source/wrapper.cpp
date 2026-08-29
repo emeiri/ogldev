@@ -470,10 +470,6 @@ void BufferMemBarrier(VkCommandBuffer CmdBuf, VkBuffer Buffer, VkPipelineStageFl
 	if (DstStage & VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT) {
 		Barrier.dstAccessMask |= VK_ACCESS_INDIRECT_COMMAND_READ_BIT;
 	}
-	
-	//if (buf->vkUsageFlags_ & VK_BUFFER_USAGE_INDEX_BUFFER_BIT) {
-	//	Barrier.dstAccessMask |= VK_ACCESS_INDEX_READ_BIT;
-	//}
 
 	vkCmdPipelineBarrier(CmdBuf, SrcStage, DstStage, VkDependencyFlags{}, 0, NULL, 1, &Barrier, 0, NULL);
 }
