@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #33:
+		Tutorial #33: Offline Rendering
 */
 
 #include <array>
@@ -84,10 +84,11 @@ struct ModelConfig {
 };
 
 static std::vector<ModelConfig> Models = {
-//	{ "G:/Models/McGuire/San_Miguel/san-miguel.obj", glm::vec3(0.0f), 1.0f }
-//	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
+	//{ "G:/Models/McGuire/San_Miguel/san-miguel.obj", glm::vec3(0.0f), 1.0f }
+//	{ "G:/Models/McGuire/San_Miguel/san-miguel-low-poly.obj", glm::vec3(0.0f), 1.0f },
+	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
 //	,{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f}
-	{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
+	//{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
 //	,{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f}
 //	,{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
 };
@@ -156,7 +157,7 @@ public:
 		CreateDescriptorPool();
 		InitBigTextureArray();
 		CreateOfflineImages();
-		CreatePipeline();
+		CreatePipelines();
 		CreateMeshes();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -425,7 +426,7 @@ private:
 	}
 
 
-	void CreatePipeline()
+	void CreatePipelines()
 	{
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 			m_pipelines[i].Init(m_vkCore, OfflineColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
@@ -712,9 +713,9 @@ private:
 
 		ImGui::ColorEdit3("Light Color", (float*)&m_lightColor);
 
-		ImGui::DragFloat("Ambient Light", &m_ambientLight, 0.01f, 0.0f, 2.0f, "%.2f");
+		ImGui::DragFloat("Ambient Light", &m_ambientLight, 0.01f, 0.0f, 1.0f, "%.2f");
 
-		ImGui::DragFloat("Diffuse Light", &m_diffuseLight, 0.01f, 0.0f, 2.0f, "%.2f");
+		ImGui::DragFloat("Diffuse Light", &m_diffuseLight, 0.01f, 0.0f, 5.0f, "%.2f");
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
