@@ -398,7 +398,7 @@ private:
 		}
 
 		m_toneMappingPipeline.AllocDescSets(m_toneMappingDescSets);
-        m_toneMappingPipeline.UpdateDescriptorSets(m_toneMappingDescSets, m_vkCore.GetImageViews(), m_offlineImages);
+        m_toneMappingPipeline.UpdateDescriptorSets(m_toneMappingDescSets, m_offlineImages);
 
         UpdateBaseTextureIndices(ModelDescs);
 
