@@ -18,6 +18,11 @@
 
 #version 460
 
+// Methods of tone mapping
+#define NO_TONE_MAPPING 0
+#define REINHARD        1
+
+
 layout(location = 0) in vec2 TexCoords;
 
 layout(location = 0) out vec4 FragColor;
@@ -26,20 +31,14 @@ layout(binding = 0) uniform sampler2D gHDRSampler;
 
 layout(push_constant) uniform PushConstants {
     int gMethodType;
-    int gEnableGammaCorrection;
 } pc;
 
-// Methods of tone mapping
-#define NO_TONE_MAPPING 0
-#define REINHARD        1
-#define BRUNO_OPSENICA  2    // https://bruop.github.io/tonemapping/
-#define WITH_EXPOSURE   3
 
 vec4 passthru()
 {
     vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
 
-    vec4 ret = vec4(hdrColor, 1.0);
+    vec4 ret = vec4(hdrColor * 2, 1.0);
 
     return ret;
 }
@@ -56,27 +55,6 @@ vec4 reinhard()
 }    
 
 
-float toGamma(float _r)
-{
-    const float gamma = 2.2;
-	return pow(abs(_r), 1.0/gamma);
-}
-
-
-vec3 toGamma(vec3 _rgb)
-{
-    const float gamma = 2.2;
-	return pow(abs(_rgb), vec3(1.0/gamma) );
-}
-
-
-vec4 toGamma(vec4 _rgba)
-{
-	return vec4(toGamma(_rgba.xyz), _rgba.w);
-}
-
-
-
 void main()
 {
     vec4 Color;
@@ -91,9 +69,5 @@ void main()
             break;
     }
 
-    if (pc.gEnableGammaCorrection != 0) {
-        FragColor = toGamma(Color);
-    } else {
-        FragColor = Color;
-    }
+    FragColor = Color;
 }

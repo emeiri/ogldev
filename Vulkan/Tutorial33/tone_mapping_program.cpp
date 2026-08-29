@@ -23,6 +23,8 @@
 #include "tone_mapping_program.h"
 #include "ogldev_vulkan_shader.h"
 
+#define NO_TONE_MAPPING 0
+#define REINHARD        1
 
 namespace OgldevVK {
 
@@ -59,13 +61,13 @@ void ToneMappingProgram::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet)
 	std::vector<VkDescriptorSet> DescSets = { DescSet };
 	GraphicsPipeline::Bind(CmdBuf, DescSets);
 
-    u32 PushConstants[2] = { 0, 0 }; // Exposure and tone mapping mode
+    u32 PushConstants[1] = { REINHARD }; // tone mapping mode
 
 	vkCmdPushConstants(CmdBuf,
 		m_pipelineLayout,
-		VK_SHADER_STAGE_FRAGMENT_BIT, // Must match shader stage
-		0,                            // Offset in push constant block
-		sizeof(u32) * 2,				  // Size of data
+		VK_SHADER_STAGE_FRAGMENT_BIT,	// Must match shader stage
+		0,								// Offset in push constant block
+		sizeof(u32),					// Size of data
 		&PushConstants[0]);
 }
 
@@ -96,7 +98,7 @@ std::vector<VkPushConstantRange> ToneMappingProgram::GetPushConstantRange()
 		{
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.offset = 0,
-            .size = sizeof(u32) * 2 // For exposure and tone mapping mode
+            .size = sizeof(u32) // tone mapping mode
 		}
 	};
 
