@@ -63,7 +63,7 @@ void VkModel::Destroy()
 
 	if (m_alignedIndices.pMem) {
 		free(m_alignedIndices.pMem);
-	}	
+	}
 }
 
 
@@ -183,10 +183,10 @@ void VkModel::CreateMetaData()
 	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;		
-		MetaData[SubmeshIndex].BaseIndex     = (u32)m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
-		MetaData[SubmeshIndex].NumIndices    = m_Meshes[SubmeshIndex].NumIndices;
-		MetaData[SubmeshIndex].BaseVertex    = (u32)m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
+		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
+		MetaData[SubmeshIndex].BaseIndex = (u32)m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
+		MetaData[SubmeshIndex].NumIndices = m_Meshes[SubmeshIndex].NumIndices;
+		MetaData[SubmeshIndex].BaseVertex = (u32)m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 	}
 
 	m_metaData = m_pVulkanCore->CreateSSBO(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));
@@ -297,7 +297,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 			}
 		}
 	} else {
-		md.m_materials.resize(m_Meshes.size());	
+		md.m_materials.resize(m_Meshes.size());
 	}
 
 	md.m_ranges.resize(m_Meshes.size());
@@ -312,11 +312,10 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 				Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
 				md.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
 				md.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
-			}
-			else {
+			} else {
 				printf("No diffuse texture in material %d\n", MaterialIndex);
 				exit(0);
-			}		
+			}
 		}
 
 		size_t offset = m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
@@ -325,7 +324,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 		md.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
 
 		offset = m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
-		range  = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
+		range = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
 
 		md.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };
 
