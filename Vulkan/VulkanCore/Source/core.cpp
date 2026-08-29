@@ -461,12 +461,15 @@ void VulkanCore::CreateSwapChain(bool DisableSRGB)
 
 	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.Selected().m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
-
+    VkImageUsageFlags ImageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
+					  			   VK_IMAGE_USAGE_TRANSFER_SRC_BIT | 
+								   VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     // Temporary workaround to allow a compute shader to render directly into the swapchain image. 
 	// This is not a good idea in general, but it works for this tutorial.
     if (DisableSRGB) {
         m_swapChainSurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
         m_swapChainSurfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        ImageUsage |= VK_IMAGE_USAGE_STORAGE_BIT; // for the compute shader to write directly into the swapchain image
     } else {
         m_swapChainSurfaceFormat = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
     }
@@ -481,10 +484,7 @@ void VulkanCore::CreateSwapChain(bool DisableSRGB)
 		.imageColorSpace = m_swapChainSurfaceFormat.colorSpace,
 		.imageExtent = SurfaceCaps.currentExtent,
 		.imageArrayLayers = 1,
-		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
-					  VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-					  VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-					  VK_IMAGE_USAGE_STORAGE_BIT,
+		.imageUsage = ImageUsage,
 		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
 		.queueFamilyIndexCount = 1,
 		.pQueueFamilyIndices = &m_queueFamily,
