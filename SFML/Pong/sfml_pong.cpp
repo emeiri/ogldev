@@ -44,28 +44,28 @@ static Pong Game;
 static InputState Input;
 
 // Utility function to calculate letterbox view ratios dynamically on resize
-void UpdateLetterboxView(sf::RenderWindow& window, float targetWidth, float targetHeight)
+void UpdateLetterboxView(sf::RenderWindow& window, float TargetWidth, float TargetHeight)
 {
-    float windowWidth = (float)(window.getSize().x);
-    float windowHeight = (float)(window.getSize().y);
+    float WindowWidth = (float)(window.getSize().x);
+    float WindowHeight = (float)(window.getSize().y);
 
-    float windowRatio = windowWidth / windowHeight;
-    float targetRatio = targetWidth / targetHeight;
+    float WindowRatio = WindowWidth / WindowHeight;
+    float TargetRatio = TargetWidth / TargetHeight;
 
     sf::View view;
-    view.setSize({ targetWidth, targetHeight });
-    view.setCenter({ targetWidth / 2.0f, targetHeight / 2.0f }); // Centers the camera on your game canvas
+    view.setSize({ TargetWidth, TargetHeight });
+    view.setCenter({ TargetWidth / 2.0f, TargetHeight / 2.0f }); // Centers the camera on your game canvas
 
     float sizeX = 1.0f;
     float sizeY = 1.0f;
     float posX = 0.0f;
     float posY = 0.0f;
 
-    if (windowRatio >= targetRatio) {
-        sizeX = targetRatio / windowRatio;
+    if (WindowRatio >= TargetRatio) {
+        sizeX = TargetRatio / WindowRatio;
         posX = (1.0f - sizeX) / 2.0f;
     } else {
-        sizeY = windowRatio / targetRatio;
+        sizeY = WindowRatio / TargetRatio;
         posY = (1.0f - sizeY) / 2.0f;
     }
 
@@ -109,32 +109,48 @@ void ProcessEvents()
         }
 
         // 2. Map rendering rules cleanly when the user scales the platform window
-        else if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+        else if (const sf::Event::Resized* resized = event->getIf<sf::Event::Resized>()) {
             UpdateLetterboxView(Window, Config.WindowSize.x, Config.WindowSize.y);
         }
 
         // 3. Process key down allocations
-        else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+        else if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
             switch (keyPressed->code) {
             case sf::Keyboard::Key::Escape:
                 std::cout << "Escape key pressed, quitting" << std::endl;
                 Window.close();
                 break;
-            case sf::Keyboard::Key::W: Input.PaddleLUp = true; break;
-            case sf::Keyboard::Key::S: Input.PaddleLDown = true; break;
-            case sf::Keyboard::Key::O: Input.PaddleRUp = true; break;
-            case sf::Keyboard::Key::L: Input.PaddleRDown = true; break;
+            case sf::Keyboard::Key::W: 
+                Input.PaddleLUp = true; 
+                break;
+            case sf::Keyboard::Key::S: 
+                Input.PaddleLDown = true; 
+                break;
+            case sf::Keyboard::Key::O: 
+                Input.PaddleRUp = true; 
+                break;
+            case sf::Keyboard::Key::L: 
+                Input.PaddleRDown = true; 
+                break;
             default: break;
             }
         }
 
         // 4. Process key up cancellations
-        else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+        else if (const sf::Event::KeyReleased* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
             switch (keyReleased->code) {
-            case sf::Keyboard::Key::W: Input.PaddleLUp = false; break;
-            case sf::Keyboard::Key::S: Input.PaddleLDown = false; break;
-            case sf::Keyboard::Key::O: Input.PaddleRUp = false; break;
-            case sf::Keyboard::Key::L: Input.PaddleRDown = false; break;
+            case sf::Keyboard::Key::W: 
+                Input.PaddleLUp = false; 
+                break;
+            case sf::Keyboard::Key::S: 
+                Input.PaddleLDown = false; 
+                break;
+            case sf::Keyboard::Key::O: 
+                Input.PaddleRUp = false; 
+                break;
+            case sf::Keyboard::Key::L: 
+                Input.PaddleRDown = false; 
+                break;
             default: break;
             }
         }
