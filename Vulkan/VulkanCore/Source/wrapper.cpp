@@ -253,29 +253,23 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 
 	// Map layouts to Synchronization2 stages and access flags
 	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
+		Barrier.srcAccessMask = VK_ACCESS_2_NONE;
+
 		if (NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
-			Barrier.srcAccessMask = VK_ACCESS_2_NONE;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
-			Barrier.srcAccessMask = VK_ACCESS_2_NONE;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT; // Adjusted assuming general layout is for compute demo
 			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_SHADER_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
-			Barrier.srcAccessMask = VK_ACCESS_2_NONE;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
-			Barrier.srcAccessMask = VK_ACCESS_2_NONE;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
+				  				   VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
-			Barrier.srcAccessMask = VK_ACCESS_2_NONE;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 		} else {
@@ -283,79 +277,65 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 			exit(1);
 		}
 	} else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+		Barrier.srcAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
+
 		if (NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_NONE;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
-			Barrier.dstAccessMask = VK_ACCESS_2_NONE;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		} else {
 			printf("Unknown Barrier case 2\n");
 			exit(1);
 		}
 	} else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+		Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
 		if (NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
+		} else if (NewLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+			Barrier.dstAccessMask = VK_ACCESS_2_NONE;
 		} else {
 			printf("Unknown Barrier case 3\n");
 			exit(1);
 		}
 	} else if (OldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
+
 		if (NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
-			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
+			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT | VK_ACCESS_2_INPUT_ATTACHMENT_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_NONE;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_NONE;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_TRANSFER_READ_BIT;
 		} else {
@@ -363,24 +343,16 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 			exit(1);
 		}
 	} else if (OldLayout == VK_IMAGE_LAYOUT_GENERAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+		Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
+
 		if (NewLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_NONE;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_NONE;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
-			// THE GENERAL-TO-GENERAL FIX:
-			// SOURCE: The Compute Shader that just finished writing the post-process pass
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT;
-
-			// DESTINATION: Open it up completely so that the next stage (ImGui drawing or fallback blits)
-			// can safely READ the pixels or WRITE text elements over it.
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
 		} else {
@@ -388,22 +360,19 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 			exit(1);
 		}
 	} else if (OldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
+		Barrier.srcAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
 		if (NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_READ_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
 			// Multi-mesh accumulation without clearing depth between draws
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		} else if (NewLayout == VK_IMAGE_LAYOUT_UNDEFINED) {
-			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
-			Barrier.srcAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-			// FIX: Stall the next frame's depth clearing pass until this flush completes
+			// NOTE: Avoid transitioning images into UNDEFINED layout mid-frame. 
+			// If this is used for frame boundaries, ensure you use attachment load ops to handle the clear safely.
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		} else {
