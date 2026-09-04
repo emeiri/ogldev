@@ -176,8 +176,10 @@ VkCommandBuffer ImGUIRenderer::PrepareCommandBuffer(int Image)
 
 	vkCmdEndRendering(m_cmdBufs[Image]);
 
-	OgldevVK::ImageMemBarrier2(m_cmdBufs[Image], m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
-		                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+    OgldevVK::VulkanBaseImage& SwapChainImage = m_pvkCore->GetSwapChainImage(Image);
+    SwapChainImage.TransitionLayout(m_cmdBufs[Image], 
+									VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
+									VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	vkEndCommandBuffer(m_cmdBufs[Image]);
 
