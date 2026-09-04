@@ -1047,20 +1047,6 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     printf("Camera internal transformation:\n");
     CameraMatrix.Print();
 
-    // 2. CONVERSION: Convert Blender (Z-Up) to Engine (Y-Up)
-    // x' = x, y' = z, z' = -y
-    Matrix4f BasisChange;
-    BasisChange.InitIdentity();
-    // New X = Old X (m[0][0] is already 1)
-
-    // New Y = Old Z (Blender Height becomes Engine Height)
-    BasisChange.m[1][1] = 0.0f;
-    BasisChange.m[1][2] = 1.0f;
-
-    // New Z = -Old Y (Blender Depth becomes Engine Depth)
-    BasisChange.m[2][1] = -1.0f;
-    BasisChange.m[2][2] = 0.0f;
-
     Matrix4f FinalWorld = Transformation;
     
     printf("Final camera transformation:\n");
@@ -1069,12 +1055,14 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     // 3. Extract World Position
     Vector4f Pos4D(0.0f, 0.0f, 0.0f, 1.0f);
     Pos4D = FinalWorld * Pos4D;
-    Vector3f FinalPos(Pos4D.x, Pos4D.y, Pos4D.z);
+    Vector3f FinalPos(pCamera->mPosition.x, pCamera->mPosition.y, -pCamera->mPosition.z);
 
     // 4. Extract World Direction (Blender Camera Forward is -Z)
-    Vector4f Target4D(0.0f, 0.0f, 1.0f, 0.0f);
+    Vector4f Target4D(0.0f, 0.0f, -1.0f, 0.0f);
     Target4D = FinalWorld * Target4D;
-    Vector3f FinalTargetDir = Vector3f(Target4D.x, Target4D.y, Target4D.z).Normalize();
+    //Vector3f FinalTargetDir = Vector3f(pCamera->mLookAt.x, pCamera->mLookAt.y, -pCamera->mLookAt.z).Normalize();
+    Vector3f FinalTargetDir(Transformation.m[0][2], -Transformation.m[1][2], Transformation.m[2][2]);
+
     FinalTargetDir = FinalTargetDir.Normalize();
 
     // 5. Extract World Up (Blender Camera Up is +Y)
@@ -1108,13 +1096,7 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
     persProjInfo.FOV = FullVerticalDeg;
 
-    // 5. Initialize Camera
-    m_cameras[Index].Init(
-        FinalPos.ToGLM(),
-        FinalTargetDir.ToGLM(),
-        FinalUp.ToGLM(),
-        persProjInfo
-    );
+    m_cameras[Index].Init(FinalPos.ToGLM(), FinalTargetDir.ToGLM(), FinalUp.ToGLM(), persProjInfo);
 
     printf("Final Pos: "); FinalPos.Print();
     printf("Final Dir: "); FinalTargetDir.Print();

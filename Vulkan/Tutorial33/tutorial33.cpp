@@ -86,7 +86,8 @@ struct ModelConfig {
 static std::vector<ModelConfig> Models = {
 	//{ "G:/Models/McGuire/San_Miguel/san-miguel.obj", glm::vec3(0.0f), 1.0f }
 //	{ "G:/Models/McGuire/San_Miguel/san-miguel-low-poly.obj", glm::vec3(0.0f), 1.0f },
-	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
+	//{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
+    { "../../Games/Pong/Pong.glb", glm::vec3(0.0f), 1.0f}
 //	,{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f}
 	//{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
 //	,{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f}
@@ -161,7 +162,8 @@ public:
 		CreateMeshes();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
-		DefaultCreateCameraPers();
+		InitCameraFromModel();
+		//DefaultCreateCameraPers();
 		// The object is ready to receive callbacks
 		OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
 		m_imGUIRenderer.Init(&m_vkCore);
@@ -283,6 +285,27 @@ public:
 
 
 private:
+
+    void InitCameraFromModel()
+    {
+        if (m_modelContexts.size() == 0) {
+            printf("No models loaded\n");
+            exit(1);
+        }
+
+        const ModelContext& mctx = m_modelContexts[0];
+		glm::vec3 Pos = mctx.m_pModel->GetCameras()[0].GetPosition();
+      //  glm::vec3 Target = mctx.Pos;
+        glm::vec3 Up(0.0, 1.0f, 0.0f);
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 1500.0f;
+        PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
+                                      zNear, zFar };
+      //  m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
+        m_pGameCamera = (GLMCameraFirstPerson*) &mctx.m_pModel->GetCameras()[0];
+      //  m_pGameCamera->m_maxSpeed = 1.5f;
+    }
 
 	void DefaultCreateCameraPers()
 	{
