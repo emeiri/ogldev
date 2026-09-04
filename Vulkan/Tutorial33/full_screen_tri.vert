@@ -19,20 +19,22 @@
 #version 460
 
 // Fullscreen triangle trick
-const vec2 verts[3] = vec2[](
-    vec2(-1.0, -1.0),
-    vec2(-1.0,  3.0),
-    vec2( 3.0, -1.0)
+const vec2 positions[3] = vec2[](
+    vec2(-1.0, -1.0), // 0: Top-Left
+    vec2(-1.0,  3.0), // 1: Far Bottom-Left extension
+    vec2( 3.0, -1.0)  // 2: Far Top-Right extension
+);
+
+const vec2 uvs[3] = vec2[](
+    vec2(0.0, 1.0), // 0: Top-Left UV
+    vec2(0.0, -1.0), // 1: Far Bottom-Left UV
+    vec2(2.0, 1.0)  // 2: Far Top-Right UV
 );
 
 layout(location = 0) out vec2 TexCoords;
 
 void main()
 {
-    vec2 Pos = verts[gl_VertexIndex];
-    gl_Position = vec4(Pos, 0.0, 1.0);
-
-    // Map from [-1,1] to [0,1]
-    vec2 PosFlippedY = vec2(Pos.x, -Pos.y);
-    TexCoords = PosFlippedY * 0.5 + 0.5;
+    gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
+    TexCoords = uvs[gl_VertexIndex];
 }
