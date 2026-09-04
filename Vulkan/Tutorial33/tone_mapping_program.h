@@ -21,23 +21,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
-#include "ogldev_types.h"
 #include "ogldev_vulkan_core.h"
-#include "Int/model_desc.h"
 #include "ogldev_vulkan_pipeline_program.h"
-
-struct OfflineImage {
-	OgldevVK::VulkanTexture m_color;
-	OgldevVK::VulkanTexture m_depth;
-
-	void Destroy(VkDevice Device) {
-		m_color.Destroy(Device);
-		m_depth.Destroy(Device);
-	}
-};
+#include "ogldev_vulkan_texture.h"
 
 namespace OgldevVK {
 

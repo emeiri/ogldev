@@ -91,6 +91,18 @@ private:
 	VulkanCore* m_pVulkanCore = NULL;
 };
 
+
+struct OfflineImage {
+	VulkanTexture m_color;
+	VulkanTexture m_depth;
+
+	void Destroy(VkDevice Device) {
+		m_color.Destroy(Device);
+		m_depth.Destroy(Device);
+	}
+};
+
+
 }
 
 typedef OgldevVK::VulkanTexture BaseTexture;
