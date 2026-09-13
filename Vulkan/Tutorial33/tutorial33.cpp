@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #33: Offline Rendering
+		Tutorial #33: Offscreen Rendering
 */
 
 #include <array>
@@ -94,7 +94,7 @@ static std::vector<ModelConfig> Models = {
 };
 
 
-VkFormat OfflineColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+VkFormat OffscreenColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -133,8 +133,8 @@ public:
         
         m_toneMappingPipeline.Destroy();
 
-        for (int i = 0; i < (int)m_offlineImages.size(); i++) {
-            m_offlineImages[i].Destroy(m_device);
+        for (int i = 0; i < (int)m_offscreenImages.size(); i++) {
+            m_offscreenImages[i].Destroy(m_device);
         }
 
         m_bigTextureArray.Destroy();		
@@ -156,7 +156,7 @@ public:
 		CreateShaders();
 		CreateDescriptorPool();
 		InitBigTextureArray();
-		CreateOfflineImages();
+		CreateOffscreenImages();
 		CreatePipelines();
 		CreateMeshes();
 		CreateCommandBuffers();
@@ -353,9 +353,9 @@ private:
 	}
 
 
-	void CreateOfflineImages()
+	void CreateOffscreenImages()
 	{
-        m_offlineImages.resize(m_numImages);
+        m_offscreenImages.resize(m_numImages);
 
 		VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
         VkFormat DepthFormat = m_vkCore.GetDepthFormat();
@@ -364,11 +364,11 @@ private:
 									   VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		VkImageUsageFlags DepthUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
-        for (int i = 0; i < (int)m_offlineImages.size(); i++) {
-            m_vkCore.CreateTexture(m_offlineImages[i].m_color, SwapChainExtent.width, SwapChainExtent.height, 
-								   ColorUsage, OfflineColorFormat, false);
+        for (int i = 0; i < (int)m_offscreenImages.size(); i++) {
+            m_vkCore.CreateTexture(m_offscreenImages[i].m_color, SwapChainExtent.width, SwapChainExtent.height, 
+								   ColorUsage, OffscreenColorFormat, false);
 			
-            m_vkCore.CreateTexture(m_offlineImages[i].m_depth, SwapChainExtent.width, SwapChainExtent.height, 
+            m_vkCore.CreateTexture(m_offscreenImages[i].m_depth, SwapChainExtent.width, SwapChainExtent.height, 
 								   DepthUsage, DepthFormat, false);
 
         }
@@ -390,7 +390,7 @@ private:
 		}
 
 		m_toneMappingPipeline.AllocDescSets(m_toneMappingDescSets);
-        m_toneMappingPipeline.UpdateDescriptorSets(m_toneMappingDescSets, m_offlineImages);
+        m_toneMappingPipeline.UpdateDescriptorSets(m_toneMappingDescSets, m_offscreenImages);
 
         UpdateBaseTextureIndices(ModelDescs);
 
@@ -420,7 +420,7 @@ private:
 	void CreatePipelines()
 	{
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
-			m_pipelines[i].Init(m_vkCore, OfflineColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
+			m_pipelines[i].Init(m_vkCore, OffscreenColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
 				                m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 		}
 
@@ -483,21 +483,21 @@ private:
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
-			OgldevVK::VulkanTexture& OfflineColorImage = m_offlineImages[i].m_color;
-			OgldevVK::VulkanTexture& OfflineDepthImage = m_offlineImages[i].m_depth;
+			OgldevVK::VulkanTexture& OffscreenColorImage = m_offscreenImages[i].m_color;
+			OgldevVK::VulkanTexture& OffscreenDepthImage = m_offscreenImages[i].m_depth;
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			VkImageLayout SrcColorLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-            OfflineColorImage.TransitionLayout(CmdBuf, SrcColorLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+            OffscreenColorImage.TransitionLayout(CmdBuf, SrcColorLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 			// Depth handling (Remains untouched and safe from previous fixes)
 			VkImageLayout SrcDepthLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-			OfflineDepthImage.TransitionLayout(CmdBuf, SrcDepthLayout, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+			OffscreenDepthImage.TransitionLayout(CmdBuf, SrcDepthLayout, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
 			// Draw Geometry
-			BeginRendering(CmdBuf, OfflineColorImage.m_view, OfflineDepthImage.m_view, IsFirstMesh);
+			BeginRendering(CmdBuf, OffscreenColorImage.m_view, OffscreenDepthImage.m_view, IsFirstMesh);
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
@@ -517,11 +517,11 @@ private:
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_fallbackCopyCmdBufs[i];
             OgldevVK::VulkanBaseImage& SwapChainImage = m_vkCore.GetSwapChainImage(i);
-			OgldevVK::VulkanTexture& OfflineImage = m_offlineImages[i].m_color;
+			OgldevVK::VulkanTexture& OffscreenImage = m_offscreenImages[i].m_color;
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-            OfflineImage.TransitionLayout(CmdBuf, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
+            OffscreenImage.TransitionLayout(CmdBuf, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
 												  VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
             SwapChainImage.TransitionLayout(CmdBuf, VK_IMAGE_LAYOUT_UNDEFINED, 
@@ -536,7 +536,7 @@ private:
 			BlitRegion.dstOffsets[0] = { 0, 0, 0 };
 			BlitRegion.dstOffsets[1] = { (i32)SwapChainExtent.width, (i32)SwapChainExtent.height, 1 };
 		
-			vkCmdBlitImage(CmdBuf, OfflineImage.m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			vkCmdBlitImage(CmdBuf, OffscreenImage.m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 				           SwapChainImage.m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 				           1, &BlitRegion, VK_FILTER_LINEAR); 
 
@@ -555,11 +555,11 @@ private:
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_toneMappingCmdBufs[i];
 			OgldevVK::VulkanBaseImage& SwapChainImage = m_vkCore.GetSwapChainImage(i);
-			OgldevVK::VulkanTexture& OfflineColorImage = m_offlineImages[i].m_color;
+			OgldevVK::VulkanTexture& OffscreenColorImage = m_offscreenImages[i].m_color;
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			OfflineColorImage.TransitionLayout(CmdBuf,
+			OffscreenColorImage.TransitionLayout(CmdBuf,
 											   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 											   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -710,7 +710,7 @@ private:
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
-    std::vector<OgldevVK::OfflineImage> m_offlineImages;
+    std::vector<OgldevVK::OffscreenImage> m_offscreenImages;
 	int m_numImages = 0;
 	struct MeshCmdBufs {
 		std::vector<VkCommandBuffer> BaseMeshDraw; // Size: m_numImages

@@ -43,7 +43,7 @@ public:
     void AllocDescSets(std::vector<VkDescriptorSet>& DescSets);
 
 	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-							  const std::vector<OfflineImage>& OfflineImages);
+							  const std::vector<OffscreenImage>& OffscreenImages);
 
     void RecordCommandBuffer(VkCommandBuffer CmdBuf);
 

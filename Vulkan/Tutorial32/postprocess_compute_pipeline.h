@@ -19,7 +19,7 @@
 
 #include "ogldev_vulkan_compute_pipeline.h"
 
-struct OfflineImage {
+struct OffscreenImage {
 	OgldevVK::VulkanTexture m_color;
 	OgldevVK::VulkanTexture m_depth;
 
@@ -38,7 +38,7 @@ public:
 
 	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets,
 					    const std::vector<OgldevVK::VulkanBaseImage>& SwapChainImages,
-						const std::vector<OfflineImage>& OfflineImages);
+						const std::vector<OffscreenImage>& OfflineImages);
 
 protected:
 

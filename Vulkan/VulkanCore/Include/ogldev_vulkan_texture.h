@@ -92,7 +92,7 @@ private:
 };
 
 
-struct OfflineImage {
+struct OffscreenImage {
 	VulkanTexture m_color;
 	VulkanTexture m_depth;
 

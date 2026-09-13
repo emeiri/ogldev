@@ -538,12 +538,12 @@ private:
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_fallbackCopyCmdBufs[i];
 			VkImage SwapChainImage = m_vkCore.GetImage(i);
-			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
+			VkImage OffscreenImage = m_offlineImages[i].m_color.m_image;
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			// 1. Transition Offline to Source, Swapchain to Destination
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, SwapChainFormat,
+			OgldevVK::ImageMemBarrier2(CmdBuf, OffscreenImage, SwapChainFormat,
 				                       VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 1, 0);
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapChainImage, SwapChainFormat,
 				                       VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, 1, 0);
@@ -559,7 +559,7 @@ private:
 			BlitRegion.dstOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 };
 		
 			vkCmdBlitImage(CmdBuf,
-				OfflineImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+				OffscreenImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 				SwapChainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 				1, &BlitRegion, VK_FILTER_LINEAR); 
 
@@ -585,11 +585,11 @@ private:
 		for (int i = 0; i < m_numImages; i++) {
 			VkCommandBuffer CmdBuf = m_computePostProcessCmdBufs[i];
 			VkImage SwapChainImage = m_vkCore.GetImage(i);
-			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
+			VkImage OffscreenImage = m_offlineImages[i].m_color.m_image;
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, SwapChainFormat, 
+			OgldevVK::ImageMemBarrier2(CmdBuf, OffscreenImage, SwapChainFormat, 
 									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
 			// 3. Transition Swapchain to GENERAL for compute writes
@@ -763,7 +763,7 @@ private:
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
-    std::vector<OfflineImage> m_offlineImages;
+    std::vector<OffscreenImage> m_offlineImages;
 	int m_numImages = 0;
 	struct MeshCmdBufs {
 		std::vector<VkCommandBuffer> BaseMeshDraw; // Size: m_numImages

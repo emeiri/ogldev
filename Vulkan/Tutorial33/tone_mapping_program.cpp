@@ -107,7 +107,7 @@ std::vector<VkPushConstantRange> ToneMappingProgram::GetPushConstantRange()
 
 
 void ToneMappingProgram::UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-											  const std::vector<OfflineImage>& OfflineImages)
+											  const std::vector<OffscreenImage>& OffscreenImages)
 {
 	int DescCount = (int)DescriptorSets.size();
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescCount);
@@ -121,8 +121,8 @@ void ToneMappingProgram::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Desc
 		VkDescriptorSet& DstSet = DescriptorSets[i];
 
 		InputInfo[i] = {
-            .sampler = OfflineImages[i].m_color.m_sampler,
-			.imageView = OfflineImages[i].m_color.m_view,
+            .sampler = OffscreenImages[i].m_color.m_sampler,
+			.imageView = OffscreenImages[i].m_color.m_view,
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 		};
 		
