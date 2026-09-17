@@ -57,4 +57,4 @@ $CC *.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_tables.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_widgets.cpp \
     ../../Common/3rdparty/ImGui/imGuIZMO.quat/imguizmo_quat.cpp \
-    $CPPFLAGS $LDFLAGS -o tutorial32
+    $CPPFLAGS $LDFLAGS -o tutorial33

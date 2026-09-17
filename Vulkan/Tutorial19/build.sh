@@ -15,6 +15,7 @@ $CC tutorial19.cpp \
     ../VulkanCore/Source/util.cpp \
     ../VulkanCore/Source/device.cpp \
     ../VulkanCore/Source/queue.cpp \
+    ../VulkanCore/Source/texture.cpp \
     ../VulkanCore/Source/wrapper.cpp \
     ../VulkanCore/Source/shader.cpp \
     ../VulkanCore/Source/glfw_vulkan.cpp \

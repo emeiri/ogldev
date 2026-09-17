@@ -10,6 +10,7 @@ $CC tutorial09.cpp \
     ../VulkanCore/Source/util.cpp \
     ../VulkanCore/Source/device.cpp \
     ../VulkanCore/Source/queue.cpp \
+    ../VulkanCore/Source/texture.cpp \
     ../VulkanCore/Source/wrapper.cpp \
     ../../Common/ogldev_util.cpp  \
     ../../Common/3rdparty/stb_image.cpp \
