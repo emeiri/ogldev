@@ -29,19 +29,12 @@ private:
     sf::Clock m_clock;
 };
 
-// Input State Struct to track paddle keys cleanly
-struct InputState {
-    bool PaddleLUp = false;
-    bool PaddleLDown = false;
-    bool PaddleRUp = false;
-    bool PaddleRDown = false;
-};
 
 static sf::RenderWindow Window;
 static SFML_Clock GameClock;
 static GameConfig Config;
 static Pong Game;
-static InputState Input;
+static PongInputState Input;
 
 // Utility function to calculate letterbox view ratios dynamically on resize
 void UpdateLetterboxView(sf::RenderWindow& window, float TargetWidth, float TargetHeight)

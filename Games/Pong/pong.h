@@ -134,6 +134,14 @@ struct GameConfig {
 };
 
 
+struct PongInputState {
+    bool PaddleLUp = false;
+    bool PaddleLDown = false;
+    bool PaddleRUp = false;
+    bool PaddleRDown = false;
+};
+
+
 class Pong {
 
 public:

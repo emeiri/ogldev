@@ -33,20 +33,13 @@ private:
     Uint64 m_tickCount = 0;
 };
 
-// Input State Struct to track paddle keys cleanly inside SDL3 Callbacks
-struct InputState {
-    bool PaddleLUp = false;
-    bool PaddleLDown = false;
-    bool PaddleRUp = false;
-    bool PaddleRDown = false;
-};
 
 static SDL_Window* pWindow = NULL;
 static SDL_Renderer* pRenderer = NULL;
 static SDL_Clock GameClock;
 static GameConfig Config;
 static Pong Game;
-static InputState Input;
+static PongInputState Input;
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
