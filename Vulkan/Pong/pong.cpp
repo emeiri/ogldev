@@ -61,7 +61,7 @@ struct ModelContext {
 	std::vector<VkDescriptorSet> m_descSets;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
-    int m_baseTextureIndex = -1;
+    int m_baseTextureIndex = 0;
 
 	void Destroy(VkDevice Device)
 	{
@@ -115,15 +115,11 @@ public:
 
 		m_imGUIRenderer.Destroy();
 
-        for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
-			for (MeshCmdBufs& v : m_cmdBufs[MeshIndex]) {
-				m_vkCore.FreeCommandBuffers((u32)v.BaseMeshDraw.size(), v.BaseMeshDraw.data());
-			}
-        }
-        
-		for (int i = 0; i < (int)m_modelContexts.size(); i++) {
-            m_modelContexts[i].Destroy(m_device);
+        for (MeshCmdBufs& v : m_cmdBufs) {
+			m_vkCore.FreeCommandBuffers((u32)v.BaseMeshDraw.size(), v.BaseMeshDraw.data());
 		}
+        
+		m_modelContext.Destroy(m_device);
 
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
@@ -159,7 +155,7 @@ public:
 		InitBigTextureArray();
 		CreateOffscreenImages();
 		CreatePipelines();
-		CreateMeshes();
+		CreateMeshe();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 		InitCameraFromModel();
@@ -174,16 +170,12 @@ public:
 	{
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
-		for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
-			UpdateUniformBuffers(MeshIndex, ImageIndex);
-		}
+		UpdateUniformBuffers(ImageIndex);
 
 		std::vector<VkCommandBuffer> SubmissionCmdBufs;
 
 		// 1. Geometry Pass
-		for (size_t MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
-			SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].BaseMeshDraw[ImageIndex]);
-		}
+		SubmissionCmdBufs.push_back(m_cmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
 
 		// 2. Resolve Post-Processing and Presentation Chains
 		if (m_enableToneMapping) {
@@ -288,13 +280,7 @@ private:
 
     void InitCameraFromModel()
     {
-        if (m_modelContexts.size() == 0) {
-            printf("No models loaded\n");
-            exit(1);
-        }
-
-        const ModelContext& mctx = m_modelContexts[0];
-		glm::vec3 Pos = mctx.m_pModel->GetCameras()[0].GetPosition();
+		glm::vec3 Pos = m_modelContext.m_pModel->GetCameras()[0].GetPosition();
       //  glm::vec3 Target = mctx.Pos;
         glm::vec3 Up(0.0, 1.0f, 0.0f);
         float FOV = 45.0f;
@@ -303,7 +289,7 @@ private:
         PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
                                       zNear, zFar };
       //  m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
-        m_pGameCamera = (GLMCameraFirstPerson*) &mctx.m_pModel->GetCameras()[0];
+        m_pGameCamera = (GLMCameraFirstPerson*) &m_modelContext.m_pModel->GetCameras()[0];
       //  m_pGameCamera->m_maxSpeed = 1.5f;
     }
 
@@ -343,16 +329,12 @@ private:
 
 	void CreateCommandBuffers()
 	{		
-        m_cmdBufs.resize(m_modelContexts.size());
+		m_cmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
 
-        for (int i = 0; i < m_modelContexts.size(); i++) {
-			m_cmdBufs[i].resize(OgldevVK::NUM_LIGHTING_MODES);
-
-			for (MeshCmdBufs& v : m_cmdBufs[i]) {
-				v.BaseMeshDraw.resize(m_numImages);
-				m_vkCore.CreateCommandBuffers(m_numImages, v.BaseMeshDraw.data());
-			}
-        }
+		for (MeshCmdBufs& v : m_cmdBufs) {
+			v.BaseMeshDraw.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, v.BaseMeshDraw.data());
+		}
 
 		printf("Created command buffers\n");
 	}
@@ -398,38 +380,23 @@ private:
 	}
 
 
-	void CreateMeshes()
+	void CreateMeshe()
 	{
-        m_modelContexts.resize(Models.size());
+        m_modelContext.m_pModel = new OgldevVK::VkModel();
 
-        std::vector<OgldevVK::ModelDesc> ModelDescs(m_modelContexts.size());
+        // We don't really need a vector here, but we need to pass a vector to the CreateTextureArray function
+		std::vector<OgldevVK::ModelDesc> ModelDescs(1);
 		
-		for (int i = 0; i < (int)m_modelContexts.size(); i++) {
-			m_modelContexts[i].m_pModel = new OgldevVK::VkModel();
-			m_modelContexts[i].m_pModel->Init(&m_vkCore, true, false);
-			m_modelContexts[i].m_pModel->LoadAssimpModel(Models[i].Path);
-            CreateUniformBuffers(i);
-            CreateDescriptorSets(i, ModelDescs[i]);
-		}
+		m_modelContext.m_pModel->Init(&m_vkCore, true, false);
+		m_modelContext.m_pModel->LoadAssimpModel(Models[0].Path);
+        CreateUniformBuffers(0);
+        CreateDescriptorSets(0, ModelDescs[0]);
 
 		m_toneMappingPipeline.AllocDescSets(m_toneMappingDescSets);
         m_toneMappingPipeline.UpdateDescriptorSets(m_toneMappingDescSets, m_offscreenImages);
-
-        UpdateBaseTextureIndices(ModelDescs);
-
+		
 		m_bigTextureArray.CreateTextureArray(ModelDescs);
 	}
-
-
-    void UpdateBaseTextureIndices(std::vector<OgldevVK::ModelDesc>& ModelDescs)
-    {
-        u32 TotalTextureCount = 0;
-        for (int i = 0; i < (int)m_modelContexts.size(); i++) {
-            m_modelContexts[i].m_baseTextureIndex = TotalTextureCount;
-			const OgldevVK::ModelDesc& md = ModelDescs[i];
-			TotalTextureCount += (u32)md.m_materials.size();
-        }
-    }
 
 
 	void CreateShaders()
@@ -454,41 +421,39 @@ private:
 	void CreateUniformBuffers(int MeshIndex)
 	{		
         // VS uniform buffers (actually using SSBOs)
-        size_t NumMeshes = m_modelContexts[MeshIndex].m_pModel->GetNumMeshes();
+        size_t NumMeshes = m_modelContext.m_pModel->GetNumMeshes();
 		size_t UniformBufferSizeVS = OgldevVK::LightingProgram::GetUniformBufferSizeVS(NumMeshes);
 
-        m_modelContexts[MeshIndex].m_uniformBuffersVS.resize(m_numImages);
+        m_modelContext.m_uniformBuffersVS.resize(m_numImages);
 
         for (int i = 0; i < m_numImages; i++) {
-			m_modelContexts[MeshIndex].m_uniformBuffersVS[i] = m_vkCore.CreateSSBO(UniformBufferSizeVS);
+			m_modelContext.m_uniformBuffersVS[i] = m_vkCore.CreateSSBO(UniformBufferSizeVS);
         }
 
         // FS uniform buffers
 		size_t UniformBufferSizeFS = OgldevVK::LightingProgram::GetUniformBufferSizeFS();
-		m_modelContexts[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
+		m_modelContext.m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
 	}
 
 
 	void CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& md)
 	{		
-		m_modelContexts[MeshIndex].m_pModel->UpdateModelDesc(md);
+		m_modelContext.m_pModel->UpdateModelDesc(md);
 
         // We don't care which pipeline we use to create the desc sets
-		m_pipelines[0].AllocDescSets(m_modelContexts[MeshIndex].m_descSets);
-		m_pipelines[0].UpdateDescriptorSets(md, m_modelContexts[MeshIndex].m_descSets,
-												m_modelContexts[MeshIndex].m_uniformBuffersVS, 
-												m_modelContexts[MeshIndex].m_uniformBuffersFS);
+		m_pipelines[0].AllocDescSets(m_modelContext.m_descSets);
+		m_pipelines[0].UpdateDescriptorSets(md, m_modelContext.m_descSets,
+												m_modelContext.m_uniformBuffersVS, 
+												m_modelContext.m_uniformBuffersFS);
 	}
 
 
 	void RecordCommandBuffers()
 	{
 		// 1. Bake the baseline mesh draw calls (No conditional post-process paths inside here anymore!)
-		for (int MeshIndex = 0; MeshIndex < (int)m_modelContexts.size(); MeshIndex++) {
-			for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
-				// Note: RecordCommandBuffersInternal now only takes 3 parameters
-				RecordCommandBuffersInternal(MeshIndex, LightMode, m_cmdBufs[MeshIndex][LightMode].BaseMeshDraw);
-			}
+		for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
+			// Note: RecordCommandBuffersInternal now only takes 3 parameters
+			RecordCommandBuffersInternal(LightMode, m_cmdBufs[LightMode].BaseMeshDraw);
 		}
 
 		RecordToneMappingCommandBuffers();
@@ -499,9 +464,8 @@ private:
 	}
 
 
-	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, std::vector<VkCommandBuffer>& CmdBufs)
+	void RecordCommandBuffersInternal(int LightingMode, std::vector<VkCommandBuffer>& CmdBufs)
 	{
-		bool IsFirstMesh = (MeshIndex == 0);
 		VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
@@ -511,18 +475,18 @@ private:
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			VkImageLayout SrcColorLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			VkImageLayout SrcColorLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
             OffscreenColorImage.TransitionLayout(CmdBuf, SrcColorLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 			// Depth handling (Remains untouched and safe from previous fixes)
-			VkImageLayout SrcDepthLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			VkImageLayout SrcDepthLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			OffscreenDepthImage.TransitionLayout(CmdBuf, SrcDepthLayout, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
 			// Draw Geometry
-			BeginRendering(CmdBuf, OffscreenColorImage.m_view, OffscreenDepthImage.m_view, IsFirstMesh);
-			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
-			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
+			BeginRendering(CmdBuf, OffscreenColorImage.m_view, OffscreenDepthImage.m_view);
+			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContext.m_descSets[i], m_modelContext.m_baseTextureIndex);
+			m_modelContext.m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
@@ -623,22 +587,17 @@ private:
 	}
 
 
-	void BeginRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkImageView DepthView, bool FirstCommandBuffer)
+	void BeginRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkImageView DepthView)
 	{
-        if (FirstCommandBuffer) {
-			VkClearValue ClearColor = {
-				.color = {1.0f, 0.0f, 0.0f, 1.0f},
-			};
+		VkClearValue ClearColor = {
+			.color = {1.0f, 0.0f, 0.0f, 1.0f},
+		};
 
-			VkClearValue DepthValue = {
-				.depthStencil = {.depth = 1.0f, .stencil = 0 }
-			};
+		VkClearValue DepthValue = {
+			.depthStencil = {.depth = 1.0f, .stencil = 0 }
+		};
 
-			m_vkCore.BeginDynamicRendering(CmdBuf, ImageView, &ClearColor, DepthView, &DepthValue);
-
-		} else {
-			m_vkCore.BeginDynamicRendering(CmdBuf, ImageView, NULL, DepthView, NULL);
-		}		
+		m_vkCore.BeginDynamicRendering(CmdBuf, ImageView, &ClearColor, DepthView, &DepthValue);
 	}
 
 
@@ -700,11 +659,11 @@ private:
 	}
 
 
-	void UpdateUniformBuffers(int MeshIndex, int ImageIndex)
+	void UpdateUniformBuffers(int ImageIndex)
 	{		
-		glm::mat4 Scale = m_scale * glm::scale(glm::mat4(1.0f), glm::vec3(Models[MeshIndex].Scale));
+		glm::mat4 Scale = m_scale * glm::scale(glm::mat4(1.0f), glm::vec3(Models[0].Scale));
 
-		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position + Models[MeshIndex].Pos);
+		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position + Models[0].Pos);
 
 		glm::mat4 World = Translate * Scale;
 
@@ -720,12 +679,12 @@ private:
 		OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 														WVP, 
 														World, 
-														m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
+														m_modelContext.m_pModel->GetTransformations(), 
 														AmbientLight,
 														DiffuseLight,
 														LightDirection, 
-														m_modelContexts[MeshIndex].m_uniformBuffersVS[ImageIndex],
-														m_modelContexts[MeshIndex].m_uniformBuffersFS[ImageIndex]);
+														m_modelContext.m_uniformBuffersVS[ImageIndex],
+														m_modelContext.m_uniformBuffersFS[ImageIndex]);
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -738,7 +697,7 @@ private:
 	struct MeshCmdBufs {
 		std::vector<VkCommandBuffer> BaseMeshDraw; // Size: m_numImages
 	};
-    std::vector<std::vector<MeshCmdBufs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
+    std::vector<MeshCmdBufs> m_cmdBufs;	// dim: lighting modes
 	std::vector<VkCommandBuffer> m_swapChainColorToPresentCmdBufs;
 	std::vector<VkCommandBuffer> m_toneMappingCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
@@ -746,7 +705,7 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
     OgldevVK::ToneMappingProgram m_toneMappingPipeline;
-	std::vector<ModelContext> m_modelContexts;
+	ModelContext m_modelContext;
 	std::vector<VkDescriptorSet> m_toneMappingDescSets;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
@@ -777,13 +736,9 @@ public:
     {
     }
 
-    void Init()
-    {
-        m_renderer.Init();
-    }
-
     void Execute()
     {
+		m_renderer.Init();
         m_renderer.Execute();
     }
 
@@ -795,8 +750,6 @@ private:
 int main(int argc, char* argv[])
 {
     Pong Game(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	Game.Init();
 
 	Game.Execute();
 
