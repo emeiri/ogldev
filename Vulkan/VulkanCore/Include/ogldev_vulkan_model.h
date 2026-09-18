@@ -69,6 +69,8 @@ public:
 
 	const std::vector<glm::mat4>& GetTransformations() const { return m_transformations; }
 
+	std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformations; }
+
 protected:
 
 	virtual void AllocBuffers() { /* Nothing to do here */ }
