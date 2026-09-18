@@ -54,7 +54,7 @@
 
 #define BIG_TEXTURE_ARRAY_BINDING 0
 
-#define APP_NAME "Tutorial 33"
+#define NAME_OF_THE_GAME "Pong"
 
 struct ModelContext {
 	OgldevVK::VkModel* m_pModel = NULL;
@@ -96,17 +96,18 @@ static std::vector<ModelConfig> Models = {
 
 VkFormat OffscreenColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
 
-class VulkanApp : public OgldevVK::GLFWCallbacks
+class PreBakedRenderer : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp(int WindowWidth, int WindowHeight)
+	PreBakedRenderer(int WindowWidth, int WindowHeight, const std::string& AppName)
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
+		m_appName = AppName;
 	}
 
-	~VulkanApp()
+	~PreBakedRenderer()
 	{
 		if (m_vkCore.GetDevice() != VK_NULL_HANDLE) {
 			vkDeviceWaitIdle(m_vkCore.GetDevice());
@@ -145,11 +146,11 @@ public:
 	}
 
 
-	void Init(const char* pAppName)
+	void Init()
 	{
-		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
+		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, m_appName.c_str());
 
-        m_vkCore.Init(pAppName, m_pWindow, (OgldevVK::InitFlags)(OgldevVK::OGLDEV_VK_INIT_COMPUTE_ENABLED));
+        m_vkCore.Init(m_appName.c_str(), m_pWindow, (OgldevVK::InitFlags)(OgldevVK::OGLDEV_VK_INIT_COMPUTE_ENABLED));
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -274,7 +275,7 @@ public:
 			if (FPSTime >= 1.0f) {
 				//printf("%d\n", Frames);
 				char Title[256];
-				snprintf(Title, sizeof(Title), "%s : FPS %d\n", APP_NAME, Frames);
+				snprintf(Title, sizeof(Title), "%s : FPS %d\n", m_appName.c_str(), Frames);
 				glfwSetWindowTitle(m_pWindow, Title);
 				FPSTime = 0.0f;
 				Frames = 0;
@@ -764,16 +765,40 @@ private:
     float m_ambientLight = 0.1f;
     float m_diffuseLight = 1.0f;
     vec3 m_lightColor = vec3(1.0f, 1.0f, 1.0f);
+	std::string m_appName;
+};
+
+
+class Pong {
+
+public:
+    
+    Pong(int WindowWidth, int WindowHeight) : m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME)
+    {
+    }
+
+    void Init()
+    {
+        m_renderer.Init();
+    }
+
+    void Execute()
+    {
+        m_renderer.Execute();
+    }
+
+private:
+    PreBakedRenderer m_renderer;
 };
 
 
 int main(int argc, char* argv[])
 {
-	VulkanApp App(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Pong Game(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	App.Init(APP_NAME);
+	Game.Init();
 
-	App.Execute();
+	Game.Execute();
 
 	return 0;
 }
