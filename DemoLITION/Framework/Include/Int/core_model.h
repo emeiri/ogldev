@@ -128,6 +128,8 @@ public:
 
     static void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
 
+    Matrix4f& GetNodeTransformation(const char* pNodeName);
+
 protected:
 
     // This is a hack for Vulkan that doesn't have a CoreWindowSystem pointer right now.
@@ -316,6 +318,12 @@ private:
 
     Assimp::Importer m_Importer;
 
+    struct HierarchyNodeInfo {
+        const aiNode* pNode = NULL;
+        Matrix4f* GlobalTransform = NULL;
+    };
+
+    std::map<std::string, HierarchyNodeInfo> m_nodeMap;
     std::vector<GLMCameraFirstPerson> m_cameras;
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight> m_pointLights;
