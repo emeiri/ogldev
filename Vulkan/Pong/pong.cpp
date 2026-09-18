@@ -76,22 +76,6 @@ struct ModelContext {
 	}
 };
 
-struct ModelConfig {
-	std::string Path;
-	glm::vec3 Pos = glm::vec3(0.0);
-    float Scale = 1.0f;
-};
-
-static std::vector<ModelConfig> Models = {
-	//{ "G:/Models/McGuire/San_Miguel/san-miguel.obj", glm::vec3(0.0f), 1.0f }
-//	{ "G:/Models/McGuire/San_Miguel/san-miguel-low-poly.obj", glm::vec3(0.0f), 1.0f },
-	//{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
-    { "../../Games/Pong/Pong.glb", glm::vec3(0.0f), 1.0f}
-//	,{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f}
-	//{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
-//	,{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f}
-//	,{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
-};
 
 
 VkFormat OffscreenColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
@@ -346,7 +330,7 @@ private:
 		u32 UniformBufferCount = 50;
 		u32 StorageBufferCount = 50;
 		u32 StorageImageCount = m_numImages;
-		u32 MaxSets = (m_numImages * (u32)Models.size() * (OgldevVK::NUM_LIGHTING_MODES + 1)) + m_numImages; // +1 for the global texture array descriptor set
+		u32 MaxSets = (m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1)) + m_numImages; // +1 for the global texture array descriptor set
 
 		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, StorageImageCount, MaxSets);
 	}
@@ -388,7 +372,8 @@ private:
 		std::vector<OgldevVK::ModelDesc> ModelDescs(1);
 		
 		m_modelContext.m_pModel->Init(&m_vkCore, true, false);
-		m_modelContext.m_pModel->LoadAssimpModel(Models[0].Path);
+		std::string Path = "../../Games/Pong/Pong.glb";
+		m_modelContext.m_pModel->LoadAssimpModel(Path);
         CreateUniformBuffers(0);
         CreateDescriptorSets(0, ModelDescs[0]);
 
@@ -661,11 +646,9 @@ private:
 
 	void UpdateUniformBuffers(int ImageIndex)
 	{		
-		glm::mat4 Scale = m_scale * glm::scale(glm::mat4(1.0f), glm::vec3(Models[0].Scale));
+		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
 
-		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position + Models[0].Pos);
-
-		glm::mat4 World = Translate * Scale;
+		glm::mat4 World = Translate;
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
