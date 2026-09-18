@@ -1,13 +1,27 @@
+/*
+
+        Copyright 2026  Etay Meiri
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #pragma once
 
 #include <cassert>
 
-struct Vec2
-{
-    float x = 0.0f;
-    float y = 0.0f;
-};
-
+#include "ogldev_math_3d.h"
 
 struct Rect
 {
@@ -22,14 +36,14 @@ class BaseObject {
     
 public:
 
-    void Init(const Vec2& size, const Vec2& pos, const Vec2& WindowSize) {
+    void Init(const Vector2f& size, const Vector2f& pos, const Vector2f& WindowSize) {
         m_pos = pos; 
         m_size = size; 
         m_halfSize = { size.x / 2.0f, size.y / 2.0f };
         m_windowSize = WindowSize;
     }
 
-    const Vec2& GetPosition() const
+    const Vector2f& GetPosition() const
     {
         return m_pos;
     }
@@ -43,17 +57,17 @@ public:
         };
     }
 
-    Vec2 GetHalfSize() const
+    Vector2f GetHalfSize() const
     {
         return m_halfSize;
     }
 
 protected:
 
-    Vec2 m_pos;
-    Vec2 m_size;
-    Vec2 m_halfSize;
-    Vec2 m_windowSize;
+    Vector2f m_pos;
+    Vector2f m_size;
+    Vector2f m_halfSize;
+    Vector2f m_windowSize;
 };
 
 
@@ -63,7 +77,7 @@ public:
 
     Paddle() = default;
 
-    void Init(const Vec2& size, const Vec2& pos, float speed, const Vec2& WindowSize) {
+    void Init(const Vector2f& size, const Vector2f& pos, float speed, const Vector2f& WindowSize) {
         BaseObject::Init(size, pos, WindowSize);
         m_speed = speed; 
     }
@@ -84,7 +98,7 @@ public:
 
     Ball() = default;
 
-    void Init(float Size, const Vec2& pos, const Vec2& velocity, const Vec2& WindowSize) { 
+    void Init(float Size, const Vector2f& pos, const Vector2f& velocity, const Vector2f& WindowSize) { 
         assert(Size > 0.0f);
         BaseObject::Init({ Size, Size }, pos, WindowSize);
         m_velocity = velocity; 
@@ -93,25 +107,25 @@ public:
 
     void Update(float deltaTime);
 
-    const Vec2& GetVelocity() const
+    const Vector2f& GetVelocity() const
     {
         return m_velocity;
     }
 
-    void SetVelocity(const Vec2& velocity)
+    void SetVelocity(const Vector2f& velocity)
     {
         m_velocity = velocity;
     }
 
 private:
 
-    Vec2 m_velocity = { -200.0f, 235.0f };
-    Vec2 m_halfWindowSize = { 0.0f, 0.0f };
+    Vector2f m_velocity = { -200.0f, 235.0f };
+    Vector2f m_halfWindowSize = { 0.0f, 0.0f };
 };
 
 
 struct GameConfig {
-    Vec2 WindowSize = { 1920.0f, 1080.0f };
+    Vector2f WindowSize = { 1920.0f, 1080.0f };
     float BallSize = 20.0f;
     float PaddleSpeed = 600.0f; // Pixels per second
     float PaddleWidth = 30.0f;
@@ -141,5 +155,5 @@ private:
     Ball m_ball;
     Paddle m_paddleL;
     Paddle m_paddleR;
-    Vec2 m_halfWindowSize;
+    Vector2f m_halfWindowSize;
 };

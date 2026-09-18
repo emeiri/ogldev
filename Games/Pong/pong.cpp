@@ -105,7 +105,7 @@ void Pong::ResolvePaddleBallCollision(Paddle& paddle)
         (m_ball.GetPosition().y - m_ball.GetHalfSize().y <= paddle.GetPosition().y + m_config.PaddleHeight / 2.0f);
 
     if (CollideWithPaddle) {
-        Vec2 NewVelocity = m_ball.GetVelocity();
+        Vector2f NewVelocity = m_ball.GetVelocity();
 
         // Bounce ball outward based on which side of center it's on
         if (m_ball.GetPosition().x < m_halfWindowSize.x && NewVelocity.x < 0.0f) {
