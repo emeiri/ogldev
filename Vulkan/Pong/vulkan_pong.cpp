@@ -18,51 +18,25 @@
     Pong In Vulkan
 */
 
-#include <array>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_vulkan.h"
-#include "imGuIZMOquat.h"
-
-#include "ogldev_vulkan_util.h"
-#include "ogldev_vulkan_core.h"
-#include "ogldev_vulkan_wrapper.h"
-#include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_glfw.h"
-#include "ogldev_vulkan_model.h"
-#include "ogldev_glm_camera.h"
-#include "ogldev_vulkan_imgui.h"
-#include "ogldev_vulkan_big_texture_array.h"
-#include "Int/model_desc.h"
-#include "lighting_program.h"
 #include "prebaked_renderer.h"
+#include "pong.h"
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
 
 #define NAME_OF_THE_GAME "Pong"
 
-class Pong {
+class VulkanPong {
 
 public:
     
-    Pong(int WindowWidth, int WindowHeight) : m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME)
+    VulkanPong(int WindowWidth, int WindowHeight) : m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME)
     {
     }
 
     void Execute()
     {
-		std::string AssetPath = "../../Games/Pong/Pong.glb";
+		std::string AssetPath = "../../Games/Pong/Pong2.glb";
 		m_renderer.Init(AssetPath);
         m_renderer.Execute();
     }
@@ -74,7 +48,7 @@ private:
 
 int main(int argc, char* argv[])
 {
-    Pong Game(WINDOW_WIDTH, WINDOW_HEIGHT);
+    VulkanPong Game(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	Game.Execute();
 
