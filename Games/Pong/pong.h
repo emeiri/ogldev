@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-#include "ogldev_math_3d.h"
+#include <glm/glm.hpp>
 
 struct Rect
 {
@@ -36,16 +36,25 @@ class BaseObject {
     
 public:
 
-    void Init(const Vector2f& size, const Vector2f& pos, const Vector2f& WindowSize) {
+    void Init(const glm::vec2& BaseOffset, const glm::vec2& size, 
+              const glm::vec2& pos, const glm::vec2& WindowSize) 
+    {
+        m_baseOffset = BaseOffset;
         m_pos = pos; 
         m_size = size; 
         m_halfSize = { size.x / 2.0f, size.y / 2.0f };
         m_windowSize = WindowSize;
     }
 
-    const Vector2f& GetPosition() const
+    const glm::vec2& GetPosition() const
     {
         return m_pos;
+    }
+
+
+    void SetPosition(const glm::vec2& pos)
+    {
+        m_pos = pos;
     }
 
     Rect GetRect() const {
@@ -57,17 +66,18 @@ public:
         };
     }
 
-    Vector2f GetHalfSize() const
+    glm::vec2 GetHalfSize() const
     {
         return m_halfSize;
     }
 
 protected:
 
-    Vector2f m_pos;
-    Vector2f m_size;
-    Vector2f m_halfSize;
-    Vector2f m_windowSize;
+    glm::vec2 m_baseOffset = { 0.0f, 0.0f };
+    glm::vec2 m_pos = { 0.0f, 0.0f };
+    glm::vec2 m_size = { 0.0f, 0.0f };
+    glm::vec2 m_halfSize = { 0.0f, 0.0f };
+    glm::vec2 m_windowSize = { 0.0f, 0.0f };
 };
 
 
@@ -77,8 +87,8 @@ public:
 
     Paddle() = default;
 
-    void Init(const Vector2f& size, const Vector2f& pos, float speed, const Vector2f& WindowSize) {
-        BaseObject::Init(size, pos, WindowSize);
+    void Init(const glm::vec2& BaseOffset, const glm::vec2& size, const glm::vec2& pos, float speed, const glm::vec2& WindowSize) {
+        BaseObject::Init(BaseOffset, size, pos, WindowSize);
         m_speed = speed; 
     }
 
@@ -98,39 +108,41 @@ public:
 
     Ball() = default;
 
-    void Init(float Size, const Vector2f& pos, const Vector2f& velocity, const Vector2f& WindowSize) { 
+    void Init(const glm::vec2& BaseOffset, float Size, const glm::vec2& pos, const glm::vec2& velocity, const glm::vec2& WindowSize) { 
         assert(Size > 0.0f);
-        BaseObject::Init({ Size, Size }, pos, WindowSize);
+        BaseObject::Init(BaseOffset, { Size, Size }, pos, WindowSize);
         m_velocity = velocity; 
         m_halfWindowSize = { WindowSize.x / 2.0f, WindowSize.y / 2.0f };
     }
 
     void Update(float deltaTime);
 
-    const Vector2f& GetVelocity() const
+    const glm::vec2& GetVelocity() const
     {
         return m_velocity;
     }
 
-    void SetVelocity(const Vector2f& velocity)
+    void SetVelocity(const glm::vec2& velocity)
     {
         m_velocity = velocity;
     }
 
 private:
 
-    Vector2f m_velocity = { -200.0f, 235.0f };
-    Vector2f m_halfWindowSize = { 0.0f, 0.0f };
+    glm::vec2 m_velocity = { -200.0f, 235.0f };
+    glm::vec2 m_halfWindowSize = { 0.0f, 0.0f };
 };
 
 
 struct GameConfig {
-    Vector2f WindowSize = { 1920.0f, 1080.0f };
+    glm::vec2 WindowSize = { 1920.0f, 1080.0f };
+    glm::vec2 BaseWindowPosition = { 0.0f, 0.0f };
     float BallSize = 20.0f;
     float PaddleSpeed = 600.0f; // Pixels per second
     float PaddleWidth = 30.0f;
     float PaddleHeight = 300.0f;
     float PaddleOffset = 25.0f; // Distance from the edge of the window
+    glm::vec2 BallInitialVelocity = { -200.0f, 235.0f };
 };
 
 
@@ -163,5 +175,5 @@ private:
     Ball m_ball;
     Paddle m_paddleL;
     Paddle m_paddleR;
-    Vector2f m_halfWindowSize;
+    glm::vec2 m_halfWindowSize;
 };
