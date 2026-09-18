@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Vulkan\Pong\lighting_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Pong\pong.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\Pong\prebaked_renderer.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Pong\tone_mapping_program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\Pong\lighting_program.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\Pong\prebaked_renderer.h" />
     <ClInclude Include="..\..\..\..\Vulkan\Pong\tone_mapping_program.h" />
   </ItemGroup>
   <ItemGroup>
