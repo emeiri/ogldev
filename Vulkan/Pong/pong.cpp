@@ -126,7 +126,7 @@ public:
 	}
 
 
-	void Init()
+	void Init(const std::string& AssetPath)
 	{
 		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, m_appName.c_str());
 
@@ -139,7 +139,7 @@ public:
 		InitBigTextureArray();
 		CreateOffscreenImages();
 		CreatePipelines();
-		CreateMeshe();
+		CreateMeshe(AssetPath);
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 		InitCameraFromModel();
@@ -364,7 +364,7 @@ private:
 	}
 
 
-	void CreateMeshe()
+	void CreateMeshe(const std::string& AssetPath)
 	{
         m_modelContext.m_pModel = new OgldevVK::VkModel();
 
@@ -372,8 +372,7 @@ private:
 		std::vector<OgldevVK::ModelDesc> ModelDescs(1);
 		
 		m_modelContext.m_pModel->Init(&m_vkCore, true, false);
-		std::string Path = "../../Games/Pong/Pong.glb";
-		m_modelContext.m_pModel->LoadAssimpModel(Path);
+		m_modelContext.m_pModel->LoadAssimpModel(AssetPath);
         CreateUniformBuffers(0);
         CreateDescriptorSets(0, ModelDescs[0]);
 
@@ -721,7 +720,8 @@ public:
 
     void Execute()
     {
-		m_renderer.Init();
+		std::string AssetPath = "../../Games/Pong/Pong.glb";
+		m_renderer.Init(AssetPath);
         m_renderer.Execute();
     }
 
