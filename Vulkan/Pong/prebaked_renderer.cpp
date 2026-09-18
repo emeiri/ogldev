@@ -16,7 +16,6 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <array>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -26,27 +25,10 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_vulkan.h"
-#include "imGuIZMOquat.h"
-
-#include "ogldev_vulkan_util.h"
-#include "ogldev_vulkan_core.h"
+#include "prebaked_renderer.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_glfw.h"
-#include "ogldev_vulkan_model.h"
-#include "ogldev_glm_camera.h"
-#include "ogldev_vulkan_imgui.h"
-#include "ogldev_vulkan_big_texture_array.h"
-#include "Int/model_desc.h"
-#include "lighting_program.h"
-#include "prebaked_renderer.h"
-
-#define WINDOW_WIDTH 2560
-#define WINDOW_HEIGHT 1440
+//#include "Int/model_desc.h"
 
 #define MAX_TEXTURES 4096
 
@@ -102,7 +84,7 @@ PreBakedRenderer::~PreBakedRenderer()
 
 void PreBakedRenderer::Init(const std::string& AssetPath)
 {
-	m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, m_appName.c_str());
+	m_pWindow = OgldevVK::glfw_vulkan_init(m_windowWidth, m_windowHeight, m_appName.c_str());
 
     m_vkCore.Init(m_appName.c_str(), m_pWindow, (OgldevVK::InitFlags)(OgldevVK::OGLDEV_VK_INIT_COMPUTE_ENABLED));
 	m_device = m_vkCore.GetDevice();

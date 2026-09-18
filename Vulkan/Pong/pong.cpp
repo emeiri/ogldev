@@ -50,10 +50,6 @@
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
 
-#define MAX_TEXTURES 4096
-
-#define BIG_TEXTURE_ARRAY_BINDING 0
-
 #define NAME_OF_THE_GAME "Pong"
 
 class Pong {

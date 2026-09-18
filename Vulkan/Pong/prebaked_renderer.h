@@ -18,7 +18,19 @@
 
 #pragma once
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+#include "imGuIZMOquat.h"
+
+#include "ogldev_vulkan_imgui.h"
+#include "ogldev_vulkan_glfw.h"
+#include "ogldev_vulkan_big_texture_array.h"
+#include "ogldev_glm_camera.h"
 #include "tone_mapping_program.h"
+#include "lighting_program.h"
+#include "ogldev_vulkan_model.h"
 
 
 struct ModelContext {
