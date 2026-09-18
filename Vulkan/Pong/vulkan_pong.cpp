@@ -34,13 +34,13 @@ public:
 		: m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME, this)
     {
         m_config.WindowSize = { 20.0f, 19.0f };
-        m_config.BallInitialVelocity = { -5.0f, 0.0f };
+        m_config.BallSpeed = 5.0f;
         m_config.BallSize = 0.75f;
         m_config.BaseWindowPosition = { -10.0f, -9.5f };
         m_config.PaddleHeight = 4.0f;
         m_config.PaddleWidth = 1.0f;
         m_config.PaddleOffset = 0.5f;
-        m_config.PaddleSpeed = 5.0f;
+        m_config.PaddleSpeed = 6.0f;
     }
 
     void Execute()
