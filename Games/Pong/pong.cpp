@@ -34,8 +34,8 @@ void Ball::Update(float deltaTime)
     if (BallHitsTop && m_velocity.y < 0.0f) {
         m_pos.y = m_baseOffset.y + m_halfSize.y; // Positional correction to prevent wall trapping
         m_velocity.y = -m_velocity.y;
-      //  printf("Ball hit the top wall. New velocity: x=%f, y=%f\n", m_velocity.x, m_velocity.y);
-       // exit(0);
+     //   printf("Ball hit the top wall. New velocity: x=%f, y=%f\n", m_velocity.x, m_velocity.y);
+     //   exit(0);
     } else if (BallHitsBottom && m_velocity.y > 0.0f) {
         m_pos.y = m_baseOffset.y + m_windowSize.y - m_halfSize.y; // Positional correction
         m_velocity.y = -m_velocity.y;
@@ -86,7 +86,7 @@ void Pong::Init(const GameConfig& config)
 
 void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown, float DeltaTime)
 {
-    printf("DeltaTime: %f\n", DeltaTime);
+    //printf("DeltaTime: %f\n", DeltaTime);
     if (PaddleLUp) {
         m_paddleL.HandleUpKey(DeltaTime);
     }
@@ -126,13 +126,13 @@ void Pong::ResolvePaddleBallCollision(Paddle& paddle)
     bool CollideWithPaddle = (BallLeftSide <= PaddleRightSide) && (BallRightSide >= PaddleLeftSide) &&
                              (BallTopSide >= PaddleBottomSide) && (BallBottomSide <= PaddleTopSide);
 
-    printf("Ball Position: x=%f, y=%f\n", m_ball.GetPosition().x, m_ball.GetPosition().y);
-    printf("Ball left: %f, right: %f, top: %f, bottom: %f\n", BallLeftSide, BallRightSide, BallBottomSide, BallTopSide);
-    printf("Paddle Position: x=%f, y=%f\n", paddle.GetPosition().x, paddle.GetPosition().y);
-    printf("Paddle left: %f, right: %f, top: %f, bottom: %f\n", PaddleLeftSide, PaddleRightSide, PaddleBottomSide, PaddleTopSide);
+  //  printf("Ball Position: x=%f, y=%f\n", m_ball.GetPosition().x, m_ball.GetPosition().y);
+  //  printf("Ball left: %f, right: %f, top: %f, bottom: %f\n", BallLeftSide, BallRightSide, BallBottomSide, BallTopSide);
+  //  printf("Paddle Position: x=%f, y=%f\n", paddle.GetPosition().x, paddle.GetPosition().y);
+  //  printf("Paddle left: %f, right: %f, top: %f, bottom: %f\n", PaddleLeftSide, PaddleRightSide, PaddleBottomSide, PaddleTopSide);
 
     if (CollideWithPaddle) {
-        printf("!!!!!!!!!!!!!!!!!!!!!!!!! COLLISION DETECTED !!!!!!!!!!!!!!!!!!!!!!!!!\n");
+       // printf("!!!!!!!!!!!!!!!!!!!!!!!!! COLLISION DETECTED !!!!!!!!!!!!!!!!!!!!!!!!!\n");
         glm::vec2 NewVelocity = m_ball.GetVelocity();
         glm::vec2 NewPosition = m_ball.GetPosition(); // Get current position
 
