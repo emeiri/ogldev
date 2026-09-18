@@ -39,11 +39,13 @@
 
 VkFormat OffscreenColorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
 
-PreBakedRenderer::PreBakedRenderer(int WindowWidth, int WindowHeight, const std::string& AppName)
+PreBakedRenderer::PreBakedRenderer(int WindowWidth, int WindowHeight, 
+								   const std::string& AppName, GameCallbacks* pGameCallbacks)
 {
 	m_windowWidth = WindowWidth;
 	m_windowHeight = WindowHeight;
 	m_appName = AppName;
+	m_pGameCallbacks = pGameCallbacks;
 }
 
 
@@ -167,6 +169,10 @@ void PreBakedRenderer::Key(GLFWwindow* pWindow, int Key, int Scancode, int Actio
 
 	if (!Handled) {
 		Handled = GLFWCameraHandler(m_pGameCamera->m_movement, Key, Action, Mods);
+
+        if (!Handled && m_pGameCallbacks) {
+            m_pGameCallbacks->OnKey(Key, Scancode, Action, Mods);
+        }
 	}
 }
 	
@@ -196,6 +202,9 @@ void PreBakedRenderer::Execute()
 	while (!glfwWindowShouldClose(m_pWindow)) {
 		float Time = (float)glfwGetTime();
 		float dt = Time - CurTime;
+        if (m_pGameCallbacks) {
+            m_pGameCallbacks->UpdateGameState(dt);
+        }
 		m_pGameCamera->Update(dt);
 		RenderScene();
 		CurTime = Time;

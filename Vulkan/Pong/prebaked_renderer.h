@@ -54,11 +54,25 @@ struct ModelContext {
 };
 
 
+class GameCallbacks {
+
+public:
+
+	virtual void UpdateGameState(float DeltaTime) {}
+
+    virtual void OnKey(int Key, int Scancode, int Action, int Mods) {}
+
+    virtual void OnMouseMove(double x, double y) {}
+
+    virtual void OnMouseButton(int Button, int Action, int Mods) {}
+
+};
+
 class PreBakedRenderer : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	PreBakedRenderer(int WindowWidth, int WindowHeight, const std::string& AppName);
+	PreBakedRenderer(int WindowWidth, int WindowHeight, const std::string& AppName, GameCallbacks* pGameCallbacks);
 
 	~PreBakedRenderer();
 
@@ -71,6 +85,8 @@ public:
 	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods);
 
 	void Execute();
+
+    OgldevVK::VkModel& GetModel() { return *m_modelContext.m_pModel; }
 
 private:
 
@@ -154,6 +170,7 @@ private:
 	float m_diffuseLight = 1.0f;
 	vec3 m_lightColor = vec3(1.0f, 1.0f, 1.0f);
 	std::string m_appName;
+	GameCallbacks* m_pGameCallbacks = NULL;
 };
 
 

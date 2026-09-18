@@ -26,23 +26,91 @@
 
 #define NAME_OF_THE_GAME "Pong"
 
-class VulkanPong {
+class VulkanPong : public GameCallbacks {
 
 public:
     
-    VulkanPong(int WindowWidth, int WindowHeight) : m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME)
+    VulkanPong(int WindowWidth, int WindowHeight) 
+		: m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME, this)
     {
+        m_config.WindowSize = { 20.0f, 20.0f };// { (float)WindowWidth, (float)WindowHeight };
+        m_config.BallInitialVelocity = { -1.0f, 0.0f };
+        m_config.BallSize = 0.75f;
+        m_config.BaseWindowPosition = { -10.0f, -10.0f };
+        m_config.PaddleHeight = 4.0f;
+        m_config.PaddleWidth = 1.0f;
+        m_config.PaddleOffset = 0.5f;
+        m_config.PaddleSpeed = 5.0f;
     }
 
     void Execute()
     {
+        m_game.Init(m_config);
+
 		std::string AssetPath = "../../Games/Pong/Pong2.glb";
 		m_renderer.Init(AssetPath);
         m_renderer.Execute();
     }
 
+	void UpdateGameState(float dt)
+	{
+        //printf("DeltaTime: %f\n", dt);
+        m_game.Update(m_inputState.PaddleLUp, m_inputState.PaddleLDown, 
+                      m_inputState.PaddleRUp, m_inputState.PaddleRDown, dt);
+
+        Rect BallRect, PaddleLRect, PaddleRRect;
+
+        m_game.GetRects(BallRect, PaddleLRect, PaddleRRect);
+
+        OgldevVK::VkModel& PongModel = m_renderer.GetModel();
+
+        std::vector<glm::mat4>& Transformations = PongModel.GetTransformationsMutable();
+
+        glm::mat4& BallTransform = Transformations[0];
+
+        BallTransform[3][0] = BallRect.x;
+        BallTransform[3][2] = BallRect.y;
+
+     //   printf("BallRect.x %f Ratio %f BallX: %f\n", BallRect.x, (BallRect.x / m_config.WindowSize.x), BallX);
+
+        glm::mat4& PaddleLTransform = Transformations[1];
+        glm::mat4& PaddleRTransform = Transformations[2];
+        
+        
+        //printf("Ball: x=%f, y=%f, w=%f, h=%f\n", BallRect.x, BallRect.y, BallRect.w, BallRect.h);
+        //m_renderer.SetEntityPositions(BallRect, PaddleLRect, PaddleRRect);
+	}
+
+
+    virtual void OnKey(int Key, int Scancode, int Action, int Mods)
+    {
+        bool KeyPressed = (Action == GLFW_PRESS || Action == GLFW_REPEAT);
+
+        switch (Key) {
+        case GLFW_KEY_R:
+            m_inputState.PaddleLUp = KeyPressed;
+            break;
+
+        case GLFW_KEY_F:
+            m_inputState.PaddleLDown = KeyPressed;
+            break;
+
+        case GLFW_KEY_O:
+            m_inputState.PaddleRUp = KeyPressed;
+            break;
+
+        case GLFW_KEY_L:
+            m_inputState.PaddleRDown = KeyPressed;
+            break;
+        }
+    }
+
+
 private:
     PreBakedRenderer m_renderer;
+	GameConfig m_config;
+    Pong m_game;
+    PongInputState m_inputState;
 };
 
 
