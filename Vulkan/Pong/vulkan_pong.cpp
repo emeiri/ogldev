@@ -34,7 +34,7 @@ public:
 		: m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME, this)
     {
         m_config.WindowSize = { 20.0f, 20.0f };// { (float)WindowWidth, (float)WindowHeight };
-        m_config.BallInitialVelocity = { -1.0f, 0.0f };
+        m_config.BallInitialVelocity = { -5.0f, 0.0f };
         m_config.BallSize = 0.75f;
         m_config.BaseWindowPosition = { -10.0f, -10.0f };
         m_config.PaddleHeight = 4.0f;
@@ -67,14 +67,18 @@ public:
         std::vector<glm::mat4>& Transformations = PongModel.GetTransformationsMutable();
 
         glm::mat4& BallTransform = Transformations[0];
-
-        BallTransform[3][0] = BallRect.x;
-        BallTransform[3][2] = BallRect.y;
+        BallTransform[3][0] = BallRect.x + (BallRect.w / 2.0f);
+        BallTransform[3][2] = BallRect.y + (BallRect.h / 2.0f);
 
      //   printf("BallRect.x %f Ratio %f BallX: %f\n", BallRect.x, (BallRect.x / m_config.WindowSize.x), BallX);
 
-        glm::mat4& PaddleLTransform = Transformations[1];
-        glm::mat4& PaddleRTransform = Transformations[2];
+        glm::mat4& PaddleLTransform = Transformations[2];
+        PaddleLTransform[3][0] = PaddleLRect.x + (PaddleLRect.w / 2.0f);
+        PaddleLTransform[3][2] = PaddleLRect.y + (PaddleLRect.h / 2.0f);
+
+        glm::mat4& PaddleRTransform = Transformations[3];
+        PaddleRTransform[3][0] = PaddleRRect.x + (PaddleRRect.w / 2.0f);
+        PaddleRTransform[3][2] = PaddleRRect.y + (PaddleRRect.h / 2.0f);
         
         
         //printf("Ball: x=%f, y=%f, w=%f, h=%f\n", BallRect.x, BallRect.y, BallRect.w, BallRect.h);
