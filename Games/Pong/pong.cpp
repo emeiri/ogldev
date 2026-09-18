@@ -5,7 +5,7 @@ void Paddle::HandleUpKey(float deltaTime)
 {
     m_pos.y -= m_speed * deltaTime;
 
-    if (m_pos.y - m_halfSize.y < 0.0f) {
+    if (m_pos.y - m_halfSize.y < m_baseOffset.y) {
         m_pos.y = m_baseOffset.y + m_halfSize.y;
     }
 }
@@ -15,7 +15,7 @@ void Paddle::HandleDownKey(float deltaTime)
 {
     m_pos.y += m_speed * deltaTime;
 
-    if (m_pos.y + m_halfSize.y > m_windowSize.y) {
+    if (m_pos.y + m_halfSize.y > m_baseOffset.y + m_windowSize.y) {
         m_pos.y = m_baseOffset.y + m_windowSize.y - m_halfSize.y;
     }
 }
