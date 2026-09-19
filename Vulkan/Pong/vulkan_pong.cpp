@@ -34,7 +34,6 @@ public:
 		: m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME, this)
     {        
         m_config.BallSpeed = 5.0f;        
-        m_config.PaddleOffset = 0.5f;
         m_config.PaddleMaxSpeed = 15.0f;
         m_config.PaddleAcceleration = 20.0f;
         m_config.PaddleDeceleration = 15.0f;
@@ -54,7 +53,7 @@ public:
         const MeshDims& PaddleRDims = PongModel.GetNodeDims("PaddleR");
 
         m_config.BallSize = BallDims.Size.x;
-        
+        m_config.PaddleOffset = PaddleLDims.Size.x / 2.0f;
         m_config.PaddleWidth = PaddleLDims.Size.x;
         m_config.PaddleHeight = PaddleLDims.Size.z;
 
