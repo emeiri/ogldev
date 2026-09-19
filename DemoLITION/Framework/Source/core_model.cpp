@@ -255,11 +255,11 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 
     CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
-    InitBuffers(pScene, NumVertices, NumIndices);
-
     if (!InitMaterials(pScene, Filename)) {
         return false;
-    }    
+    }
+
+    InitBuffers(pScene, NumVertices, NumIndices);
 
     CalculateMeshTransformations(pScene);
 
