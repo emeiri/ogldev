@@ -333,9 +333,6 @@ private:
     float m_textureScale = 1.0f;
     u32 m_numAnimations = 0;
 
-    Vector3f m_minPos = Vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
-    Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-
     bool m_flipTexCoordV = false;
 
     /////////////////////////////////////
