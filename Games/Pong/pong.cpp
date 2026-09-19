@@ -46,24 +46,20 @@ static glm::vec2 CreateRandomNormalizedVector()
 }
 
 
-void Paddle::HandleUpKey(float deltaTime)
+
+void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
 {
-    m_pos.y -= m_speed * deltaTime;
+    m_accelObj.Update(deltaTime, IsUpKeyPressed, IsDownKeyPressed);
+
+    m_pos.y += m_accelObj.GetCurrentSpeed() * deltaTime;
+
     //printf("Paddle Position: x=%f, y=%f\n", m_pos.x, m_pos.y);
     if (m_pos.y - m_halfSize.y < m_baseOffset.y) {
         m_pos.y = m_baseOffset.y + m_halfSize.y;
-       // printf("Paddle hit the top wall. New position: x=%f, y=%f\n", m_pos.x, m_pos.y);
-    }
-}
-
-
-void Paddle::HandleDownKey(float deltaTime)
-{
-    m_pos.y += m_speed * deltaTime;
-   // printf("Paddle Position: x=%f, y=%f\n", m_pos.x, m_pos.y);
-    if (m_pos.y + m_halfSize.y > m_baseOffset.y + m_windowSize.y) {
+        // printf("Paddle hit the top wall. New position: x=%f, y=%f\n", m_pos.x, m_pos.y);
+    }   if (m_pos.y + m_halfSize.y > m_baseOffset.y + m_windowSize.y) {
         m_pos.y = m_baseOffset.y + m_windowSize.y - m_halfSize.y;
-      //  printf("Paddle hit the wall. New position: x=%f, y=%f\n", m_pos.x, m_pos.y);
+        //  printf("Paddle hit the wall. New position: x=%f, y=%f\n", m_pos.x, m_pos.y);
     }
 }
 
@@ -133,37 +129,26 @@ void Pong::Init(const GameConfig& config)
     pos = config.BaseWindowPosition + glm::vec2(m_config.PaddleOffset, m_halfWindowSize.y);
 
     m_paddleL.Init(config.BaseWindowPosition, { m_config.PaddleWidth, m_config.PaddleHeight }, pos, 
-                   m_config.PaddleSpeed, m_config.WindowSize);
+                   m_config.PaddleMaxSpeed, m_config.PaddleAcceleration, m_config.PaddleDeceleration, m_config.WindowSize);
 
     pos = config.BaseWindowPosition + glm::vec2(m_config.WindowSize.x - m_config.PaddleOffset, m_halfWindowSize.y);
 
     m_paddleR.Init(config.BaseWindowPosition, { m_config.PaddleWidth, m_config.PaddleHeight }, pos, 
-                   m_config.PaddleSpeed, m_config.WindowSize);
+                   m_config.PaddleMaxSpeed, m_config.PaddleAcceleration, m_config.PaddleDeceleration, m_config.WindowSize);
 }
 
 
 void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown, float DeltaTime)
 {
     //printf("DeltaTime: %f\n", DeltaTime);
-    if (PaddleLUp) {
-        m_paddleL.HandleUpKey(DeltaTime);
-    }
+    m_paddleL.Update(DeltaTime, PaddleLUp, PaddleLDown);
 
-    if (PaddleLDown) {
-        m_paddleL.HandleDownKey(DeltaTime);
-    }
-
-    if (PaddleRUp) {
-        m_paddleR.HandleUpKey(DeltaTime);
-    }
-
-    if (PaddleRDown) {
-        m_paddleR.HandleDownKey(DeltaTime);
-    }
+    m_paddleR.Update(DeltaTime, PaddleRUp, PaddleRDown);
     
     m_ball.Update(DeltaTime);
 
     ResolvePaddleBallCollision(m_paddleL);
+
     ResolvePaddleBallCollision(m_paddleR);
 }
 

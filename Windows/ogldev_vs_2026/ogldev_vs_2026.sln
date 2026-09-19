@@ -49,6 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F
 	ProjectSection(SolutionItems) = preProject
 		..\..\Include\glfx.h = ..\..\Include\glfx.h
 		..\..\Include\ogldev.h = ..\..\Include\ogldev.h
+		..\..\Include\ogldev_accelorobject.h = ..\..\Include\ogldev_accelorobject.h
 		..\..\Include\ogldev_app.h = ..\..\Include\ogldev_app.h
 		..\..\Include\ogldev_array_2d.h = ..\..\Include\ogldev_array_2d.h
 		..\..\Include\ogldev_atb.h = ..\..\Include\ogldev_atb.h

@@ -23,6 +23,8 @@
 
 #include <glm/glm.hpp>
 
+#include "ogldev_accelorobject.h"
+
 struct Rect
 {
     float x = 0.0f;
@@ -87,18 +89,18 @@ public:
 
     Paddle() = default;
 
-    void Init(const glm::vec2& BaseOffset, const glm::vec2& size, const glm::vec2& pos, float speed, const glm::vec2& WindowSize) {
+    void Init(const glm::vec2& BaseOffset, const glm::vec2& size, const glm::vec2& pos, 
+              float MaxSpeed, float Acceleration, float Deceleration, const glm::vec2& WindowSize)
+    {
         BaseObject::Init(BaseOffset, size, pos, WindowSize);
-        m_speed = speed; 
+        m_accelObj.Init(MaxSpeed, Acceleration, Deceleration);
     }
 
-    void HandleUpKey(float deltaTime);
-
-    void HandleDownKey(float deltaTime);
+    void Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed);
 
 private:
 
-    float m_speed = 0.0f;
+    AccelorObject m_accelObj;
 };
 
 
@@ -108,7 +110,9 @@ public:
 
     Ball() = default;
 
-    void Init(const glm::vec2& BaseOffset, float Size, const glm::vec2& pos, const glm::vec2& velocity, const glm::vec2& WindowSize) { 
+    void Init(const glm::vec2& BaseOffset, float Size, const glm::vec2& pos, 
+              const glm::vec2& velocity, const glm::vec2& WindowSize) 
+    { 
         assert(Size > 0.0f);
         BaseObject::Init(BaseOffset, { Size, Size }, pos, WindowSize);
         m_velocity = velocity; 
@@ -139,7 +143,9 @@ struct GameConfig {
     glm::vec2 BaseWindowPosition = { 0.0f, 0.0f };
     float BallSpeed = 400.0f; // Pixels per second
     float BallSize = 20.0f;
-    float PaddleSpeed = 600.0f; // Pixels per second
+    float PaddleMaxSpeed = 600.0f; // Pixels per second
+    float PaddleAcceleration = 2000.0f;
+    float PaddleDeceleration = 1000.0f;
     float PaddleWidth = 30.0f;
     float PaddleHeight = 300.0f;
     float PaddleOffset = 25.0f; // Distance from the edge of the window

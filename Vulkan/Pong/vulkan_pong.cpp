@@ -40,7 +40,9 @@ public:
         m_config.PaddleHeight = 4.0f;
         m_config.PaddleWidth = 1.0f;
         m_config.PaddleOffset = 0.5f;
-        m_config.PaddleSpeed = 6.0f;
+        m_config.PaddleMaxSpeed = 15.0f;
+        m_config.PaddleAcceleration = 12.0f;
+        m_config.PaddleDeceleration = 12.0f;
     }
 
     void Execute()
@@ -91,19 +93,19 @@ public:
         bool KeyPressed = (Action == GLFW_PRESS || Action == GLFW_REPEAT);
 
         switch (Key) {
-        case GLFW_KEY_F:
+        case GLFW_KEY_R:
             m_inputState.PaddleLUp = KeyPressed;
             break;
 
-        case GLFW_KEY_R:
+        case GLFW_KEY_F:
             m_inputState.PaddleLDown = KeyPressed;
             break;
 
-        case GLFW_KEY_L:
+        case GLFW_KEY_O:
             m_inputState.PaddleRUp = KeyPressed;
             break;
 
-        case GLFW_KEY_O:
+        case GLFW_KEY_L:
             m_inputState.PaddleRDown = KeyPressed;
             break;
         }
