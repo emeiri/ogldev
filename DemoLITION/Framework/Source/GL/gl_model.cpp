@@ -181,7 +181,7 @@ bool GLModel::LoadMesh(const std::string& Filename)
         m_Meshes[i].BaseIndex = mesh.m_meshes[i].m_baseIndex;
         //m_Meshes[i].ValidFaces =
         m_Meshes[i].MaterialIndex = 0;
-        m_Meshes[i].Transformation.InitIdentity();
+        m_Meshes[i].TransformationDeprecated.InitIdentity();
     }
 
     m_Indices.resize(mesh.m_totalIndices);
@@ -437,7 +437,7 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
         pRenderCallbacks->ControlSpecularExponent_CB(HasSpecularTexure);
         pRenderCallbacks->DrawStart_CB(MeshIndex);
         pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
-        pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].Transformation);
+        pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].TransformationDeprecated);
     }
 
     glDrawElementsBaseVertex(GL_TRIANGLES,

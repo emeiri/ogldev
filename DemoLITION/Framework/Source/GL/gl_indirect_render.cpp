@@ -53,7 +53,7 @@ void IndirectRender::InitMeshes(const std::vector<BasicMeshEntry>& Meshes)
     m_meshes.resize(Meshes.size());
 
     for (int i = 0; i < Meshes.size(); i++) {
-        m_meshes[i].m_transformation = Meshes[i].Transformation;
+        m_meshes[i].m_transformation = Meshes[i].TransformationDeprecated;
         m_meshes[i].m_materialIndex = Meshes[i].MaterialIndex;
     }
 }

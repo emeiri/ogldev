@@ -372,7 +372,7 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 
     Matrix4f CombinedTransformation = ParentTransformation * NodeTransformation;
 
-    m_nodeMap[pNode->mName.C_Str()] = { pNode, &m_Meshes[0].Transformation };//CombinedTransformation
+    m_nodeMap[pNode->mName.C_Str()] = { pNode, &m_Meshes[0].TransformationDeprecated };//CombinedTransformation
 
 
 #ifdef DEBUG_SCENE_HIERARCHY
@@ -389,7 +389,7 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 #ifdef DEBUG_SCENE_HIERARCHY
             printf("%d ", MeshIndex);
 #endif
-            m_Meshes[MeshIndex].Transformation = CombinedTransformation;
+            m_Meshes[MeshIndex].TransformationDeprecated = CombinedTransformation;
         }
 #ifdef DEBUG_SCENE_HIERARCHY
         printf("\n");

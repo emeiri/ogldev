@@ -217,7 +217,7 @@ void VkModel::InitGeometryPost()
 	m_transformations.resize(m_Meshes.size());
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-		glm::mat4 MeshTransform = glm::make_mat4(m_Meshes[SubmeshIndex].Transformation.data());
+		glm::mat4 MeshTransform = glm::make_mat4(m_Meshes[SubmeshIndex].TransformationDeprecated.data());
 		// The matrix is stored as row major in the file but glm expects column major by default.
 		m_transformations[SubmeshIndex] = glm::transpose(MeshTransform);
 	}
