@@ -33,4 +33,5 @@ struct BasicMeshEntry {
     // Moved to the node hierarchy. This is still here to ease the transition.
     Matrix4f TransformationDeprecated;
     std::string Name;
+    glm::vec3 Size = glm::vec3(0.0f);
 };

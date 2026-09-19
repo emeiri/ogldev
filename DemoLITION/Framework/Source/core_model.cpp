@@ -54,19 +54,19 @@ aiProcess_OptimizeGraph)
 #endif
 
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (\
-aiProcess_Triangulate | \
-aiProcess_GenSmoothNormals |    \
 aiProcess_CalcTangentSpace |    \
-aiProcess_JoinIdenticalVertices |   \
-aiProcess_SortByPType |              \
-aiProcess_GenUVCoords | \
-aiProcess_ValidateDataStructure | \
-aiProcess_RemoveRedundantMaterials | \
 aiProcess_FindDegenerates | \
 aiProcess_FindInvalidData | \
+aiProcess_GenBoundingBoxes | \
+aiProcess_GenSmoothNormals |    \
+aiProcess_GenUVCoords | \
+aiProcess_ImproveCacheLocality | \
+aiProcess_JoinIdenticalVertices |   \
 aiProcess_LimitBoneWeights | \
-aiProcess_ImproveCacheLocality)
-
+aiProcess_RemoveRedundantMaterials | \
+aiProcess_SortByPType | \
+aiProcess_Triangulate | \
+aiProcess_ValidateDataStructure)
 #else
 
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices | \
@@ -344,6 +344,13 @@ void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Ve
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
 
+        aiAABB BBox = paiMesh->mAABB;
+
+        float Width = BBox.mMax.x - BBox.mMin.x;
+        float Height = BBox.mMax.y - BBox.mMin.y;
+        float Depth = BBox.mMax.z - BBox.mMin.z;
+        m_Meshes[i].Size = glm::vec3(Width, Height, Depth);
+
         if (UseMeshOptimizer) {
             InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
         } else {
@@ -426,6 +433,7 @@ template<typename VertexType>
 void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh) 
 {
     printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
+    printf("Size: %f, %f, %f\n", m_Meshes[MeshIndex].Size.x, m_Meshes[MeshIndex].Size.y, m_Meshes[MeshIndex].Size.z);
 
     // Update exact data tracking directly from current dynamic array size to prevent offset corruption
     m_Meshes[MeshIndex].BaseVertex = (uint)(Vertices.size());
