@@ -34,4 +34,6 @@ struct BasicMeshEntry {
     Matrix4f TransformationDeprecated;
     std::string Name;
     glm::vec3 Size = glm::vec3(0.0f);
+    glm::vec3 BboxMin = glm::vec3(0.0f);
+    glm::vec3 BboxMax = glm::vec3(0.0f);
 };

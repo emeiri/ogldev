@@ -342,6 +342,8 @@ void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Ve
         const aiMesh* paiMesh = pScene->mMeshes[i];
 
         aiAABB BBox = paiMesh->mAABB;
+        m_Meshes[i].BboxMin = glm::vec3(BBox.mMin.x, BBox.mMin.y, BBox.mMin.z);
+        m_Meshes[i].BboxMax = glm::vec3(BBox.mMax.x, BBox.mMax.y, BBox.mMax.z);
 
         float Width = BBox.mMax.x - BBox.mMin.x;
         float Height = BBox.mMax.y - BBox.mMin.y;
