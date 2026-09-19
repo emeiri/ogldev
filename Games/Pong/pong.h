@@ -173,6 +173,8 @@ public:
 
     void GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const;
 
+    void GetPositions(glm::vec2& BallPos, glm::vec2& PaddleLPos, glm::vec2& PaddleRPos) const;
+
 private:
 
     void ResolvePaddleBallCollision(Paddle& paddle);

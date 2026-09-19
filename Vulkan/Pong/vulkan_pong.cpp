@@ -60,31 +60,25 @@ public:
         m_game.Update(m_inputState.PaddleLUp, m_inputState.PaddleLDown, 
                       m_inputState.PaddleRUp, m_inputState.PaddleRDown, dt);
 
-        Rect BallRect, PaddleLRect, PaddleRRect;
+        glm::vec2 BallPos, PaddleLPos, PaddleRPos;
 
-        m_game.GetRects(BallRect, PaddleLRect, PaddleRRect);
+        m_game.GetPositions(BallPos, PaddleLPos, PaddleRPos);
 
         OgldevVK::VkModel& PongModel = m_renderer.GetModel();
 
         std::vector<glm::mat4>& Transformations = PongModel.GetTransformationsMutable();
 
         glm::mat4& BallTransform = Transformations[0];
-        BallTransform[3][0] = BallRect.x + (BallRect.w / 2.0f);
-        BallTransform[3][2] = BallRect.y + (BallRect.h / 2.0f);
-
-     //   printf("BallRect.x %f Ratio %f BallX: %f\n", BallRect.x, (BallRect.x / m_config.WindowSize.x), BallX);
+        BallTransform[3][0] = BallPos.x;
+        BallTransform[3][2] = BallPos.y;
 
         glm::mat4& PaddleLTransform = Transformations[2];
-        PaddleLTransform[3][0] = PaddleLRect.x + (PaddleLRect.w / 2.0f);
-        PaddleLTransform[3][2] = PaddleLRect.y + (PaddleLRect.h / 2.0f);
+        PaddleLTransform[3][0] = PaddleLPos.x;
+        PaddleLTransform[3][2] = PaddleLPos.y;
 
         glm::mat4& PaddleRTransform = Transformations[3];
-        PaddleRTransform[3][0] = PaddleRRect.x + (PaddleRRect.w / 2.0f);
-        PaddleRTransform[3][2] = PaddleRRect.y + (PaddleRRect.h / 2.0f);
-        
-        
-        //printf("Ball: x=%f, y=%f, w=%f, h=%f\n", BallRect.x, BallRect.y, BallRect.w, BallRect.h);
-        //m_renderer.SetEntityPositions(BallRect, PaddleLRect, PaddleRRect);
+        PaddleRTransform[3][0] = PaddleRPos.x;
+        PaddleRTransform[3][2] = PaddleRPos.y;
 	}
 
 

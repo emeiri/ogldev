@@ -206,3 +206,12 @@ void Pong::GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const
     PaddleLRect = m_paddleL.GetRect();
     PaddleRRect = m_paddleR.GetRect();
 }
+
+
+void Pong::GetPositions(glm::vec2& BallPos, glm::vec2& PaddleLPos, glm::vec2& PaddleRPos) const
+{
+    BallPos = m_ball.GetPosition();
+    PaddleLPos = m_paddleL.GetPosition();
+    PaddleRPos = m_paddleR.GetPosition();
+}
+
