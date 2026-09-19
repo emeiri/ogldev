@@ -32,25 +32,46 @@ public:
     
     VulkanPong(int WindowWidth, int WindowHeight) 
 		: m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME, this)
-    {
-        m_config.WindowSize = { 20.0f, 19.0f };
-        m_config.BallSpeed = 5.0f;
-        m_config.BallSize = 0.75f;
-        m_config.BaseWindowPosition = { -10.0f, -9.5f };
-        m_config.PaddleHeight = 4.0f;
-        m_config.PaddleWidth = 1.0f;
+    {        
+        m_config.BallSpeed = 5.0f;        
         m_config.PaddleOffset = 0.5f;
         m_config.PaddleMaxSpeed = 15.0f;
-        m_config.PaddleAcceleration = 12.0f;
-        m_config.PaddleDeceleration = 12.0f;
+        m_config.PaddleAcceleration = 20.0f;
+        m_config.PaddleDeceleration = 15.0f;
     }
 
     void Execute()
     {
-        m_game.Init(m_config);
-
 		std::string AssetPath = "../../Games/Pong/Pong2.glb";
 		m_renderer.Init(AssetPath);
+
+        OgldevVK::VkModel& PongModel = m_renderer.GetModel();
+
+        const MeshDims& BallDims = PongModel.GetNodeDims("Ball");
+        const MeshDims& PaddleLDims = PongModel.GetNodeDims("PaddleL");
+        const MeshDims& TopWallDims = PongModel.GetNodeDims("TopWall");
+        const MeshDims& BottomWallDims = PongModel.GetNodeDims("BottomWall");
+        const MeshDims& PaddleRDims = PongModel.GetNodeDims("PaddleR");
+
+        m_config.BallSize = BallDims.Size.x;
+        
+        m_config.PaddleWidth = PaddleLDims.Size.x;
+        m_config.PaddleHeight = PaddleLDims.Size.z;
+
+        float TopWallBottomSide = TopWallDims.Pos.z - TopWallDims.Size.z / 2.0f;
+        float BottomWallTopSide = BottomWallDims.Pos.z + BottomWallDims.Size.z / 2.0f;
+
+        m_config.BaseWindowPosition.x = PaddleLDims.Pos.x - PaddleLDims.Size.x / 2.0f;        
+        m_config.BaseWindowPosition.y = -TopWallBottomSide;     // The Pong core goes from zero down to full size
+
+        float PaddleRRightSide = PaddleRDims.Pos.x + PaddleRDims.Size.x / 2.0f;
+        float PaddleLLeftSide = PaddleLDims.Pos.x - PaddleLDims.Size.x / 2.0f;
+
+        m_config.WindowSize.x = PaddleRRightSide - PaddleLLeftSide;
+        m_config.WindowSize.y = TopWallBottomSide - BottomWallTopSide;
+
+        m_game.Init(m_config);
+
         m_renderer.Execute();
     }
 
