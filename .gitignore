@@ -55,3 +55,4 @@ VulkanClear/*
 *.obj.dt.d.json
 *.obj.dt.module.json
 *.obj.dt.module.json.command
+imgui.ini
