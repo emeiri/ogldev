@@ -23,6 +23,14 @@
 
 #include "ogldev_math_3d.h"
 
+struct MeshDims {
+    glm::vec3 Pos = glm::vec3(0.0f);
+    glm::vec3 Size = glm::vec3(0.0f);
+    glm::vec3 BboxMin = glm::vec3(0.0f);
+    glm::vec3 BboxMax = glm::vec3(0.0f);
+};
+
+
 struct BasicMeshEntry {
     uint NumIndices = 0;
     uint NumVertices = 0;
@@ -33,7 +41,5 @@ struct BasicMeshEntry {
     // Moved to the node hierarchy. This is still here to ease the transition.
     Matrix4f TransformationDeprecated;
     std::string Name;
-    glm::vec3 Size = glm::vec3(0.0f);
-    glm::vec3 BboxMin = glm::vec3(0.0f);
-    glm::vec3 BboxMax = glm::vec3(0.0f);
+    MeshDims Dims;
 };

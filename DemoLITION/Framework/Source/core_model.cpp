@@ -342,13 +342,13 @@ void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Ve
         const aiMesh* paiMesh = pScene->mMeshes[i];
 
         aiAABB BBox = paiMesh->mAABB;
-        m_Meshes[i].BboxMin = glm::vec3(BBox.mMin.x, BBox.mMin.y, BBox.mMin.z);
-        m_Meshes[i].BboxMax = glm::vec3(BBox.mMax.x, BBox.mMax.y, BBox.mMax.z);
+        m_Meshes[i].Dims.BboxMin = glm::vec3(BBox.mMin.x, BBox.mMin.y, BBox.mMin.z);
+        m_Meshes[i].Dims.BboxMax = glm::vec3(BBox.mMax.x, BBox.mMax.y, BBox.mMax.z);
 
         float Width = BBox.mMax.x - BBox.mMin.x;
         float Height = BBox.mMax.y - BBox.mMin.y;
         float Depth = BBox.mMax.z - BBox.mMin.z;
-        m_Meshes[i].Size = glm::vec3(Width, Height, Depth);
+        m_Meshes[i].Dims.Size = glm::vec3(Width, Height, Depth);
 
         if (UseMeshOptimizer) {
             InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
@@ -373,7 +373,11 @@ void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
     for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
         glm::mat4 MeshTransform = glm::make_mat4(m_Meshes[SubmeshIndex].TransformationDeprecated.data());
         // The matrix is stored as row major in the file but glm expects column major by default.
-        m_transformationsGLM[SubmeshIndex] = glm::transpose(MeshTransform);
+        glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
+        m_transformationsGLM[SubmeshIndex] = MeshTransformGLM;
+
+        glm::vec3 MeshPos = { MeshTransformGLM[3][0], MeshTransformGLM[3][1], -MeshTransformGLM[3][2] };
+        m_Meshes[SubmeshIndex].Dims.Pos = MeshPos;
     }
 }
 
@@ -432,7 +436,7 @@ template<typename VertexType>
 void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh) 
 {
     printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
-    printf("Size: %f, %f, %f\n", m_Meshes[MeshIndex].Size.x, m_Meshes[MeshIndex].Size.y, m_Meshes[MeshIndex].Size.z);
+    printf("Size: %f, %f, %f\n", m_Meshes[MeshIndex].Dims.Size.x, m_Meshes[MeshIndex].Dims.Size.y, m_Meshes[MeshIndex].Dims .Size.z);
 
     // Update exact data tracking directly from current dynamic array size to prevent offset corruption
     m_Meshes[MeshIndex].BaseVertex = (uint)(Vertices.size());

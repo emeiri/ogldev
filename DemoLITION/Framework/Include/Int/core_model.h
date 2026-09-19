@@ -136,6 +136,19 @@ public:
 
     std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformationsGLM; }
 
+    const MeshDims& GetNodeDims(const char* pNodeName) const 
+    { 
+        auto it = m_nodeMap.find(pNodeName);
+        if (it == m_nodeMap.end()) {
+            printf("Invalid node name '%s'\n", pNodeName);
+            assert(0);
+        }
+
+        int MeshIndex = it->second;
+
+        return m_Meshes[MeshIndex].Dims; 
+    }
+
 protected:
 
     // This is a hack for Vulkan that doesn't have a CoreWindowSystem pointer right now.
