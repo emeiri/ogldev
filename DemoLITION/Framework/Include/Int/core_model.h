@@ -130,6 +130,8 @@ public:
 
     glm::mat4& GetNodeTransformationGLM(const char* pNodeName);
 
+    void SetNodePositionXZ(const char* pNodeName, float x, float z);
+
     const std::vector<glm::mat4>& GetTransformations() const { return m_transformationsGLM; }
 
     std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformationsGLM; }

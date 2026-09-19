@@ -68,17 +68,11 @@ public:
 
         std::vector<glm::mat4>& Transformations = PongModel.GetTransformationsMutable();
 
-        glm::mat4& BallTransform = Transformations[0];
-        BallTransform[3][0] = BallPos.x;
-        BallTransform[3][2] = BallPos.y;
+        PongModel.SetNodePositionXZ("Ball", BallPos.x, BallPos.y);
 
-        glm::mat4& PaddleLTransform = Transformations[2];
-        PaddleLTransform[3][0] = PaddleLPos.x;
-        PaddleLTransform[3][2] = PaddleLPos.y;
+        PongModel.SetNodePositionXZ("PaddleL", PaddleLPos.x, PaddleLPos.y);
 
-        glm::mat4& PaddleRTransform = Transformations[3];
-        PaddleRTransform[3][0] = PaddleRPos.x;
-        PaddleRTransform[3][2] = PaddleRPos.y;
+        PongModel.SetNodePositionXZ("PaddleR", PaddleRPos.x, PaddleRPos.y);
 	}
 
 

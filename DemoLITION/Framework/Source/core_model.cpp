@@ -1360,6 +1360,18 @@ glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)
 }
 
 
+void CoreModel::SetNodePositionXZ(const char* pNodeName, float x, float z)
+{
+    glm::mat4& Transformation = GetNodeTransformationGLM(pNodeName);
+    Transformation[3][0] = x;
+    Transformation[3][2] = z;
+}
+
+//
+// Skeletal Animation Support
+//
+
+
 void CoreModel::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
 {
     if (pMesh->mNumBones > MAX_BONES) {
