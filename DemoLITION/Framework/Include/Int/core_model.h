@@ -322,6 +322,7 @@ private:
         const aiNode* pNode = NULL;
         Matrix4f* GlobalTransform = NULL;
     };
+    int m_numNodes = 0;
 
     std::map<std::string, HierarchyNodeInfo> m_nodeMap;
     std::vector<GLMCameraFirstPerson> m_cameras;

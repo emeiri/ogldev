@@ -84,7 +84,7 @@ aiProcess_ImproveCacheLocality)
 //aiProcess_MakeLeftHanded | \
 
 
-static void traverse(int depth, aiNode* pNode);
+static int traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
@@ -209,7 +209,8 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
 
     if (m_pScene) {
         printf("--- START Node Hierarchy ---\n");
-        traverse(0, m_pScene->mRootNode);
+        m_numNodes = traverse(0, m_pScene->mRootNode);
+        printf("Num nodes: %d\n", m_numNodes);
         printf("--- END Node Hierarchy ---\n");
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
         m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
@@ -1013,8 +1014,12 @@ void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
 }
 
 
-static void traverse(int depth, aiNode* pNode)
+static int traverse(int depth, aiNode* pNode)
 {
+    if (!pNode) {
+        return 0;
+    }
+
 #ifdef DEBUG_SCENE_HIERARCHY
     for (int i = 0; i < depth; i++) {
         printf(" ");
@@ -1028,9 +1033,13 @@ static void traverse(int depth, aiNode* pNode)
     NodeTransformation.Print(); 
 #endif
 
+    int Count = 1;
+
     for (uint i = 0; i < pNode->mNumChildren; i++) {
-        traverse(depth + 1, pNode->mChildren[i]);
+        Count += traverse(depth + 1, pNode->mChildren[i]);
     }
+
+    return Count;
 }
 
 
