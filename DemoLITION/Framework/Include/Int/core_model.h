@@ -128,7 +128,11 @@ public:
 
     static void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
 
-    Matrix4f& GetNodeTransformation(const char* pNodeName);
+    glm::mat4& GetNodeTransformationGLM(const char* pNodeName);
+
+    const std::vector<glm::mat4>& GetTransformations() const { return m_transformationsGLM; }
+
+    std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformationsGLM; }
 
 protected:
 
@@ -224,7 +228,7 @@ protected:
         VertexBoneData Bones;
     };
 
-    virtual void InitGeometryPost() = 0;
+    virtual void InitGeometryPost() {}
 
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<CoreMaterial> m_Materials;
@@ -313,18 +317,13 @@ private:
     void InitSingleCamera(int Index, const aiScene* pScene);
 
     const aiScene* m_pScene = NULL;
-
-    Matrix4f m_GlobalInverseTransform;
-
     Assimp::Importer m_Importer;
 
-    struct HierarchyNodeInfo {
-        const aiNode* pNode = NULL;
-        Matrix4f* GlobalTransform = NULL;
-    };
     int m_numNodes = 0;
+    Matrix4f m_GlobalInverseTransform;
 
-    std::map<std::string, HierarchyNodeInfo> m_nodeMap;
+    std::vector<glm::mat4> m_transformationsGLM;
+    std::map<std::string, int> m_nodeMap;
     std::vector<GLMCameraFirstPerson> m_cameras;
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight> m_pointLights;

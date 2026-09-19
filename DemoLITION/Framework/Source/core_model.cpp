@@ -361,6 +361,14 @@ void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
     Transformation.InitIdentity();
 
     TraverseNodeHierarchy(Transformation, pScene->mRootNode);
+    
+    m_transformationsGLM.resize(m_Meshes.size());
+
+    for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+        glm::mat4 MeshTransform = glm::make_mat4(m_Meshes[SubmeshIndex].TransformationDeprecated.data());
+        // The matrix is stored as row major in the file but glm expects column major by default.
+        m_transformationsGLM[SubmeshIndex] = glm::transpose(MeshTransform);
+    }
 }
 
 
@@ -373,23 +381,29 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 
     Matrix4f CombinedTransformation = ParentTransformation * NodeTransformation;
 
-    m_nodeMap[pNode->mName.C_Str()] = { pNode, &m_Meshes[0].TransformationDeprecated };//CombinedTransformation
-
-
 #ifdef DEBUG_SCENE_HIERARCHY
     printf("Combined transformation:\n");
     CombinedTransformation.Print();
 #endif
-    
+
+   // glm::mat4 CombinedTransformationGLM = glm::make_mat4(CombinedTransformation.data());
+   // CombinedTransformationGLM = glm::transpose(CombinedTransformationGLM);
+  
     if (pNode->mNumMeshes > 0) {
 #ifdef DEBUG_SCENE_HIERARCHY
-        printf("Num meshes: %d - ", pNode->mNumMeshes);
+        printf("Num meshes: %d\n", pNode->mNumMeshes);
 #endif
+        if (pNode->mNumMeshes > 1) {
+            printf("Warning: Node '%s' has more than one mesh (%d meshes). This is not fully supported.\n", pNode->mName.C_Str(), pNode->mNumMeshes);
+            exit(0);
+        }
+
         for (int i = 0; i < (int)pNode->mNumMeshes; i++) {
             int MeshIndex = pNode->mMeshes[i];
 #ifdef DEBUG_SCENE_HIERARCHY
             printf("%d ", MeshIndex);
 #endif
+            m_nodeMap[pNode->mName.C_Str()] = MeshIndex;
             m_Meshes[MeshIndex].TransformationDeprecated = CombinedTransformation;
         }
 #ifdef DEBUG_SCENE_HIERARCHY
@@ -1333,16 +1347,16 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 }
 
 
-Matrix4f& CoreModel::GetNodeTransformation(const char* pNodeName)
+glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)
 {
-    std::map<std::string, HierarchyNodeInfo>::iterator it = m_nodeMap.find(pNodeName);
+    std::map<std::string, int>::iterator it = m_nodeMap.find(pNodeName);
 
     if (it == m_nodeMap.end()) {
         OGLDEV_ERROR("Cannot find node %s in the hierarchy\n", pNodeName);
         assert(0);
     }
 
-    return *(it->second.GlobalTransform);
+    return m_transformationsGLM[it->second];
 }
 
 

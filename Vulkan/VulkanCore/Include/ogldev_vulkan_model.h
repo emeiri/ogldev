@@ -65,11 +65,7 @@ public:
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
-	void UpdateModelDesc(ModelDesc& md);
-
-	const std::vector<glm::mat4>& GetTransformations() const { return m_transformations; }
-
-	std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformations; }
+	void UpdateModelDesc(ModelDesc& md);	
 
 protected:
 
@@ -78,8 +74,6 @@ protected:
 	virtual Texture* AllocTexture2D();
 
 	virtual void DestroyTexture(Texture* pTexture);
-
-	virtual void InitGeometryPost();
 
 	virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) { assert(0); }
 
@@ -115,7 +109,6 @@ private:
 	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
 	VkDescriptorSet m_texturesDescriptorSet = NULL;
-	std::vector<glm::mat4> m_transformations;
 
 	size_t m_vertexSize = 0;	// sizeof(Vertex) OR sizeof(SkinnedVertex)
 
