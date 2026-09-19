@@ -35,6 +35,7 @@ struct SubmeshMetaData {
 	u32 BaseIndex;         // offset into IndexSSBO (in indices)
 	u32 NumIndices;        // number of indices for this submesh
 	u32 BaseVertex;        // base vertex applied in shader
+	glm::vec4 Color;
 };
 
 #if defined(_MSC_VER)
@@ -183,10 +184,14 @@ void VkModel::CreateMetaData()
 	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
+        int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
+		MetaData[SubmeshIndex].MaterialIndex = MaterialIndex;
 		MetaData[SubmeshIndex].BaseIndex = (u32)m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
 		MetaData[SubmeshIndex].NumIndices = m_Meshes[SubmeshIndex].NumIndices;
 		MetaData[SubmeshIndex].BaseVertex = (u32)m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
+
+		CoreMaterial* pMaterial = &m_Materials[MaterialIndex];
+        MetaData[SubmeshIndex].Color = { pMaterial->BaseColor.r, pMaterial->BaseColor.g, pMaterial->BaseColor.b, pMaterial->BaseColor.a };
 	}
 
 	m_metaData = m_pVulkanCore->CreateSSBO(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));

@@ -54,6 +54,7 @@ struct MetaData {
     uint IndexOffset; 
     uint IndexCount; 
     uint VertexOffset; 
+    vec4 Color;
 };
 
 layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
@@ -61,6 +62,7 @@ layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO { MetaData metas[]
 layout(location = 0) out vec2 TexCoord;
 layout(location = 1) flat out uint MaterialIndex;
 layout(location = 2) out vec3 Normal;
+layout(location = 3) out vec4 Color;
 
 const int INDEX_SIZE_IN_BYTES = 4;
 
@@ -87,6 +89,8 @@ void main()
     vec3 OrigNorm = vec3(vtx.normal_x, vtx.normal_y, vtx.normal_z);
 
     Normal = mat3(ubo.Data[DrawId].NormalMatrix) * OrigNorm;
+
+    Color = md.Color;
 
     // DEBUGGING
     //Normal = OrigNorm;  

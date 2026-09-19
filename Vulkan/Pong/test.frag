@@ -35,6 +35,7 @@ layout(constant_id = 0) const uint LIGHTING_MODE = LIGHTING_MODE_FULL;
 layout(location = 0) in vec2 TexCoord;
 layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 Normal;
+layout(location = 3) in vec4 Color;
 
 layout(location = 0) out vec4 OutColor;
 
@@ -56,7 +57,7 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 
 void main() 
 {
-    vec4 BaseColor = TextureBindless2D(MaterialIndex, TexCoord);
+    vec4 BaseColor = TextureBindless2D(MaterialIndex, TexCoord) * Color;
 
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
