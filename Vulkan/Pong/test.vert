@@ -36,7 +36,7 @@ const int FLOAT_SIZE_IN_BYTES = 4;
 
 layout (std430, set = 1, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
-layout (set = 1, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
+layout (std430, set = 1, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
 
 struct UniformData {
     mat4 WVP; 
