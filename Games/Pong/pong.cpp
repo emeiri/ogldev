@@ -49,7 +49,7 @@ static glm::vec2 CreateRandomNormalizedVector()
 
 void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
 {
-    m_accelObj.Update(deltaTime, IsUpKeyPressed, IsDownKeyPressed);
+    m_accelObj.Update(deltaTime, IsDownKeyPressed, IsUpKeyPressed);
 
     m_pos.y += m_accelObj.GetCurrentSpeed() * deltaTime;
 
