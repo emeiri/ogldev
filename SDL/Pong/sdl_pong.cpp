@@ -59,7 +59,7 @@ public:
     }
 
 
-    SDL_AppResult HandleInput(const SDL_Event* pEvent)
+    SDL_AppResult ProcessInput(const SDL_Event* pEvent)
     {
         if (pEvent->type == SDL_EVENT_QUIT) {
             return SDL_APP_SUCCESS;
@@ -161,7 +161,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 /* This function runs when a new event occurs (Safely handles Input Flags) */
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
-    return g_sdlPong.HandleInput(event);
+    return g_sdlPong.ProcessInput(event);
 }
 
 
