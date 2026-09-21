@@ -169,10 +169,10 @@ public:
     
     void Init(const GameConfig& config);
 
-    void Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown, float DeltaTime);
+    void Update(float DeltaTime, bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown);
 
     void GetRects(Rect& BallRect, Rect& PaddleLRect, Rect& PaddleRRect) const;
-
+    
     void GetPositions(glm::vec2& BallPos, glm::vec2& PaddleLPos, glm::vec2& PaddleRPos) const;
 
 private:

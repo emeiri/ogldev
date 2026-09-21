@@ -138,7 +138,7 @@ void Pong::Init(const GameConfig& config)
 }
 
 
-void Pong::Update(bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown, float DeltaTime)
+void Pong::Update(float DeltaTime, bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown)
 {
     //printf("DeltaTime: %f\n", DeltaTime);
     m_paddleL.Update(DeltaTime, PaddleLUp, PaddleLDown);

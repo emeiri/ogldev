@@ -95,7 +95,7 @@ public:
         float DeltaTime = m_gameClock.GetDeltaTime();
 
         // Game updates utilizing the Event-Driven clean input state flags
-        m_game.Update(m_input.PaddleLUp, m_input.PaddleLDown, m_input.PaddleRUp, m_input.PaddleRDown, DeltaTime);
+        m_game.Update(DeltaTime, m_input.PaddleLUp, m_input.PaddleLDown, m_input.PaddleRUp, m_input.PaddleRDown);
 
         RenderFrame();
     }

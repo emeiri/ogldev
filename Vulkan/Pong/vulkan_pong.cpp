@@ -77,8 +77,8 @@ public:
 	void UpdateGameState(float dt)
 	{
         //printf("DeltaTime: %f\n", dt);
-        m_game.Update(m_inputState.PaddleLUp, m_inputState.PaddleLDown, 
-                      m_inputState.PaddleRUp, m_inputState.PaddleRDown, dt);
+        m_game.Update(dt, m_inputState.PaddleLUp, m_inputState.PaddleLDown, 
+                      m_inputState.PaddleRUp, m_inputState.PaddleRDown);
 
         glm::vec2 BallPos, PaddleLPos, PaddleRPos;
 
