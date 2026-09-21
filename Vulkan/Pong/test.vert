@@ -33,6 +33,7 @@ struct VertexData
 
 const int NUM_FLOATS_IN_VERTEX_DATA = 20;
 const int FLOAT_SIZE_IN_BYTES = 4;
+const int INDEX_SIZE_IN_BYTES = 4;
 
 layout (std430, set = 1, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
@@ -56,15 +57,14 @@ struct MetaData {
     uint VertexOffset; 
     vec4 Color;
 };
-
-layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
+layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO { 
+    MetaData metas[]; 
+} MetaBuf;
 
 layout(location = 0) out vec2 TexCoord;
 layout(location = 1) flat out uint MaterialIndex;
 layout(location = 2) out vec3 Normal;
 layout(location = 3) out vec4 Color;
-
-const int INDEX_SIZE_IN_BYTES = 4;
 
 void main() 
 {    
@@ -95,4 +95,3 @@ void main()
     // DEBUGGING
     //Normal = OrigNorm;  
 }
-
