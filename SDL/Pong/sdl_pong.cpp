@@ -108,20 +108,21 @@ private:
         SDL_SetRenderDrawColor(m_pRenderer, 16, 16, 16, 255);
         SDL_RenderClear(m_pRenderer);
 
-        // Set entity drawing color to white
-        SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
-
         Rect PaddleLRect, PaddleRRect, BallRect;
         m_game.GetRects(BallRect, PaddleLRect, PaddleRRect);
 
         SDL_FRect PaddleRect{ PaddleLRect.x, PaddleLRect.y, PaddleLRect.w, PaddleLRect.h };
+        SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 255, 255);
         SDL_RenderFillRect(m_pRenderer, &PaddleRect);
 
         PaddleRect = { PaddleRRect.x, PaddleRRect.y, PaddleRRect.w, PaddleRRect.h };
+        SDL_SetRenderDrawColor(m_pRenderer, 255, 0, 0, 255);
         SDL_RenderFillRect(m_pRenderer, &PaddleRect);
 
         SDL_FRect BallRectF{ BallRect.x, BallRect.y, BallRect.w, BallRect.h };
+        SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 0, 255);
         SDL_RenderFillRect(m_pRenderer, &BallRectF);
+
         SDL_RenderPresent(m_pRenderer);
     }
 
