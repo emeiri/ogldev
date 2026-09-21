@@ -122,13 +122,15 @@ void main()
 
     dudv *= 4.0;
 
-    vec2 mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod0) / dudv;
+    vec2 pos = WorldPos.xz + 0.5 * dudv;
+
+    vec2 mod_div_dudv = mod(pos, GridCellSizeLod0) / dudv;
     float Lod0a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
 
-    mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod1) / dudv;
+    mod_div_dudv = mod(pos, GridCellSizeLod1) / dudv;
     float Lod1a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
     
-    mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod2) / dudv;
+    mod_div_dudv = mod(pos, GridCellSizeLod2) / dudv;
     float Lod2a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
 
     float LOD_fade = fract(LOD);
