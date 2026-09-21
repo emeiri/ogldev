@@ -118,7 +118,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\..\Include;$(ProjectDir)\..\..\..\..\Include\assimp5;$(ProjectDir)\..\..\..\..\Games\Pong;C:\Users\Etay Meiri\Documents\ogldev\Include\SFML3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\..\Include;$(ProjectDir)\..\..\..\..\Include\SFML3;$(ProjectDir)\..\..\..\..\Include\assimp5;$(ProjectDir)\..\..\..\..\Games\Pong;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
