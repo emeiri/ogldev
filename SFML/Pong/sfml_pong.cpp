@@ -30,11 +30,138 @@ private:
 };
 
 
-static sf::RenderWindow Window;
-static SFML_Clock GameClock;
-static GameConfig Config;
-static Pong Game;
-static PongInputState Input;
+class SFMLPong {
+
+public:
+
+    SFMLPong() = default;
+
+    bool Init()
+    {
+        sf::VideoMode VideoMode(sf::Vector2u((unsigned int)(m_config.WindowSize.x), 
+                                             (unsigned int)(m_config.WindowSize.y)));
+
+        m_window.create(VideoMode, "Pong", sf::Style::Default);
+
+        if (!m_window.isOpen()) {
+            std::cerr << "Failed to create SFML window." << std::endl;
+            return false;
+        }
+
+        std::cout << "SFML Window initialized successfully." << std::endl;
+
+        m_window.setVerticalSyncEnabled(true);
+        //UpdateLetterboxView(m_window, m_config.WindowSize.x, m_config.WindowSize.y);
+
+        m_gameClock.Init();
+        m_game.Init(m_config);
+
+        return true;
+    }
+
+
+    void GameLoop()
+    {
+        while (m_window.isOpen()) {
+            float DeltaTime = m_gameClock.GetDeltaTime();
+
+            ProcessEvents();
+
+            m_game.Update(DeltaTime, m_input.PaddleLUp, m_input.PaddleLDown, m_input.PaddleRUp, m_input.PaddleRDown);
+
+            RenderFrame();
+        }
+    }
+
+private:
+
+    void ProcessEvents()
+    {
+        while (const std::optional<sf::Event> event = m_window.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>()) {
+                m_window.close();
+            } else if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                switch (keyPressed->code) {
+                case sf::Keyboard::Key::Escape:
+                    std::cout << "Escape key pressed, quitting" << std::endl;
+                    m_window.close();
+                    break;
+                case sf::Keyboard::Key::W:
+                    m_input.PaddleLUp = true;
+                    break;
+                case sf::Keyboard::Key::S:
+                    m_input.PaddleLDown = true;
+                    break;
+                case sf::Keyboard::Key::O:
+                    m_input.PaddleRUp = true;
+                    break;
+                case sf::Keyboard::Key::L:
+                    m_input.PaddleRDown = true;
+                    break;
+                default: break;
+                }
+            } else if (const sf::Event::KeyReleased* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+                switch (keyReleased->code) {
+                case sf::Keyboard::Key::W:
+                    m_input.PaddleLUp = false;
+                    break;
+                case sf::Keyboard::Key::S:
+                    m_input.PaddleLDown = false;
+                    break;
+                case sf::Keyboard::Key::O:
+                    m_input.PaddleRUp = false;
+                    break;
+                case sf::Keyboard::Key::L:
+                    m_input.PaddleRDown = false;
+                    break;
+                default: break;
+                }
+            }
+        }
+    }
+
+
+    void RenderFrame()
+    {
+        // Clear backbuffer with specific grey color matching (16,16,16)
+        m_window.clear(sf::Color(16, 16, 16));
+
+        Rect PaddleLRect, PaddleRRect, BallRect;
+        m_game.GetRects(BallRect, PaddleLRect, PaddleRRect);
+
+        // Instantiate simple primitive rectangle layouts matching your Pong structures
+        sf::RectangleShape sfPaddleL(sf::Vector2f(PaddleLRect.w, PaddleLRect.h));
+        sfPaddleL.setPosition({ PaddleLRect.x, PaddleLRect.y });
+        sfPaddleL.setFillColor(sf::Color::White);
+
+        sf::RectangleShape sfPaddleR(sf::Vector2f(PaddleRRect.w, PaddleRRect.h));
+        sfPaddleR.setPosition({ PaddleRRect.x, PaddleRRect.y });
+        sfPaddleR.setFillColor(sf::Color::White);
+
+        sf::RectangleShape sfBall(sf::Vector2f(BallRect.w, BallRect.h));
+        sfBall.setPosition({ BallRect.x, BallRect.y });
+        sfBall.setFillColor(sf::Color::White);
+
+        // Issue sequential composition instructions to the open view context
+        m_window.draw(sfPaddleL);
+        m_window.draw(sfPaddleR);
+        m_window.draw(sfBall);
+
+        // Swaps buffers to display the rendered frame onto the screen
+        m_window.display();
+    }
+
+    sf::RenderWindow m_window;
+    SFML_Clock m_gameClock;
+    GameConfig m_config;
+    Pong m_game;
+    PongInputState m_input;
+};
+
+
+SFMLPong g_sfmlPong;
+
 
 // Utility function to calculate letterbox view ratios dynamically on resize
 void UpdateLetterboxView(sf::RenderWindow& window, float TargetWidth, float TargetHeight)
@@ -67,151 +194,13 @@ void UpdateLetterboxView(sf::RenderWindow& window, float TargetWidth, float Targ
 }
 
 
-bool AppInit()
-{
-    sf::VideoMode videoMode(sf::Vector2u((unsigned int)(Config.WindowSize.x), (unsigned int)(Config.WindowSize.y)));
-
-    // SFML 3 target window initializer 
-    Window.create(videoMode, "Pong", sf::Style::Default);
-
-    if (!Window.isOpen()) {
-        std::cerr << "Failed to create SFML window." << std::endl;
-        return false;
-    }
-
-    std::cout << "SFML Window initialized successfully." << std::endl;
-
-    Window.setVerticalSyncEnabled(true);
-    UpdateLetterboxView(Window, Config.WindowSize.x, Config.WindowSize.y);
-
-    GameClock.Init();
-    Game.Init(Config);
-
-    return true;
-}
-
-
-void ProcessEvents()
-{
-    // SFML 3 uses modern type-safe optional events instead of uninitialized structs
-    while (const std::optional<sf::Event> event = Window.pollEvent())
-    {
-        // 1. Check for window closing triggers
-        if (event->is<sf::Event::Closed>()) {
-            Window.close();
-        }
-
-        // 2. Map rendering rules cleanly when the user scales the platform window
-        else if (const sf::Event::Resized* resized = event->getIf<sf::Event::Resized>()) {
-            UpdateLetterboxView(Window, Config.WindowSize.x, Config.WindowSize.y);
-        }
-
-        // 3. Process key down allocations
-        else if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            switch (keyPressed->code) {
-            case sf::Keyboard::Key::Escape:
-                std::cout << "Escape key pressed, quitting" << std::endl;
-                Window.close();
-                break;
-            case sf::Keyboard::Key::W: 
-                Input.PaddleLUp = true; 
-                break;
-            case sf::Keyboard::Key::S: 
-                Input.PaddleLDown = true; 
-                break;
-            case sf::Keyboard::Key::O: 
-                Input.PaddleRUp = true; 
-                break;
-            case sf::Keyboard::Key::L: 
-                Input.PaddleRDown = true; 
-                break;
-            default: break;
-            }
-        }
-
-        // 4. Process key up cancellations
-        else if (const sf::Event::KeyReleased* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
-            switch (keyReleased->code) {
-            case sf::Keyboard::Key::W: 
-                Input.PaddleLUp = false; 
-                break;
-            case sf::Keyboard::Key::S: 
-                Input.PaddleLDown = false; 
-                break;
-            case sf::Keyboard::Key::O: 
-                Input.PaddleRUp = false; 
-                break;
-            case sf::Keyboard::Key::L: 
-                Input.PaddleRDown = false; 
-                break;
-            default: break;
-            }
-        }
-    }
-}
-
-/* This replaces static void RenderGame() */
-static void RenderGame()
-{
-    // Clear backbuffer with specific grey color matching (16,16,16)
-    Window.clear(sf::Color(16, 16, 16));
-
-    Rect PaddleLRect, PaddleRRect, BallRect;
-    Game.GetRects(BallRect, PaddleLRect, PaddleRRect);
-
-    // Instantiate simple primitive rectangle layouts matching your Pong structures
-    sf::RectangleShape sfPaddleL(sf::Vector2f(PaddleLRect.w, PaddleLRect.h));
-    sfPaddleL.setPosition({ PaddleLRect.x, PaddleLRect.y });
-    sfPaddleL.setFillColor(sf::Color::White);
-
-    sf::RectangleShape sfPaddleR(sf::Vector2f(PaddleRRect.w, PaddleRRect.h));
-    sfPaddleR.setPosition({ PaddleRRect.x, PaddleRRect.y });
-    sfPaddleR.setFillColor(sf::Color::White);
-
-    sf::RectangleShape sfBall(sf::Vector2f(BallRect.w, BallRect.h));
-    sfBall.setPosition({ BallRect.x, BallRect.y });
-    sfBall.setFillColor(sf::Color::White);
-
-    // Issue sequential composition instructions to the open view context
-    Window.draw(sfPaddleL);
-    Window.draw(sfPaddleR);
-    Window.draw(sfBall);
-
-    // Swaps buffers to display the rendered frame onto the screen
-    Window.display();
-}
-
-/* Synthesizes SDL_AppIterate and your application framework loop context */
-void AppIterate()
-{
-    float DeltaTime = GameClock.GetDeltaTime();
-
-    // Game updates utilizing the Event-Driven clean input state flags
-    Game.Update(DeltaTime, Input.PaddleLUp, Input.PaddleLDown, Input.PaddleRUp, Input.PaddleRDown);
-
-    RenderGame();
-}
-
-/* Replaces SDL_AppQuit wrapper behaviors cleanly upon structural scope termination */
-void AppQuit()
-{
-    // SFML RAII takes care of destroying window configurations automatically
-    std::cout << "Application terminated successfully." << std::endl;
-}
-
-// Global Main Application Runner to orchestrate loop flow cleanly without callbacks
 int main(int argc, char* argv[])
 {
-    if (!AppInit()) {
+    if (!g_sfmlPong.Init()) {
         return -1;
     }
 
-    // Standard structural loop replacement context execution loop
-    while (Window.isOpen()) {
-        ProcessEvents();
-        AppIterate();
-    }
+    g_sfmlPong.GameLoop();
 
-    AppQuit();
     return 0;
 }
