@@ -165,9 +165,9 @@ struct GameConfig {
     glm::vec2 BaseWindowPosition = { 0.0f, 0.0f };
     float BallSpeed = 400.0f; // Pixels per second
     float BallSize = 20.0f;
-    float PaddleMaxSpeed = 600.0f; // Pixels per second
-    float PaddleAcceleration = 2000.0f;
-    float PaddleDeceleration = 1000.0f;
+    float PaddleMaxSpeed = 15.0f; // Pixels per second
+    float PaddleAcceleration = 50.0f;
+    float PaddleDeceleration = 35.0f;
     float PaddleWidth = 30.0f;
     float PaddleHeight = 300.0f;
     float PaddleOffset = 25.0f; // Distance from the edge of the window
