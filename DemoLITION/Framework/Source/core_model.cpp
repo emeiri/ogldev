@@ -368,14 +368,9 @@ void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
 
     TraverseNodeHierarchy(Transformation, pScene->mRootNode);
     
-    m_transformationsGLM.resize(m_Meshes.size());
-
     for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-        glm::mat4 MeshTransform = glm::make_mat4(m_Meshes[SubmeshIndex].TransformationDeprecated.data());
         // The matrix is stored as row major in the file but glm expects column major by default.
-        glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
-        m_transformationsGLM[SubmeshIndex] = MeshTransformGLM;
-
+        const glm::mat4& MeshTransformGLM = m_transformationsGLM[SubmeshIndex];
         glm::vec3 MeshPos = { MeshTransformGLM[3][0], MeshTransformGLM[3][1], -MeshTransformGLM[3][2] };
         m_Meshes[SubmeshIndex].Dims.Pos = MeshPos;
     }
@@ -387,13 +382,13 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 #ifdef DEBUG_SCENE_HIERARCHY
     printf("Traversing node '%s'\n", pNode->mName.C_Str());
 #endif
-    Matrix4f NodeTransformation(pNode->mTransformation);    
+    Matrix4f LocalTransform(pNode->mTransformation);    
 
-    Matrix4f CombinedTransformation = ParentTransformation * NodeTransformation;
+    Matrix4f GlobalTransform = ParentTransformation * LocalTransform;
 
 #ifdef DEBUG_SCENE_HIERARCHY
-    printf("Combined transformation:\n");
-    CombinedTransformation.Print();
+    printf("Global transformation:\n");
+    GlobalTransform.Print();
 #endif
 
    // glm::mat4 CombinedTransformationGLM = glm::make_mat4(CombinedTransformation.data());
@@ -403,18 +398,22 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 #ifdef DEBUG_SCENE_HIERARCHY
         printf("Num meshes: %d\n", pNode->mNumMeshes);
 #endif
-        if (pNode->mNumMeshes > 1) {
-            printf("Warning: Node '%s' has more than one mesh (%d meshes). This is not fully supported.\n", pNode->mName.C_Str(), pNode->mNumMeshes);
-            exit(0);
-        }
-
         for (int i = 0; i < (int)pNode->mNumMeshes; i++) {
             int MeshIndex = pNode->mMeshes[i];
+            const BasicMeshEntry& MeshEntry = m_Meshes[MeshIndex];
+            int CurInstanceID = (int)m_transformations.size();
+            m_transformations.push_back(GlobalTransform);
+
+            glm::mat4 MeshTransform = glm::make_mat4(GlobalTransform.data());
+            // The matrix is stored as row major in the file but glm expects column major by default.
+            glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
+            m_transformationsGLM.push_back(MeshTransformGLM);
+
 #ifdef DEBUG_SCENE_HIERARCHY
             printf("%d ", MeshIndex);
 #endif
             m_nodeMap[pNode->mName.C_Str()] = MeshIndex;
-            m_Meshes[MeshIndex].TransformationDeprecated = CombinedTransformation;
+            m_Meshes[MeshIndex].TransformationDeprecated = GlobalTransform;
         }
 #ifdef DEBUG_SCENE_HIERARCHY
         printf("\n");
@@ -427,7 +426,7 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
     }
 
     for (uint i = 0; i < pNode->mNumChildren; i++) {
-        TraverseNodeHierarchy(CombinedTransformation, pNode->mChildren[i]);
+        TraverseNodeHierarchy(GlobalTransform, pNode->mChildren[i]);
     }
 }
 
