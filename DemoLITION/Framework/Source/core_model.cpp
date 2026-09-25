@@ -371,7 +371,7 @@ void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
     for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
         // The matrix is stored as row major in the file but glm expects column major by default.
         const glm::mat4& MeshTransformGLM = m_transformationsGLM[SubmeshIndex];
-        glm::vec3 MeshPos = { MeshTransformGLM[3][0], MeshTransformGLM[3][1], -MeshTransformGLM[3][2] };
+        glm::vec3 MeshPos = glm::vec3(MeshTransformGLM[3]);
         m_Meshes[SubmeshIndex].Dims.Pos = MeshPos;
     }
 }
@@ -407,7 +407,11 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
             glm::mat4 MeshTransform = glm::make_mat4(GlobalTransform.data());
             // The matrix is stored as row major in the file but glm expects column major by default.
             glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
-            m_transformationsGLM.push_back(MeshTransformGLM);
+
+            glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
+            glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
+
+            m_transformationsGLM.push_back(LeftHandedMatrixGLM);
 
 #ifdef DEBUG_SCENE_HIERARCHY
             printf("%d ", MeshIndex);
