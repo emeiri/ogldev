@@ -77,8 +77,7 @@ private:
 
     void ProcessEvents()
     {
-        while (const std::optional<sf::Event> event = m_window.pollEvent())
-        {
+        while (const std::optional<sf::Event> event = m_window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 m_window.close();
             } else if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
@@ -87,10 +86,10 @@ private:
                     std::cout << "Escape key pressed, quitting" << std::endl;
                     m_window.close();
                     break;
-                case sf::Keyboard::Key::W:
+                case sf::Keyboard::Key::R:
                     m_input.PaddleLUp = true;
                     break;
-                case sf::Keyboard::Key::S:
+                case sf::Keyboard::Key::F:
                     m_input.PaddleLDown = true;
                     break;
                 case sf::Keyboard::Key::O:
@@ -103,10 +102,10 @@ private:
                 }
             } else if (const sf::Event::KeyReleased* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
                 switch (keyReleased->code) {
-                case sf::Keyboard::Key::W:
+                case sf::Keyboard::Key::R:
                     m_input.PaddleLUp = false;
                     break;
-                case sf::Keyboard::Key::S:
+                case sf::Keyboard::Key::F:
                     m_input.PaddleLDown = false;
                     break;
                 case sf::Keyboard::Key::O:
