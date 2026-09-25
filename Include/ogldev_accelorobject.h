@@ -76,7 +76,7 @@ public:
             }
         }
 
-        return m_currentSpeed * dt;
+        return m_currentSpeed;
     }
 
     float GetCurrentSpeed() const { return m_currentSpeed; }

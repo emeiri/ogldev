@@ -51,7 +51,7 @@ void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
 {
     m_accelObj.Update(deltaTime, IsDownKeyPressed, IsUpKeyPressed);
 
-    m_pos.y += m_accelObj.GetCurrentSpeed() * deltaTime;
+    m_pos.y += m_accelObj.GetCurrentSpeed();
 
     //printf("Paddle Position: x=%f, y=%f\n", m_pos.x, m_pos.y);
     if (m_pos.y - m_halfSize.y < m_baseOffset.y) {
