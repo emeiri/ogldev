@@ -57,7 +57,7 @@ void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
     if (m_pos.y - m_halfSize.y < m_baseOffset.y) {
         m_pos.y = m_baseOffset.y + m_halfSize.y;
         // printf("Paddle hit the top wall. New position: x=%f, y=%f\n", m_pos.x, m_pos.y);
-    }   if (m_pos.y + m_halfSize.y > m_baseOffset.y + m_windowSize.y) {
+    } else if (m_pos.y + m_halfSize.y > m_baseOffset.y + m_windowSize.y) {
         m_pos.y = m_baseOffset.y + m_windowSize.y - m_halfSize.y;
         //  printf("Paddle hit the wall. New position: x=%f, y=%f\n", m_pos.x, m_pos.y);
     }
