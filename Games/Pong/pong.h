@@ -199,7 +199,7 @@ public:
 
 private:
 
-    void ResolvePaddleBallCollision(Paddle& paddle);
+    bool ResolvePaddleBallCollision(Paddle& paddle);
 
     GameConfig m_config;
     Ball m_ball;

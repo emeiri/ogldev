@@ -140,20 +140,19 @@ void Pong::Init(const GameConfig& config)
 
 void Pong::Update(float DeltaTime, bool PaddleLUp, bool PaddleLDown, bool PaddleRUp, bool PaddleRDown)
 {
-    //printf("DeltaTime: %f\n", DeltaTime);
     m_paddleL.Update(DeltaTime, PaddleLUp, PaddleLDown);
 
     m_paddleR.Update(DeltaTime, PaddleRUp, PaddleRDown);
     
     m_ball.Update(DeltaTime);
 
-    ResolvePaddleBallCollision(m_paddleL);
-
-    ResolvePaddleBallCollision(m_paddleR);
+    if (!ResolvePaddleBallCollision(m_paddleL)) {
+        ResolvePaddleBallCollision(m_paddleR);
+    }    
 }
 
 
-void Pong::ResolvePaddleBallCollision(Paddle& paddle)
+bool Pong::ResolvePaddleBallCollision(Paddle& paddle)
 {
     float BallLeftSide = m_ball.GetLeft();
     float BallRightSide = m_ball.GetRight();
@@ -195,6 +194,8 @@ void Pong::ResolvePaddleBallCollision(Paddle& paddle)
         m_ball.SetVelocity(NewVelocity);
         m_ball.SetPosition(NewPosition); // Apply the position correction immediately!
     }
+
+    return CollideWithPaddle;
 }
 
 
