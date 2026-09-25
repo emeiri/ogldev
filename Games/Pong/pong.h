@@ -74,6 +74,27 @@ public:
         return m_halfSize;
     }
 
+    float GetLeft() const
+    {
+        return m_pos.x - m_halfSize.x;
+    }
+
+    float GetRight() const
+    {
+        return m_pos.x + m_halfSize.x;
+    }
+
+    float GetTop() const
+    {
+        return m_pos.y + m_halfSize.y;
+    }
+
+    float GetBottom() const
+    {
+        return m_pos.y - m_halfSize.y;
+    }
+
+
 protected:
 
     glm::vec2 m_baseOffset = { 0.0f, 0.0f };
