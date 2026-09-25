@@ -71,8 +71,8 @@ void Ball::Update(float deltaTime)
 
     //printf("dt %f Ball Position: x=%f, y=%f velocity: x=%f, y=%f\n", deltaTime, m_pos.x, m_pos.y, m_velocity.x, m_velocity.y);
 
-    bool BallHitsBottom = m_pos.y + m_halfSize.y >= m_baseOffset.y + m_windowSize.y;
-    bool BallHitsTop = m_pos.y - m_halfSize.y <= m_baseOffset.y;
+    bool BallHitsBottom = GetTop() >= m_baseOffset.y + m_windowSize.y;
+    bool BallHitsTop = GetBottom() <= m_baseOffset.y;
 
     if (BallHitsTop && m_velocity.y < 0.0f) {
         m_pos.y = m_baseOffset.y + m_halfSize.y; // Positional correction to prevent wall trapping
@@ -88,8 +88,8 @@ void Ball::Update(float deltaTime)
 
     // --- Scoring & Reset States ---
     // Left Wall Out-of-Bounds (Right Player Scores)
-    if (m_pos.x + m_halfSize.x < m_baseOffset.x) {
-        m_pos = m_baseOffset + glm::vec2(m_halfWindowSize.x, m_halfWindowSize.y);
+    if (GetRight() < m_baseOffset.x) {
+        m_pos = m_baseOffset + m_halfWindowSize;
         float Speed = glm::length(m_velocity);
         glm::vec2 BallVelocity = CreateRandomNormalizedVector() * Speed;
         //printf("Ball out of bounds on the left side. Right player scores! New velocity: x=%f, y=%f\n", m_velocity.x, m_velocity.y);
@@ -99,8 +99,8 @@ void Ball::Update(float deltaTime)
 //        exit(0);
     }
     // Right Wall Out-of-Bounds (Left Player Scores) - FIXED from bouncing wall
-    else if (m_pos.x - m_halfSize.x > m_baseOffset.x + m_windowSize.x) {
-        m_pos = m_baseOffset + glm::vec2(m_halfWindowSize.x, m_halfWindowSize.y);
+    else if (GetLeft() > m_baseOffset.x + m_windowSize.x) {
+        m_pos = m_baseOffset + m_halfWindowSize;
         float Speed = glm::length(m_velocity);
         glm::vec2 BallVelocity = CreateRandomNormalizedVector() * Speed;
         //printf("Ball out of bounds on the right side. Left player scores! New velocity: x=%f, y=%f\n", m_velocity.x, m_velocity.y);
@@ -155,16 +155,14 @@ void Pong::Update(float DeltaTime, bool PaddleLUp, bool PaddleLDown, bool Paddle
 
 void Pong::ResolvePaddleBallCollision(Paddle& paddle)
 {
-    float BallLeftSide = m_ball.GetPosition().x - m_ball.GetHalfSize().x;
-    float BallRightSide = m_ball.GetPosition().x + m_ball.GetHalfSize().x;
-    float BallTopSide = m_ball.GetPosition().y + m_ball.GetHalfSize().y;
-    float BallBottomSide = m_ball.GetPosition().y - m_ball.GetHalfSize().y;
-    float PaddleLeftSide = paddle.GetPosition().x - m_config.PaddleWidth / 2.0f;
-    float PaddleRightSide = paddle.GetPosition().x + m_config.PaddleWidth / 2.0f;
-    float PaddleTopSide = paddle.GetPosition().y + m_config.PaddleHeight / 2.0f;
-    float PaddleBottomSide = paddle.GetPosition().y - m_config.PaddleHeight / 2.0f;
-
-   // printf("Ball half size: x=%f, y=%f\n", m_ball.GetHalfSize().x, m_ball.GetHalfSize().y);
+    float BallLeftSide = m_ball.GetLeft();
+    float BallRightSide = m_ball.GetRight();
+    float BallTopSide = m_ball.GetTop();
+    float BallBottomSide = m_ball.GetBottom();
+    float PaddleLeftSide = paddle.GetLeft();
+    float PaddleRightSide = paddle.GetRight();
+    float PaddleTopSide = paddle.GetTop();
+    float PaddleBottomSide = paddle.GetBottom();
 
     bool CollideWithPaddle = (BallLeftSide <= PaddleRightSide) && (BallRightSide >= PaddleLeftSide) &&
                              (BallTopSide >= PaddleBottomSide) && (BallBottomSide <= PaddleTopSide);
