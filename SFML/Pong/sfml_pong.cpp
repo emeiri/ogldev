@@ -123,29 +123,28 @@ private:
 
     void RenderFrame()
     {
-        // Clear backbuffer with specific grey color matching (16,16,16)
         m_window.clear(sf::Color(16, 16, 16));
 
         Rect PaddleLRect, PaddleRRect, BallRect;
         m_game.GetRects(BallRect, PaddleLRect, PaddleRRect);
 
         // Instantiate simple primitive rectangle layouts matching your Pong structures
-        sf::RectangleShape sfPaddleL(sf::Vector2f(PaddleLRect.w, PaddleLRect.h));
-        sfPaddleL.setPosition({ PaddleLRect.x, PaddleLRect.y });
-        sfPaddleL.setFillColor(sf::Color::White);
+        sf::RectangleShape PaddleL(sf::Vector2f(PaddleLRect.w, PaddleLRect.h));
+        PaddleL.setPosition({ PaddleLRect.x, PaddleLRect.y });
+        PaddleL.setFillColor(sf::Color::Magenta);
 
-        sf::RectangleShape sfPaddleR(sf::Vector2f(PaddleRRect.w, PaddleRRect.h));
-        sfPaddleR.setPosition({ PaddleRRect.x, PaddleRRect.y });
-        sfPaddleR.setFillColor(sf::Color::White);
+        sf::RectangleShape PaddleR(sf::Vector2f(PaddleRRect.w, PaddleRRect.h));
+        PaddleR.setPosition({ PaddleRRect.x, PaddleRRect.y });
+        PaddleR.setFillColor(sf::Color::Cyan);
 
-        sf::RectangleShape sfBall(sf::Vector2f(BallRect.w, BallRect.h));
-        sfBall.setPosition({ BallRect.x, BallRect.y });
-        sfBall.setFillColor(sf::Color::White);
+        sf::CircleShape Ball(BallRect.w / 2.0f);
+        Ball.setPosition({ BallRect.x, BallRect.y });
+        Ball.setFillColor(sf::Color::Yellow);
 
         // Issue sequential composition instructions to the open view context
-        m_window.draw(sfPaddleL);
-        m_window.draw(sfPaddleR);
-        m_window.draw(sfBall);
+        m_window.draw(PaddleL);
+        m_window.draw(PaddleR);
+        m_window.draw(Ball);
 
         // Swaps buffers to display the rendered frame onto the screen
         m_window.display();
