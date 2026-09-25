@@ -38,15 +38,16 @@ class BaseObject {
     
 public:
 
-    void Init(const glm::vec2& BaseOffset, const glm::vec2& size, 
-              const glm::vec2& pos, const glm::vec2& WindowSize) 
+    void Init(const glm::vec2& BaseOffset, const glm::vec2& size,
+        const glm::vec2& pos, const glm::vec2& WindowSize)
     {
         m_baseOffset = BaseOffset;
-        m_pos = pos; 
-        m_size = size; 
-        m_halfSize = { size.x / 2.0f, size.y / 2.0f };
+        m_pos = pos;
+        m_size = size;
+        m_halfSize = size / 2.0f;
         m_windowSize = WindowSize;
     }
+
 
     const glm::vec2& GetPosition() const
     {
