@@ -38,8 +38,10 @@ class BaseObject {
     
 public:
 
-    void Init(const glm::vec2& size, const glm::vec2& pos, const glm::vec2& WindowSize)
+    void Init(const glm::vec2& BaseOffset, const glm::vec2& size,
+        const glm::vec2& pos, const glm::vec2& WindowSize)
     {
+        m_baseOffset = BaseOffset;
         m_pos = pos;
         m_size = size;
         m_halfSize = size / 2.0f;
@@ -95,6 +97,7 @@ public:
 
 protected:
 
+    glm::vec2 m_baseOffset = { 0.0f, 0.0f };
     glm::vec2 m_pos = { 0.0f, 0.0f };
     glm::vec2 m_size = { 0.0f, 0.0f };
     glm::vec2 m_halfSize = { 0.0f, 0.0f };
@@ -108,10 +111,10 @@ public:
 
     Paddle() = default;
 
-    void Init(const glm::vec2& size, const glm::vec2& pos, const glm::vec2& WindowSize,
-              float MaxSpeed, float Acceleration, float Deceleration)
+    void Init(const glm::vec2& BaseOffset, const glm::vec2& size, const glm::vec2& pos, 
+              float MaxSpeed, float Acceleration, float Deceleration, const glm::vec2& WindowSize)
     {
-        BaseObject::Init(size, pos, WindowSize);
+        BaseObject::Init(BaseOffset, size, pos, WindowSize);
         m_accelObj.Init(MaxSpeed, Acceleration, Deceleration);
     }
 
@@ -129,11 +132,11 @@ public:
 
     Ball() = default;
 
-    void Init(float Size, const glm::vec2& pos, 
+    void Init(const glm::vec2& BaseOffset, float Size, const glm::vec2& pos, 
               const glm::vec2& velocity, const glm::vec2& WindowSize) 
     { 
         assert(Size > 0.0f);
-        BaseObject::Init({ Size, Size }, pos, WindowSize);
+        BaseObject::Init(BaseOffset, { Size, Size }, pos, WindowSize);
         m_velocity = velocity; 
         m_halfWindowSize = { WindowSize.x / 2.0f, WindowSize.y / 2.0f };
     }
@@ -159,6 +162,7 @@ private:
 
 struct GameConfig {
     glm::vec2 WindowSize = { 1920.0f, 1080.0f };
+    glm::vec2 BaseWindowPosition = { 0.0f, 0.0f };
     float BallSpeed = 400.0f; // Pixels per second
     float BallSize = 20.0f;
     float PaddleMaxSpeed = 15.0f; // Pixels per second

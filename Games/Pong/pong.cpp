@@ -52,10 +52,10 @@ void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
 
     m_pos.y += m_accelObj.GetCurrentSpeed();
 
-    if (m_pos.y - m_halfSize.y < 0) {
-        m_pos.y = m_halfSize.y;
-    } else if (m_pos.y + m_halfSize.y > m_windowSize.y) {
-        m_pos.y = m_windowSize.y - m_halfSize.y;
+    if (m_pos.y - m_halfSize.y < m_baseOffset.y) {
+        m_pos.y = m_baseOffset.y + m_halfSize.y;
+    } else if (m_pos.y + m_halfSize.y > m_baseOffset.y + m_windowSize.y) {
+        m_pos.y = m_baseOffset.y + m_windowSize.y - m_halfSize.y;
     }
 }
 
@@ -64,28 +64,28 @@ void Ball::Update(float deltaTime)
 {
     m_pos += m_velocity * deltaTime;
 
-    bool BallHitsBottom = GetBottom() >= m_windowSize.y;
-    bool BallHitsTop = GetTop() <= 0;
+    bool BallHitsBottom = GetBottom() >= m_baseOffset.y + m_windowSize.y;
+    bool BallHitsTop = GetTop() <= m_baseOffset.y;
 
     if (BallHitsTop && m_velocity.y < 0.0f) {
-        m_pos.y = m_halfSize.y; // Positional correction to prevent wall trapping
+        m_pos.y = m_baseOffset.y + m_halfSize.y; // Positional correction to prevent wall trapping
         m_velocity.y = -m_velocity.y;
     } else if (BallHitsBottom && m_velocity.y > 0.0f) {
-        m_pos.y = m_windowSize.y - m_halfSize.y; // Positional correction
+        m_pos.y = m_baseOffset.y + m_windowSize.y - m_halfSize.y; // Positional correction
         m_velocity.y = -m_velocity.y;
     }
 
     // Left Wall Out-of-Bounds (Right Player Scores)
-    if (GetRight() < 0) {
-        m_pos = m_halfWindowSize;
+    if (GetRight() < m_baseOffset.x) {
+        m_pos = m_baseOffset + m_halfWindowSize;
         float Speed = glm::length(m_velocity);
         glm::vec2 BallVelocity = CreateRandomNormalizedVector() * Speed;
         m_velocity.x = abs(BallVelocity.x); // Serve towards player 2 this time
         m_velocity.y = BallVelocity.y;
     }
     // Right Wall Out-of-Bounds (Left Player Scores)
-    else if (GetLeft() > m_windowSize.x) {
-        m_pos = m_halfWindowSize;
+    else if (GetLeft() > m_baseOffset.x + m_windowSize.x) {
+        m_pos = m_baseOffset + m_halfWindowSize;
         float Speed = glm::length(m_velocity);
         glm::vec2 BallVelocity = CreateRandomNormalizedVector() * Speed;
         m_velocity.x = -abs(BallVelocity.x); // Serve towards player 1 this time
@@ -102,21 +102,22 @@ void Pong::Init(const GameConfig& config)
 
     m_halfWindowSize = m_config.WindowSize / 2.0f;
 
-    glm::vec2 pos = m_halfWindowSize;
+    glm::vec2 pos = config.BaseWindowPosition + m_halfWindowSize;
 
     glm::vec2 BallVelocity = CreateRandomNormalizedVector() * m_config.BallSpeed;
 
-    m_ball.Init(m_config.BallSize, pos, BallVelocity, m_config.WindowSize);
+    m_ball.Init(config.BaseWindowPosition, m_config.BallSize, pos, 
+                BallVelocity, m_config.WindowSize);
 
-    pos = glm::vec2(m_config.PaddleOffset, m_halfWindowSize.y);
+    pos = config.BaseWindowPosition + glm::vec2(m_config.PaddleOffset, m_halfWindowSize.y);
 
-    m_paddleL.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, pos, m_config.WindowSize, 
-                   m_config.PaddleMaxSpeed, m_config.PaddleAcceleration, m_config.PaddleDeceleration);
+    m_paddleL.Init(config.BaseWindowPosition, { m_config.PaddleWidth, m_config.PaddleHeight }, pos, 
+                   m_config.PaddleMaxSpeed, m_config.PaddleAcceleration, m_config.PaddleDeceleration, m_config.WindowSize);
 
-    pos = glm::vec2(m_config.WindowSize.x - m_config.PaddleOffset, m_halfWindowSize.y);
+    pos = config.BaseWindowPosition + glm::vec2(m_config.WindowSize.x - m_config.PaddleOffset, m_halfWindowSize.y);
 
-    m_paddleR.Init({ m_config.PaddleWidth, m_config.PaddleHeight }, pos, m_config.WindowSize, 
-                   m_config.PaddleMaxSpeed, m_config.PaddleAcceleration, m_config.PaddleDeceleration);
+    m_paddleR.Init(config.BaseWindowPosition, { m_config.PaddleWidth, m_config.PaddleHeight }, pos, 
+                   m_config.PaddleMaxSpeed, m_config.PaddleAcceleration, m_config.PaddleDeceleration, m_config.WindowSize);
 }
 
 
@@ -153,7 +154,7 @@ bool Pong::ResolvePaddleBallCollision(Paddle& paddle)
         glm::vec2 NewPosition = m_ball.GetPosition();
 
         // Bounce ball outward and correct position to prevent clipping
-        glm::vec2 WorldCenter = m_halfWindowSize; 
+        glm::vec2 WorldCenter = m_config.BaseWindowPosition + m_halfWindowSize; 
         if (m_ball.GetPosition().x < WorldCenter.x && NewVelocity.x < 0.0f) {
             NewVelocity.x = std::abs(NewVelocity.x);
 
