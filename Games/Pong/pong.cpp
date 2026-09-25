@@ -66,8 +66,7 @@ void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
 
 void Ball::Update(float deltaTime)
 {
-    m_pos.x += m_velocity.x * deltaTime;
-    m_pos.y += m_velocity.y * deltaTime;
+    m_pos += m_velocity * deltaTime;
 
     //printf("dt %f Ball Position: x=%f, y=%f velocity: x=%f, y=%f\n", deltaTime, m_pos.x, m_pos.y, m_velocity.x, m_velocity.y);
 
@@ -116,11 +115,12 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
-    m_halfWindowSize = { m_config.WindowSize.x / 2.0f, m_config.WindowSize.y / 2.0f };
-
-    glm::vec2 pos = config.BaseWindowPosition + glm::vec2(m_halfWindowSize.x, m_halfWindowSize.y);
-
     srand((unsigned int)time(NULL));
+
+    m_halfWindowSize = m_config.WindowSize / 2.0f;
+
+    glm::vec2 pos = config.BaseWindowPosition + m_halfWindowSize;
+
     glm::vec2 BallVelocity = CreateRandomNormalizedVector() * m_config.BallSpeed;
 
     m_ball.Init(config.BaseWindowPosition, m_config.BallSize, pos, 
