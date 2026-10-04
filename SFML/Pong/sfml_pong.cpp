@@ -128,7 +128,6 @@ private:
         Rect PaddleLRect, PaddleRRect, BallRect;
         m_game.GetRects(BallRect, PaddleLRect, PaddleRRect);
 
-        // Instantiate simple primitive rectangle layouts matching your Pong structures
         sf::RectangleShape PaddleL(sf::Vector2f(PaddleLRect.w, PaddleLRect.h));
         PaddleL.setPosition({ PaddleLRect.x, PaddleLRect.y });
         PaddleL.setFillColor(sf::Color::Magenta);
@@ -141,12 +140,10 @@ private:
         Ball.setPosition({ BallRect.x, BallRect.y });
         Ball.setFillColor(sf::Color::Yellow);
 
-        // Issue sequential composition instructions to the open view context
         m_window.draw(PaddleL);
         m_window.draw(PaddleR);
         m_window.draw(Ball);
 
-        // Swaps buffers to display the rendered frame onto the screen
         m_window.display();
     }
 
