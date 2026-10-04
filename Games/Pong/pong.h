@@ -82,14 +82,14 @@ public:
         return m_pos.x + m_halfSize.x;
     }
 
-    float GetTop() const
-    {
-        return m_pos.y + m_halfSize.y;
-    }
-
-    float GetBottom() const
+    float GetTop() const    // Window space has origin at top left, so top is smaller y value
     {
         return m_pos.y - m_halfSize.y;
+    }
+
+    float GetBottom() const // Window space has origin at top left, so bottom is larger y value
+    {
+        return m_pos.y + m_halfSize.y;
     }
 
 

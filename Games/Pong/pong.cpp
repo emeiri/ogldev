@@ -46,7 +46,6 @@ static glm::vec2 CreateRandomNormalizedVector()
 }
 
 
-
 void Paddle::Update(float deltaTime, bool IsUpKeyPressed, bool IsDownKeyPressed)
 {
     m_accelObj.Update(deltaTime, IsDownKeyPressed, IsUpKeyPressed);
@@ -65,8 +64,8 @@ void Ball::Update(float deltaTime)
 {
     m_pos += m_velocity * deltaTime;
 
-    bool BallHitsBottom = GetTop() >= m_windowSize.y;
-    bool BallHitsTop = GetBottom() <= 0;
+    bool BallHitsBottom = GetBottom() >= m_windowSize.y;
+    bool BallHitsTop = GetTop() <= 0;
 
     if (BallHitsTop && m_velocity.y < 0.0f) {
         m_pos.y = m_halfSize.y; // Positional correction to prevent wall trapping
@@ -89,7 +88,7 @@ void Ball::Update(float deltaTime)
         m_pos = m_halfWindowSize;
         float Speed = glm::length(m_velocity);
         glm::vec2 BallVelocity = CreateRandomNormalizedVector() * Speed;
-        m_velocity.x = -abs(BallVelocity.x); // Serve towards player 2 this time
+        m_velocity.x = -abs(BallVelocity.x); // Serve towards player 1 this time
         m_velocity.y = BallVelocity.y;
     }
 }
@@ -147,7 +146,7 @@ bool Pong::ResolvePaddleBallCollision(Paddle& paddle)
     float PaddleBottomSide = paddle.GetBottom();
 
     bool CollideWithPaddle = (BallLeftSide <= PaddleRightSide) && (BallRightSide >= PaddleLeftSide) &&
-                             (BallTopSide >= PaddleBottomSide) && (BallBottomSide <= PaddleTopSide);
+                             (BallBottomSide >= PaddleTopSide) && (BallTopSide <= PaddleBottomSide);
 
     if (CollideWithPaddle) {
         glm::vec2 NewVelocity = m_ball.GetVelocity() * 1.05f;
