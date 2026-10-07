@@ -101,7 +101,6 @@ void PreBakedRenderer::Init(const std::string& AssetPath)
 	CreateCommandBuffers();
 	RecordCommandBuffers();
 	InitCameraFromModel();
-	//DefaultCreateCameraPers();
 	// The object is ready to receive callbacks
 	OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
 	m_imGUIRenderer.Init(&m_vkCore);
@@ -227,51 +226,12 @@ void PreBakedRenderer::Execute()
 
 void PreBakedRenderer::InitCameraFromModel()
 {
-	glm::vec3 Pos = m_modelContext.m_pModel->GetCameras()[0].GetPosition();
-    //  glm::vec3 Target = mctx.Pos;
-    glm::vec3 Up(0.0, 1.0f, 0.0f);
-    float FOV = 45.0f;
-    float zNear = 0.1f;
-    float zFar = 1500.0f;
-    PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
-                                    zNear, zFar };
-    //  m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
-    m_pGameCamera = (GLMCameraFirstPerson*) &m_modelContext.m_pModel->GetCameras()[0];
-    //  m_pGameCamera->m_maxSpeed = 1.5f;
-}
+    if (m_modelContext.m_pModel->GetCameras().size() == 0) {
+        OGLDEV_ERROR("Model has no cameras.");
+        assert(0);
+    }
 
-
-void PreBakedRenderer::DefaultCreateCameraPers()
-{
-	float FOV = 45.0f;
-	float zNear = 0.1f;
-	float zFar = 1500.0f;
-
-	DefaultCreateCameraPers(FOV, zNear, zFar);
-}
-
-
-void PreBakedRenderer::DefaultCreateCameraPers(float FOV, float zNear, float zFar)
-{
-	if ((m_windowWidth == 0) || (m_windowHeight == 0)) {
-		printf("Invalid window dims: width %d height %d\n", m_windowWidth, m_windowHeight);
-		exit(1);
-	}
-
-	if (m_pGameCamera) {
-		printf("Camera already initialized\n");
-		exit(1);
-	}
-
-	PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
-									zNear, zFar };
-		
-	glm::vec3 Pos(10.0f, 2.4f, -0.17f);
-	glm::vec3 Target(-1.0f, -0.025f, 0.0f);
-	glm::vec3 Up(0.0, 1.0f, 0.0f);
-
-	m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
-	m_pGameCamera->m_maxSpeed = 1.5f;
+    m_pGameCamera = (GLMCameraFirstPerson*)&m_modelContext.m_pModel->GetCameras()[0];
 }
 
 
@@ -609,9 +569,7 @@ void PreBakedRenderer::UpdateGUI()
 
 void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 {		
-	glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
-
-	glm::mat4 World = Translate;
+    glm::mat4 World = glm::mat4(1.0f);
 
 	glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
