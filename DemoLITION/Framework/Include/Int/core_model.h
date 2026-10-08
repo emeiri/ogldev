@@ -134,6 +134,8 @@ public:
 
     const std::vector<glm::mat4>& GetTransformations() const { return m_transformationsGLM; }
 
+    std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformationsGLM; }
+
     const MeshDims& GetNodeDims(const char* pNodeName) const 
     { 
         auto it = m_nodeMap.find(pNodeName);
