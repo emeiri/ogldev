@@ -60,10 +60,12 @@ void VkModel::Destroy()
 
 	if (m_alignedVertices.pMem) {
 		free(m_alignedVertices.pMem);
+        m_alignedVertices.pMem = NULL;
 	}
 
 	if (m_alignedIndices.pMem) {
 		free(m_alignedIndices.pMem);
+        m_alignedIndices.pMem = NULL;
 	}
 }
 
