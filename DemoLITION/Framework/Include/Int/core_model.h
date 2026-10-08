@@ -105,7 +105,6 @@ public:
     void SetDirLight(int i, const DirectionalLight& Light)
     {
         if (i < m_dirLights.size()) {
-            printf("%f\n", Light.AmbientIntensity);
             m_dirLights[i] = Light;
         }
     }
