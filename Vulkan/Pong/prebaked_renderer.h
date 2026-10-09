@@ -78,11 +78,11 @@ public:
 
 	void Init(const std::string& AssetPath);
 
-	void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods);
+	virtual void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods);
 
-	void MouseMove(GLFWwindow* pWindow, double x, double y);
+	virtual void MouseMove(GLFWwindow* pWindow, double x, double y);
 
-	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods);
+	virtual void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods);
 
 	void Execute();
 
