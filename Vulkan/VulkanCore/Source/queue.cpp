@@ -38,6 +38,8 @@ void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamil
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR");
 
 	CreateSyncObjects();
+
+	m_imagesInFlight.resize(m_numImages, VK_NULL_HANDLE);
 }
 
 
@@ -94,8 +96,10 @@ void VulkanQueue::WaitIdle()
 
 u32 VulkanQueue::AcquireNextImage()
 {
-	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
-    vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
+	VkFence FrameFence = m_inFlightFences[m_frameIndex];
+
+	// Wait until this frame slot's previous submission is done
+	vkWaitForFences(m_device, 1, &FrameFence, VK_TRUE, UINT64_MAX);
 
 	VkResult res = vkAcquireNextImageKHR(
 		m_device,
@@ -107,9 +111,20 @@ u32 VulkanQueue::AcquireNextImage()
 	);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR");
 
+	// The image may still be in use by a submission from a different frame slot.
+	// Its command buffer and uniform buffer belong to the image, so wait for that frame too.
+	VkFence ImageFence = m_imagesInFlight[m_acquiredImageIndex];
+	if (ImageFence != VK_NULL_HANDLE && ImageFence != FrameFence) {
+		vkWaitForFences(m_device, 1, &ImageFence, VK_TRUE, UINT64_MAX);
+	}
+
+	m_imagesInFlight[m_acquiredImageIndex] = FrameFence;
+
+	// Reset only now, right before the submit that will signal it
+	vkResetFences(m_device, 1, &FrameFence);
+
 	return m_acquiredImageIndex;
 }
-
 
 void VulkanQueue::SubmitSync(VkCommandBuffer CmbBuf)
 {
