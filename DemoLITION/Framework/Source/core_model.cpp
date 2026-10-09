@@ -71,6 +71,7 @@ aiProcess_ValidateDataStructure)
 
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices | \
                                       aiProcess_Triangulate | \
+                                      aiProcess_GenBoundingBoxes | \
                                       aiProcess_GenSmoothNormals | \
                                       aiProcess_LimitBoneWeights | \
                                       aiProcess_SplitLargeMeshes | \
@@ -81,8 +82,6 @@ aiProcess_ValidateDataStructure)
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
 #endif
-//aiProcess_MakeLeftHanded | \
-
 
 static int traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
