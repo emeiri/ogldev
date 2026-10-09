@@ -104,7 +104,7 @@ private:
 
 	void CreateOffscreenImages();
 
-	void CreateMeshe(const std::string& AssetPath);
+	void CreateMesh(const std::string& AssetPath);
 
 	void CreateShaders();
 

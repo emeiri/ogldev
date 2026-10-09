@@ -97,7 +97,7 @@ void PreBakedRenderer::Init(const std::string& AssetPath)
 	InitBigTextureArray();
 	CreateOffscreenImages();
 	CreatePipelines();
-	CreateMeshe(AssetPath);
+	CreateMesh(AssetPath);
 	CreateCommandBuffers();
 	RecordCommandBuffers();
 	InitCameraFromModel();
@@ -288,7 +288,7 @@ void PreBakedRenderer::CreateOffscreenImages()
 }
 
 
-void PreBakedRenderer::CreateMeshe(const std::string& AssetPath)
+void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 {
     m_modelContext.m_pModel = new OgldevVK::VkModel();
 
