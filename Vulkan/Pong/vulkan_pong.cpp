@@ -107,18 +107,12 @@ public:
 
 	void UpdateGameState(float dt)
 	{
-        m_timeAccumulator += dt;
-
         glm::vec2 OldBallPos, OldPaddleLPos, OldPaddleRPos;
 
         m_game.GetPositions(OldBallPos, OldPaddleLPos, OldPaddleRPos);
 
-        //printf("DeltaTime: %f\n", dt);
-        while (m_timeAccumulator >= FIXED_DELTA_TIME) {
-            m_game.Update(FIXED_DELTA_TIME, m_inputState.PaddleLUp, m_inputState.PaddleLDown,
-                          m_inputState.PaddleRUp, m_inputState.PaddleRDown);
-            m_timeAccumulator -= FIXED_DELTA_TIME;
-        }
+        m_game.Update(dt, m_inputState.PaddleLUp, m_inputState.PaddleLDown,
+                      m_inputState.PaddleRUp, m_inputState.PaddleRDown);
 
         glm::vec2 BallPos, PaddleLPos, PaddleRPos;
 
@@ -126,10 +120,7 @@ public:
 
         OgldevVK::VkModel& PongModel = m_renderer.GetModel();
 
-        float alpha = (float)(m_timeAccumulator / FIXED_DELTA_TIME);
-        glm::vec2 RenderBallPosition = glm::mix(OldBallPos, BallPos, alpha);
-
-        PongModel.SetNodePositionXZ("Ball", RenderBallPosition.x, RenderBallPosition.y);
+        PongModel.SetNodePositionXZ("Ball", BallPos.x, BallPos.y);
 
         PongModel.SetNodePositionXZ("PaddleL", PaddleLPos.x, PaddleLPos.y);
 
@@ -142,7 +133,6 @@ private:
 	GameConfig m_config;
     Pong m_game;
     PongInputState m_inputState;
-    float m_timeAccumulator = 0.0f;
 };
 
 
