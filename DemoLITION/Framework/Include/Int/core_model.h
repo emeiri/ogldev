@@ -35,9 +35,6 @@
 #include "GL/gl_basic_mesh_entry.h"
 
 
-void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
-
-
 class DemolitionRenderCallbacks
 {
 public:
@@ -124,8 +121,6 @@ public:
     virtual void SetAmbientOcclusionMap(int TextureHandle) { assert(0); }
 
     virtual size_t GetNumMeshes() const { return m_Meshes.size(); }
-
-    static void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
 
     glm::mat4& GetNodeTransformationGLM(const char* pNodeName);
 
