@@ -213,7 +213,6 @@ void PreBakedRenderer::Execute()
 		FPSTime += dt;
 
 		if (FPSTime >= 1.0f) {
-			//printf("%d\n", Frames);
 			char Title[256];
 			snprintf(Title, sizeof(Title), "%s : FPS %d\n", m_appName.c_str(), Frames);
 			glfwSetWindowTitle(m_pWindow, Title);
