@@ -199,14 +199,14 @@ void PreBakedRenderer::Execute()
 	int Frames = 0;
 	float FPSTime = 0.0f;
 	while (!glfwWindowShouldClose(m_pWindow)) {
-		float Time = (float)glfwGetTime();
-		float dt = Time - CurTime;
+		double Time = glfwGetTime();
+		float dt = (float)(Time - CurTime);
         if (m_pGameCallbacks) {
             m_pGameCallbacks->UpdateGameState(dt);
         }
 		m_pGameCamera->Update(dt);
 		RenderScene();
-		CurTime = Time;
+		CurTime = (float)Time;
 		glfwPollEvents();
 
 		Frames++;
