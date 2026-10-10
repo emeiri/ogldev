@@ -137,6 +137,9 @@ uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
 const int toon_color_levels = 4;
 const float toon_scale_factor = 1.0f / toon_color_levels;
 
+// Light level of a fully shadowed pixel (ambient is added separately).
+const float kShadowFloor = 0.05;
+
 // ---------------------------------------------------------------------------
 // Material
 // ---------------------------------------------------------------------------
@@ -182,12 +185,9 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 
     float SampledDistance = texture(gShadowCubeMap, LightToPixel).r;
 
-    float bias = 0.015;
+    const float bias = 0.015;
 
-    if (SampledDistance + bias < Distance)
-        return 0.05;
-    else
-        return 1.0;
+    return (SampledDistance + bias < Distance) ? kShadowFloor : 1.0;
 }
 
 
