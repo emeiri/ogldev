@@ -200,7 +200,7 @@ float CalcShadowFactorBasic(vec3 LightDirection, vec3 Normal)
 {
     vec3 ShadowCoords = CalcShadowCoords();
 
-    float Depth = texture(gShadowMap, ShadowCoords.xy).x;
+    float Depth = textureLod(gShadowMap, ShadowCoords.xy, 0.0).x;
 
     float DiffuseFactor = dot(Normal, -LightDirection);
 
@@ -237,7 +237,7 @@ float CalcShadowFactorPCF(vec3 LightDirection, vec3 Normal)
     for (int y = -HalfFilterSize ; y < -HalfFilterSize + gShadowMapFilterSize ; y++) {
         for (int x = -HalfFilterSize ; x < -HalfFilterSize + gShadowMapFilterSize ; x++) {
             vec2 Offset = vec2(x, y) * TexelSize;
-            float Depth = texture(gShadowMap, ShadowCoords.xy + Offset).x;
+            float Depth = textureLod(gShadowMap, ShadowCoords.xy + Offset, 0.0).x;
 
             if (Depth + bias < ShadowCoords.z) {
                 ShadowSum += 0.0;
@@ -276,7 +276,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
         OffsetCoord.x = i;
         vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;
         sc.xy = ShadowCoords.xy + Offsets.rg * TexelSize;
-        Depth = texture(gShadowMap, sc.xy).x;
+        Depth = textureLod(gShadowMap, sc.xy, 0.0).x;
         if (Depth + bias < ShadowCoords.z) {
            Sum += 0.0;
         } else {
@@ -284,7 +284,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
         }
 
         sc.xy = ShadowCoords.xy + Offsets.ba * TexelSize;
-        Depth = texture(gShadowMap, sc.xy).x;
+        Depth = textureLod(gShadowMap, sc.xy, 0.0).x;
         if (Depth + bias < ShadowCoords.z) {
            Sum += 0.0;
         } else {
@@ -299,7 +299,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
             OffsetCoord.x = i;
             vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;
             sc.xy = ShadowCoords.xy + Offsets.rg * TexelSize;
-            Depth = texture(gShadowMap, sc.xy).x;
+            Depth = textureLod(gShadowMap, sc.xy, 0.0).x;
             if (Depth + bias < ShadowCoords.z) {
                Sum += 0.0;
             } else {
@@ -307,7 +307,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
             }
 
             sc.xy = ShadowCoords.xy + Offsets.ba * TexelSize;
-            Depth = texture(gShadowMap, sc.xy).x;
+            Depth = textureLod(gShadowMap, sc.xy, 0.0).x;
             if (Depth + bias < ShadowCoords.z) {
                Sum += 0.0;
             } else {
