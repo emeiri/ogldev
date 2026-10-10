@@ -36,9 +36,9 @@ public:
 		: m_renderer(WindowWidth, WindowHeight, NAME_OF_THE_GAME, this)
     {        
         m_config.BallSpeed = 5.0f;        
-        m_config.PaddleMaxSpeed = 0.5f;
-        m_config.PaddleAcceleration = 1.0f;
-        m_config.PaddleDeceleration = 0.5f;
+        m_config.PaddleMaxSpeed = 0.1f;
+        m_config.PaddleAcceleration = 0.3f;
+        m_config.PaddleDeceleration = 0.2f;
     }
 
     void Init()
