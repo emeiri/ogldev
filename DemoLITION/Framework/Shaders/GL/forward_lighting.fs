@@ -456,6 +456,43 @@ vec4 CalcSpotLight(int Index, vec3 Normal)
 // ---------------------------------------------------------------------------
 // Normal mapping
 // ---------------------------------------------------------------------------
+
+vec3 CalcBumpedNormal()                                                                     
+{             
+    // Step #1: Sample a normal from the normal map
+    vec3 BumpMapNormal;
+    
+    if (gIsIndirectRender) {
+        BumpMapNormal = texture(materials[MaterialIndex].NormalMap, TexCoord.xy).xyz;
+    } else {
+        BumpMapNormal = texture(gNormalMap, TexCoord).xyz;
+    }
+    
+    // Step #2: transform from [0,1] to [-1,1]
+    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
+
+    // Step #3: re-normalize the tangent space base vector after interpolation
+    vec3 Normal = normalize(Normal0);
+    vec3 Tangent = normalize(Tangent0);
+    vec3 Bitangent = normalize(Bitangent0);
+
+    // Improvement: re-orthogonalize the TBN base vectors using the Gram-Schmidt process:
+    //              (in this case the bitangent is calculated on the fly so we don't need
+    //              to put it in the vertex buffer)
+    // Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
+    // vec3 Bitangent = cross(Tangent, Normal);    
+    
+    mat3 TBN = mat3(Tangent, Bitangent, Normal);
+
+    // Step #4: transform from tangent space to world space
+    vec3 NewNormal = normalize(TBN * BumpMapNormal);
+
+    return NewNormal;                                                                       
+}            
+// ---------------------------------------------------------------------------
+// Fog
+// ---------------------------------------------------------------------------
+
 float CalcLinearFogFactor()
 {
     float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
@@ -569,38 +606,6 @@ float CalcFogFactor()
 }
 
 
-vec3 CalcBumpedNormal()                                                                     
-{             
-    // Step #1: Sample a normal from the normal map
-    vec3 BumpMapNormal;
-    
-    if (gIsIndirectRender) {
-        BumpMapNormal = texture(materials[MaterialIndex].NormalMap, TexCoord.xy).xyz;
-    } else {
-        BumpMapNormal = texture(gNormalMap, TexCoord).xyz;
-    }
-    
-    // Step #2: transform from [0,1] to [-1,1]
-    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
-
-    // Step #3: re-normalize the tangent space base vector after interpolation
-    vec3 Normal = normalize(Normal0);
-    vec3 Tangent = normalize(Tangent0);
-    vec3 Bitangent = normalize(Bitangent0);
-
-    // Improvement: re-orthogonalize the TBN base vectors using the Gram-Schmidt process:
-    //              (in this case the bitangent is calculated on the fly so we don't need
-    //              to put it in the vertex buffer)
-    // Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
-    // vec3 Bitangent = cross(Tangent, Normal);    
-    
-    mat3 TBN = mat3(Tangent, Bitangent, Normal);
-
-    // Step #4: transform from tangent space to world space
-    vec3 NewNormal = normalize(TBN * BumpMapNormal);
-
-    return NewNormal;                                                                       
-}            
 
 
 vec3 GetNormal()
