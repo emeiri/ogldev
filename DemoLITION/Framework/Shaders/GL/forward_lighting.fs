@@ -510,7 +510,7 @@ vec3 CalcBumpedNormal()
     //              (in this case the bitangent is calculated on the fly so we don't need
     //              to put it in the vertex buffer)
     // Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
-    // vec3 Bitangent = cross(Tangent, Normal);    
+    // Bitangent = cross(Tangent, Normal);    
     
     mat3 TBN = mat3(Tangent, Bitangent, Normal);
 
@@ -763,8 +763,14 @@ vec3 getNormalFromMap()
 }
 
 
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
 void main()
 {
+    // Everything that needs implicit derivatives is computed here, in uniform control
+    // flow, before any branch. Inside branches we only use textureGrad / textureLod.
     TexCoord = TexCoord0;
 
     TexDx = dFdx(TexCoord);
