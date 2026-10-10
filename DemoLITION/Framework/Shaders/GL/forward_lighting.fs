@@ -331,16 +331,14 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal, bool IsPoint)
     float ShadowFactor = 1.0;
 
     if (gShadowsEnabled) {
-        if (gShadowMapRandomRadius > 0.0) {
+        if (IsPoint) {
+            ShadowFactor = CalcShadowFactorPointLight(LightDirection);
+        } else if (gShadowMapRandomRadius > 0.0) {
             ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);        
         } else if (gShadowMapFilterSize > 0){
             ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);        
         } else {
-            if (IsPoint) {
-                ShadowFactor = CalcShadowFactorPointLight(LightDirection);            
-            } else {
-                ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
-            }
+            ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
         }
     }
 
