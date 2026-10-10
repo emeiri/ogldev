@@ -693,7 +693,7 @@ vec4 GetTexColor()
 
     if (gIsCubemapping) {
         vec3 CameraToPixel = normalize(WorldPos0 - gCameraWorldPos);
-        vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal0));
+        vec3 ReflectionDir = normalize(reflect(CameraToPixel, normalize(Normal0)));
         TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
     } else if (gIsIndirectRender) {
         TexColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
