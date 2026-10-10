@@ -458,6 +458,31 @@ vec4 CalcSpotLight(int Index, vec3 Normal)
 }
 
 
+vec4 GetTotalLight(vec3 Normal)
+{        
+    vec4 TotalLight = vec4(0.0);
+
+    for (int i = 0 ; i < gNumLights ; i++) {
+        switch (Lights[i].LightType) {
+
+            case LIGHT_TYPE_DIR:
+                TotalLight += CalcDirectionalLight(i, Normal);
+                break;
+
+            case LIGHT_TYPE_POINT:
+                TotalLight += CalcPointLight(i, Normal, true);
+                break;
+
+            case LIGHT_TYPE_SPOT:
+                TotalLight += CalcSpotLight(i, Normal);
+                break;
+        }
+    }
+
+    return TotalLight;
+}
+
+
 // ---------------------------------------------------------------------------
 // Normal mapping
 // ---------------------------------------------------------------------------
@@ -494,6 +519,22 @@ vec3 CalcBumpedNormal()
 
     return NewNormal;                                                                       
 }            
+
+
+vec3 GetNormal()
+{
+    vec3 Normal;    
+
+    if (gHasNormalMap) {
+        Normal = CalcBumpedNormal();
+    } else {
+        Normal = normalize(Normal0);
+    }
+
+    return Normal;
+}
+
+
 // ---------------------------------------------------------------------------
 // Fog
 // ---------------------------------------------------------------------------
@@ -612,45 +653,6 @@ float CalcFogFactor()
 }
 
 
-
-
-vec3 GetNormal()
-{
-    vec3 Normal;    
-
-    if (gHasNormalMap) {
-        Normal = CalcBumpedNormal();
-    } else {
-        Normal = normalize(Normal0);
-    }
-
-    return Normal;
-}
-
-
-vec4 GetTotalLight(vec3 Normal)
-{        
-    vec4 TotalLight = vec4(0.0);
-
-    for (int i = 0 ; i < gNumLights ; i++) {
-        switch (Lights[i].LightType) {
-
-            case LIGHT_TYPE_DIR:
-                TotalLight += CalcDirectionalLight(i, Normal);
-                break;
-
-            case LIGHT_TYPE_POINT:
-                TotalLight += CalcPointLight(i, Normal, true);
-                break;
-
-            case LIGHT_TYPE_SPOT:
-                TotalLight += CalcSpotLight(i, Normal);
-                break;
-        }
-    }
-
-    return TotalLight;
-}
 
 
 // ---------------------------------------------------------------------------
