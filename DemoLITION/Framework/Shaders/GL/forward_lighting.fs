@@ -32,7 +32,10 @@ in vec4 ProjectedTexCoord;
 
 out vec4 FragColor;
 
+// Set once at the top of main(), in uniform control flow.
 vec2 TexCoord;
+vec2 TexDx, TexDy;            // gradients of the texture coordinates
+vec2 ProjUV, ProjDx, ProjDy;  // projected-texture UVs and their gradients
 
 #define MAX_NUM_LIGHTS 4
 
@@ -385,7 +388,9 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, vec3 Normal, float Shadow
             float SpecularExponent = 128.0;
 
             if (gEnableSpecularExponent) {
-                SpecularExponent = texture(gSamplerSpecularExponent, TexCoord).r * 255.0;
+                // Inside a divergent branch: explicit gradients keep the LOD well defined.
+                SpecularExponent = textureGrad(gSamplerSpecularExponent, TexCoord, TexDx, TexDy).r * 255.0;
+                SpecularExponent = max(SpecularExponent, 1.0);   // pow(x, 0) == 1 gave full-power specular
             }
 
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
@@ -758,6 +763,15 @@ vec3 getNormalFromMap()
 void main()
 {
     TexCoord = TexCoord0;
+
+    TexDx = dFdx(TexCoord);
+    TexDy = dFdy(TexCoord);
+
+    // Safe even when w <= 0: these values are only *used* inside the w > 0 branch
+    ProjUV = ProjectedTexCoord.xy / ProjectedTexCoord.w;
+    ProjDx = dFdx(ProjUV);
+    ProjDy = dFdy(ProjUV);
+
     vec3 Normal = GetNormal();
     
     FragColor = CalcPhongLighting(Normal);
