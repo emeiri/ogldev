@@ -503,8 +503,7 @@ float CalcLinearFogFactor()
     float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
     float FogRange = gFogEnd - gFogStart;
     float FogDist = gFogEnd - CameraToPixelDist;
-    float FogFactor = FogDist / FogRange;
-    FogFactor = clamp(FogFactor, 0.0, 1.0);
+    float FogFactor = FogDist / FogRange;    
     return FogFactor;
 }
 
@@ -606,6 +605,8 @@ float CalcFogFactor()
     } else {
         FogFactor = CalcExpFogFactor();
     }
+
+    FogFactor = clamp(FogFactor, 0.0, 1.0);
 
     return FogFactor;
 }
