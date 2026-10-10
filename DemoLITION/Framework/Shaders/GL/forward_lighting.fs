@@ -47,6 +47,7 @@ vec2 TexCoord;
 #define RENDER_MODE_TEXCOORDS 4
 #define RENDER_MODE_BASE_COLOR 5
 #define RENDER_MODE_WHITE 6
+#define PI 3.1415926535897932384626433832795
 
 struct LightSource {
     vec3 Color;                    // offset 0
@@ -133,6 +134,9 @@ uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
 const int toon_color_levels = 4;
 const float toon_scale_factor = 1.0f / toon_color_levels;
 
+// ---------------------------------------------------------------------------
+// Material
+// ---------------------------------------------------------------------------
 
 vec4 GetMaterialAmbientColor()
 {
@@ -164,6 +168,9 @@ vec4 GetMaterialSpecularColor()
 }
 
 
+// ---------------------------------------------------------------------------
+// Shadows
+// ---------------------------------------------------------------------------
 float CalcShadowFactorPointLight(vec3 LightToPixel)
 {
     float Distance = length(LightToPixel);
@@ -354,8 +361,6 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, vec3 Normal, float Shadow
                         Lights[Index].AmbientIntensity *
                         GetMaterialAmbientColor();
 
-    //return vec4(Lights[Index].AmbientIntensity);
-
     float DiffuseFactor = dot(Normal, -LightDirection);
 
     vec4 DiffuseColor = vec4(0, 0, 0, 0);
@@ -402,15 +407,12 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, vec3 Normal, float Shadow
     }
 
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
-   //return vec4(DiffuseFactor);
- // return DiffuseColor;
 }
 
 
 vec4 CalcDirectionalLight(int Index, vec3 Normal)
 {
     float ShadowFactor = CalcShadowFactor(Lights[Index].Direction, Normal, false);
-    //return vec4(ShadowFactor);
     return CalcLightInternal(Index, Lights[Index].Direction, Normal, ShadowFactor);
 }
 
@@ -451,6 +453,9 @@ vec4 CalcSpotLight(int Index, vec3 Normal)
 }
 
 
+// ---------------------------------------------------------------------------
+// Normal mapping
+// ---------------------------------------------------------------------------
 float CalcLinearFogFactor()
 {
     float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
@@ -522,8 +527,6 @@ float CalcLayeredFogFactor()
 }
 
 
-#define PI 3.1415926535897932384626433832795
-
 float CalcAnimatedFogFactor()
 {
     float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
@@ -553,7 +556,7 @@ float CalcFogFactor()
     float FogFactor = 1.0;
 
     if (gFogTime > 0.0) {
-       FogFactor = CalcAnimatedFogFactor();
+        FogFactor = CalcAnimatedFogFactor();
     } else if (gLayeredFogTop > 0.0) {
         FogFactor = CalcLayeredFogFactor();
     } else if (gFogStart >= 0.0) {
@@ -638,6 +641,10 @@ vec4 GetTotalLight(vec3 Normal)
     return TotalLight;
 }
 
+
+// ---------------------------------------------------------------------------
+// Texture / reflection / refraction
+// ---------------------------------------------------------------------------
 
 vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
 {
