@@ -778,6 +778,7 @@ void main()
             break;
 
         case RENDER_MODE_TEXTURE_ONLY:
+        case RENDER_MODE_BASE_COLOR:
             FragColor = GetTexColor();
             break;
 
@@ -786,7 +787,11 @@ void main()
             break;
 
         case RENDER_MODE_NORMALS:
-            FragColor = vec4(Normal0, 1.0);
+            FragColor = vec4(Normal * 0.5 + 0.5, 1.0);
+            break;
+
+        case RENDER_MODE_TEXCOORDS:
+            FragColor = vec4(TexCoord0, 0.0, 1.0);
             break;
 
         case RENDER_MODE_WHITE:
