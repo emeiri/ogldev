@@ -394,7 +394,7 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, vec3 Normal, float Shadow
     }
 
     if (gHasNormalMap) {
-        float OriginalDiffuse = dot(normalize(Normal0), -LightDirection);
+        float OriginalDiffuse = max(0.0, dot(normalize(Normal0), -LightDirection));
         DiffuseColor *= OriginalDiffuse;
     }
 
