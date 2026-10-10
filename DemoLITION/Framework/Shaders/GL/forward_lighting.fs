@@ -791,13 +791,10 @@ void main()
     // vec4 projTexColor = texture(gProjectedTexture, ProjectionUVs);
 
     // 1. Check raw Z first. If it's negative, the GPU can immediately exit the block
-    if (ProjectedTexCoord.z > 0.0) {
-    
-        // 2. ONLY execute the expensive division if the point is in front of the lens
-        float projDepth = ProjectedTexCoord.z / ProjectedTexCoord.w;
-
-        if (projDepth <= 1.0) {
-            vec4 projTexColor = textureProj(gProjectedTexture, ProjectedTexCoord);
+    if (ProjectedTexCoord.w > 0.0 && ProjectedTexCoord.z <= ProjectedTexCoord.w) {
+        // z <= w is the same as z/w <= 1.0 without the divide
+        if (all(greaterThanEqual(ProjUV, vec2(0.0))) && all(lessThanEqual(ProjUV, vec2(1.0)))) {
+            vec4 projTexColor = textureGrad(gProjectedTexture, ProjUV, ProjDx, ProjDy);
             TempColor += projTexColor * 0.5;
         }
     }
