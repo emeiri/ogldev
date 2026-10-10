@@ -22,6 +22,7 @@
 #include <ctime>
 
 #include "pong.h"
+#include "regress_hook.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -98,7 +99,7 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
-    srand((unsigned int)time(NULL));
+    srand(Regress::Active() ? Regress::Seed() : (unsigned int)time(NULL));
 
     m_halfWindowSize = m_config.WindowSize / 2.0f;
 

@@ -130,6 +130,7 @@
 #include "imgui.h"
 #ifndef IMGUI_DISABLE
 #include "imgui_impl_opengl3.h"
+#include "regress_hook.h"
 #include <stdio.h>
 #include <stdint.h>     // intptr_t
 #if defined(__APPLE__)
@@ -453,6 +454,10 @@ static void ImGui_ImplOpenGL3_DrawCallback_SetSamplerNearest(const ImDrawList*, 
 // This is in order to be able to run within an OpenGL engine that doesn't do so.
 void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 {
+    // OGLDEV: no GUI in the regression test mode (it shows frame rates and other numbers that change between runs)
+    if (Regress::Active())
+        return;
+
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);

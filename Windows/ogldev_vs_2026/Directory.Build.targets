@@ -1,0 +1,16 @@
+﻿<Project>
+  <!--
+    Regression test mode (see Testing\README.md).
+
+    MSBuild imports this file into every project below this directory. It puts
+    Testing\shim in front of the include path so that the GLFW and freeglut
+    headers resolve to thin wrappers that implement the test mode. The
+    tutorials' sources and project files are not touched, and the wrappers do
+    nothing unless an application is started with the test options.
+  -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\..\Testing\shim;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

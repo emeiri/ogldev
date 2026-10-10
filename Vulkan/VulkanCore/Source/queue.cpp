@@ -23,6 +23,7 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_queue.h"
 #include "ogldev_vulkan_wrapper.h"
+#include "regress_hook.h"
 
 namespace OgldevVK {
 
@@ -181,6 +182,8 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 void VulkanQueue::Present(u32 ImageIndex)
 {
 	assert(ImageIndex == m_acquiredImageIndex);
+
+	Regress::EndFrame(&ImageIndex);
 
 	VkPresentInfoKHR PresentInfo = {
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,

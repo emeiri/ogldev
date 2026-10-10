@@ -32,6 +32,7 @@
 #include <GL/glew.h>
 #endif
 #include "ogldev_types.h"
+#include "regress_hook.h"
 
 
 using namespace std;
@@ -61,13 +62,13 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define SNPRINTF _snprintf_s
 #define VSNPRINTF vsnprintf_s
 #define RANDOM rand
-#define SRANDOM srand((unsigned)time(NULL))
+#define SRANDOM srand(Regress::Active() ? Regress::Seed() : (unsigned)time(NULL))
 #pragma warning (disable: 4566)
 #else
 #define SNPRINTF snprintf
 #define VSNPRINTF vsnprintf
 #define RANDOM random
-#define SRANDOM srandom(getpid())
+#define SRANDOM srandom(Regress::Active() ? Regress::Seed() : getpid())
 #endif
 
 #define INVALID_UNIFORM_LOCATION 0xffffffff

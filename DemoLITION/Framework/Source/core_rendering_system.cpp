@@ -22,6 +22,7 @@
 #include "Int/core_rendering_system.h"
 #include "Int/core_scene.h"
 #include "GL/gl_rendering_system.h"
+#include "regress_hook.h"
 
 #define NUM_MODELS 1024
 
@@ -72,6 +73,7 @@ void* CoreRenderingSystem::CreateWindow(int Width, int Height, const char* pWind
 {
     m_windowWidth = Width;
     m_windowHeight = Height;
+    Regress::ForceWindowSize(m_windowWidth, m_windowHeight);
 
     void* pWindow = CreateWindowInternal(pWindowName);
 

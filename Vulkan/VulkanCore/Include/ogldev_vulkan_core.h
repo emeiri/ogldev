@@ -140,6 +140,9 @@ public:
 
 	VkExtent2D GetSwapChainExtent() const;
 
+	// Regression test mode: writes a swapchain image (in the present layout) to a PNG file
+	bool CaptureSwapChainImage(u32 ImageIndex, const char* pPath);
+
 private:
 
 	void UpdateInstanceVersion();

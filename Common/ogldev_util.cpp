@@ -36,6 +36,7 @@
 #include <stdarg.h>
 
 #include "ogldev_util.h"
+#include "regress_hook.h"
 
 bool ReadFile(const char* pFileName, string& outFile)
 {
@@ -234,13 +235,13 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 long long GetCurrentTimeMillis()
 {
 #ifdef _WIN32
-    return GetTickCount64();
+    return Regress::TimeMillis(GetTickCount64());
 #else
     timeval t;
     gettimeofday(&t, NULL);
 
     long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-    return ret;
+    return Regress::TimeMillis(ret);
 #endif
 }
 
@@ -338,6 +339,10 @@ void glDebugOutput(GLenum source,
     case GL_DEBUG_SEVERITY_MEDIUM:       printf("Medium\n"); break;
     case GL_DEBUG_SEVERITY_LOW:          printf("Low\n"); break;
     case GL_DEBUG_SEVERITY_NOTIFICATION: printf("Notification\n"); break;
+    }
+
+    if (type == GL_DEBUG_TYPE_ERROR) {
+        Regress::ReportApiError(message);
     }
 }
 

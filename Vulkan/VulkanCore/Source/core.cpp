@@ -26,8 +26,25 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
+#include "regress_hook.h"
 
 namespace OgldevVK {
+
+static VulkanCore* s_pRegressCore = NULL;
+
+static bool RegressCapture(const char* pPath, int Width, int Height, void* pApiContext)
+{
+	u32 ImageIndex = *(u32*)pApiContext;
+
+	return s_pRegressCore->CaptureSwapChainImage(ImageIndex, pPath);
+}
+
+
+static void RegressQuit()
+{
+	glfwSetWindowShouldClose(s_pRegressCore->GetWindow(), GLFW_TRUE);
+}
+
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
@@ -49,6 +66,10 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	}
 
 	printf("\n");
+
+	if (Severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+		Regress::ReportApiError(pCallbackData->pMessage);
+	}
 
 	return VK_FALSE;  // The calling function should not be aborted
 }
@@ -143,6 +164,17 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, InitFlags Flags
 	CreateCommandBuffers(1, &m_copyCmdBuf);
 	if (m_depthEnabled) {
 		CreateDepthResources();
+	}
+
+	if (Regress::Active()) {
+		const VkPhysicalDeviceProperties& Props = m_physDevices.Selected().m_devProps;
+		char Version[64];
+		snprintf(Version, sizeof(Version), "driver %u.%u.%u", VK_VERSION_MAJOR(Props.driverVersion),
+				 VK_VERSION_MINOR(Props.driverVersion), VK_VERSION_PATCH(Props.driverVersion));
+		s_pRegressCore = this;
+		Regress::SetInfo("vk", Props.deviceName, Version);
+		Regress::SetCapture(RegressCapture);
+		Regress::SetQuit(RegressQuit);
 	}
 }
 
@@ -1526,6 +1558,98 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView Image
 	};
 
 	vkCmdBeginRendering(CmdBuf, &RenderingInfo);
+}
+
+
+bool VulkanCore::CaptureSwapChainImage(u32 ImageIndex, const char* pPath)
+{
+	// The frame has been submitted but not presented, so let it finish
+	m_queue.WaitIdle();
+
+	u32 Width = (u32)m_windowWidth;
+	u32 Height = (u32)m_windowHeight;
+	VkDeviceSize Size = (VkDeviceSize)Width * Height * 4;
+	VkImage Image = m_swapChainImages[ImageIndex].m_image;
+
+	BufferAndMemory Buf = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+									   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	VkImageMemoryBarrier Barrier = {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.pNext = NULL,
+		.srcAccessMask = 0,
+		.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+		.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+		.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.image = Image,
+		.subresourceRange = VkImageSubresourceRange {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		}
+	};
+
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	vkCmdPipelineBarrier(m_copyCmdBuf, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+						 0, 0, NULL, 0, NULL, 1, &Barrier);
+
+	VkBufferImageCopy Region = {
+		.bufferOffset = 0,
+		.bufferRowLength = 0,
+		.bufferImageHeight = 0,
+		.imageSubresource = VkImageSubresourceLayers {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		},
+		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
+		.imageExtent = VkExtent3D {.width = Width, .height = Height, .depth = 1 }
+	};
+
+	vkCmdCopyImageToBuffer(m_copyCmdBuf, Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, Buf.m_buffer, 1, &Region);
+
+	Barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	Barrier.dstAccessMask = 0;
+	Barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	Barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	vkCmdPipelineBarrier(m_copyCmdBuf, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+						 0, 0, NULL, 0, NULL, 1, &Barrier);
+
+	SubmitCopyCommand();
+
+	void* pMem = NULL;
+	VkResult res = vkMapMemory(m_device, Buf.m_mem, 0, VK_WHOLE_SIZE, 0, &pMem);
+	CHECK_VK_RESULT(res, "vkMapMemory");
+
+	std::vector<unsigned char> Pixels((size_t)Size);
+	memcpy(Pixels.data(), pMem, (size_t)Size);
+
+	vkUnmapMemory(m_device, Buf.m_mem);
+	Buf.Destroy(m_device);
+
+	VkFormat Format = m_swapChainSurfaceFormat.format;
+	bool IsBGRA = (Format == VK_FORMAT_B8G8R8A8_UNORM) || (Format == VK_FORMAT_B8G8R8A8_SRGB);
+
+	for (size_t i = 0; i < Pixels.size(); i += 4) {
+		if (IsBGRA) {
+			std::swap(Pixels[i], Pixels[i + 2]);
+		}
+		Pixels[i + 3] = 255;
+	}
+
+	if (!Regress::GetState().InfoWritten) {
+		Regress::WriteInfo((int)Width, (int)Height);
+		Regress::GetState().InfoWritten = true;
+	}
+
+	return Regress::WritePNG(pPath, (int)Width, (int)Height, Pixels.data(), false);
 }
 
 

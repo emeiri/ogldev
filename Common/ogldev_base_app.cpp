@@ -16,6 +16,7 @@
 */
 
 #include "ogldev_base_app.h"
+#include "regress_hook.h"
 
 static OgldevBaseApp* app = NULL;
 
@@ -44,6 +45,8 @@ void OgldevBaseApp::InitBaseApp()
 
 void OgldevBaseApp::DefaultCreateWindow(int WindowWidth, int WindowHeight, const char* pWindowName)
 {
+    Regress::ForceWindowSize(WindowWidth, WindowHeight);
+
     m_windowWidth = WindowWidth;
     m_windowHeight = WindowHeight;
 

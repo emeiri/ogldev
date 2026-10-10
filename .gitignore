@@ -56,3 +56,6 @@ VulkanClear/*
 *.obj.dt.module.json
 *.obj.dt.module.json.command
 imgui.ini
+
+/Testing/out/
+/Testing/goldens/
