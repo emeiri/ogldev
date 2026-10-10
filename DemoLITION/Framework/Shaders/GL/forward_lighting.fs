@@ -417,11 +417,15 @@ vec4 CalcDirectionalLight(int Index, vec3 Normal)
 vec4 CalcPointLight(int Index, vec3 Normal, bool IsPoint)
 {
     vec3 LightWorldDir = WorldPos0 - Lights[Index].WorldPos;
-    float ShadowFactor = CalcShadowFactor(LightWorldDir, Normal, IsPoint);
 
-    float Distance = length(LightWorldDir);
+    float Distance = length(LightWorldDir);     // Distance before normalization!
+
     LightWorldDir = normalize(LightWorldDir);
+    
+    float ShadowFactor = CalcShadowFactor(LightWorldDir, Normal, IsPoint);    
+    
     vec4 Color = CalcLightInternal(Index, LightWorldDir, Normal, ShadowFactor);
+
     float Attenuation =  Lights[Index].Atten_Constant +
                          Lights[Index].Atten_Linear * Distance +
                          Lights[Index].Atten_Exp * Distance * Distance;
