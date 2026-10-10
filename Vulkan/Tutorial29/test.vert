@@ -52,6 +52,7 @@ struct MetaData {
     uint IndexOffset; 
     uint IndexCount; 
     uint VertexOffset; 
+    vec4 Color;
 };
 
 layout(std430, set = 0, binding = 4) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
