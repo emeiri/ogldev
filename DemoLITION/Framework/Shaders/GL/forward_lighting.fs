@@ -163,15 +163,6 @@ vec4 GetMaterialSpecularColor()
     }
 }
 
-float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
-{
-    float RimFactor = dot(PixelToCamera, Normal);
-    RimFactor = 1.0 - RimFactor;
-    RimFactor = max(0.0, RimFactor);
-    RimFactor = pow(RimFactor, gRimLightPower);
-    return RimFactor;
-}
-
 
 float CalcShadowFactorPointLight(vec3 LightToPixel)
 {
@@ -342,6 +333,20 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal, bool IsPoint)
 
     return ShadowFactor;
 }
+
+// ---------------------------------------------------------------------------
+// Lighting
+// ---------------------------------------------------------------------------
+
+float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
+{
+    float RimFactor = dot(PixelToCamera, Normal);
+    RimFactor = 1.0 - RimFactor;
+    RimFactor = max(0.0, RimFactor);
+    RimFactor = pow(RimFactor, gRimLightPower);
+    return RimFactor;
+}
+
 
 vec4 CalcLightInternal(int Index, vec3 LightDirection, vec3 Normal, float ShadowFactor)
 {
