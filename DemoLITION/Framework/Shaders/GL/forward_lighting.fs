@@ -788,20 +788,25 @@ void main()
             break;
 
         case RENDER_MODE_TEXTURE_ONLY:
-        case RENDER_MODE_BASE_COLOR:
             FragColor = GetTexColor();
             break;
 
         case RENDER_MODE_LIGHTING_ONLY:
-            FragColor = GetTotalLight(Normal);    
+            FragColor = vec4(GetTotalLight(Normal).rgb, 1.0);
             break;
 
         case RENDER_MODE_NORMALS:
+            // Shading normal (includes the normal map), remapped from [-1,1] to [0,1].
+            // Use GeoNormal here instead to see the raw vertex normal.
             FragColor = vec4(Normal * 0.5 + 0.5, 1.0);
             break;
 
         case RENDER_MODE_TEXCOORDS:
-            FragColor = vec4(TexCoord0, 0.0, 1.0);
+            FragColor = vec4(fract(TexCoord), 0.0, 1.0);
+            break;
+
+        case RENDER_MODE_BASE_COLOR:
+            FragColor = GetMaterialDiffuseColor();
             break;
 
         case RENDER_MODE_WHITE:
