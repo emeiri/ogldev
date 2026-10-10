@@ -577,7 +577,6 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
     glm::vec4 AmbientLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_ambientLight);
     glm::vec4 DiffuseLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_diffuseLight);
 	glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
-	//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
         
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													WVP, 
