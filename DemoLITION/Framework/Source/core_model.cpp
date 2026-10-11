@@ -957,13 +957,11 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
     unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
     unsigned int NumIndices = (unsigned int)m_modelData.m_indices.size();
 
-  //  CountVerticesAndIndices(pScene, NumVertices, NumIndices);
-
     if (!InitMaterials(pScene, Filename)) {
         return false;
     }
 
-    InitBuffers(pScene, NumVertices, NumIndices);
+    InitGPUBuffers(pScene, NumVertices, NumIndices);
 
     CalculateMeshTransformations(pScene);
 
@@ -977,7 +975,7 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 }
 
 
-void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices)
+void CoreModel::InitGPUBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices)
 {
     printf("Num animations %d\n", pScene->mNumAnimations);
 

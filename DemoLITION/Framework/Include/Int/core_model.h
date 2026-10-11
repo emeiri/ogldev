@@ -376,7 +376,7 @@ private:
 
     bool InitGeometry(const aiScene* pScene, const std::string& Filename);
 
-    void InitBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices);
+    void InitGPUBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices);
 
     template<typename VertexType>
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
