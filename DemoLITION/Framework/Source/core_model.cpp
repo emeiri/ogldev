@@ -145,7 +145,7 @@ void AssimpModelLoader::InitGeometry()
 
     InitBuffers(NumVertices, NumIndices);
 
-   // CalculateMeshTransformations();
+    CalculateMeshTransformations();
 
   //  InitGeometryPost();
 }
@@ -412,6 +412,83 @@ void AssimpModelLoader::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, 
 }
 
 
+void AssimpModelLoader::CalculateMeshTransformations()
+{
+    printf("----------------------------------------\n");
+    printf("Calculating mesh transformations\n");
+    Matrix4f Transformation;
+    Transformation.InitIdentity();
+
+    TraverseNodeHierarchy(Transformation, m_pScene->mRootNode);
+
+    for (u32 SubmeshIndex = 0; SubmeshIndex < m_pModelData->m_meshes.size(); SubmeshIndex++) {
+        // The matrix is stored as row major in the file but glm expects column major by default.
+        const glm::mat4& MeshTransformGLM = m_pModelData->m_transformationsGLM[SubmeshIndex];
+        glm::vec3 MeshPos = glm::vec3(MeshTransformGLM[3]);
+        m_pModelData->m_meshes[SubmeshIndex].Dims.Pos = MeshPos;
+    }
+}
+
+
+void AssimpModelLoader::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode)
+{
+#ifdef DEBUG_SCENE_HIERARCHY
+    printf("Traversing node '%s'\n", pNode->mName.C_Str());
+#endif
+    Matrix4f LocalTransform(pNode->mTransformation);
+
+    Matrix4f GlobalTransform = ParentTransformation * LocalTransform;
+
+#ifdef DEBUG_SCENE_HIERARCHY
+    printf("Global transformation:\n");
+    GlobalTransform.Print();
+#endif
+
+    // glm::mat4 CombinedTransformationGLM = glm::make_mat4(CombinedTransformation.data());
+    // CombinedTransformationGLM = glm::transpose(CombinedTransformationGLM);
+
+    if (pNode->mNumMeshes > 0) {
+#ifdef DEBUG_SCENE_HIERARCHY
+        printf("Num meshes: %d\n", pNode->mNumMeshes);
+#endif
+        for (int i = 0; i < (int)pNode->mNumMeshes; i++) {
+            int MeshIndex = pNode->mMeshes[i];
+            const BasicMeshEntry& MeshEntry = m_pModelData->m_meshes[MeshIndex];
+            int CurInstanceID = (int)m_pModelData->m_transformations.size();
+            m_pModelData->m_transformations.push_back(GlobalTransform);
+
+            glm::mat4 MeshTransform = glm::make_mat4(GlobalTransform.data());
+            // The matrix is stored as row major in the file but glm expects column major by default.
+            glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
+
+            glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
+            glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
+
+            m_pModelData->m_transformationsGLM.push_back(LeftHandedMatrixGLM);
+
+#ifdef DEBUG_SCENE_HIERARCHY
+            printf("%d ", MeshIndex);
+#endif
+            m_pModelData->m_nodeMap[pNode->mName.C_Str()] = MeshIndex;
+            m_pModelData->m_meshes[MeshIndex].TransformationDeprecated = GlobalTransform;
+        }
+#ifdef DEBUG_SCENE_HIERARCHY
+        printf("\n");
+#endif
+    } else {
+#ifdef DEBUG_SCENE_HIERARCHY
+        printf("No meshes\n");
+#endif
+    }
+
+    for (uint i = 0; i < pNode->mNumChildren; i++) {
+        TraverseNodeHierarchy(GlobalTransform, pNode->mChildren[i]);
+    }
+}
+
+
+
+
 void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
 {
     if (pMesh->mNumBones > MAX_BONES) {
@@ -635,8 +712,7 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
 
     if (m_pScene) {
         printf("--- START Node Hierarchy ---\n");
-        m_numNodes = traverse(0, m_pScene->mRootNode);
-        printf("Num nodes: %d\n", m_numNodes);
+        traverse(0, m_pScene->mRootNode);
         printf("--- END Node Hierarchy ---\n");
         Ret = InitFromScene(m_pScene, Filename);
     }
@@ -685,8 +761,6 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 
     InitBuffers(pScene, NumVertices, NumIndices);
 
-    CalculateMeshTransformations(pScene);
-
     InitGeometryPost();
 
 #ifdef OGLDEV_VULKAN
@@ -721,82 +795,6 @@ static uint CountValidFaces(const aiMesh& Mesh)
     }
 
     return NumValidFaces;
-}
-
-
-void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
-{
-    printf("----------------------------------------\n");
-    printf("Calculating mesh transformations\n");
-    Matrix4f Transformation;
-    Transformation.InitIdentity();
-
-    TraverseNodeHierarchy(Transformation, pScene->mRootNode);
-    
-    for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-        // The matrix is stored as row major in the file but glm expects column major by default.
-        const glm::mat4& MeshTransformGLM = m_transformationsGLM[SubmeshIndex];
-        glm::vec3 MeshPos = glm::vec3(MeshTransformGLM[3]);
-        m_Meshes[SubmeshIndex].Dims.Pos = MeshPos;
-    }
-}
-
-
-void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode)
-{
-#ifdef DEBUG_SCENE_HIERARCHY
-    printf("Traversing node '%s'\n", pNode->mName.C_Str());
-#endif
-    Matrix4f LocalTransform(pNode->mTransformation);    
-
-    Matrix4f GlobalTransform = ParentTransformation * LocalTransform;
-
-#ifdef DEBUG_SCENE_HIERARCHY
-    printf("Global transformation:\n");
-    GlobalTransform.Print();
-#endif
-
-   // glm::mat4 CombinedTransformationGLM = glm::make_mat4(CombinedTransformation.data());
-   // CombinedTransformationGLM = glm::transpose(CombinedTransformationGLM);
-  
-    if (pNode->mNumMeshes > 0) {
-#ifdef DEBUG_SCENE_HIERARCHY
-        printf("Num meshes: %d\n", pNode->mNumMeshes);
-#endif
-        for (int i = 0; i < (int)pNode->mNumMeshes; i++) {
-            int MeshIndex = pNode->mMeshes[i];
-            const BasicMeshEntry& MeshEntry = m_Meshes[MeshIndex];
-            int CurInstanceID = (int)m_transformations.size();
-            m_transformations.push_back(GlobalTransform);
-
-            glm::mat4 MeshTransform = glm::make_mat4(GlobalTransform.data());
-            // The matrix is stored as row major in the file but glm expects column major by default.
-            glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
-
-            glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
-            glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
-
-            m_transformationsGLM.push_back(LeftHandedMatrixGLM);
-
-#ifdef DEBUG_SCENE_HIERARCHY
-            printf("%d ", MeshIndex);
-#endif
-            m_nodeMap[pNode->mName.C_Str()] = MeshIndex;
-            m_Meshes[MeshIndex].TransformationDeprecated = GlobalTransform;
-        }
-#ifdef DEBUG_SCENE_HIERARCHY
-        printf("\n");
-#endif
-    }
-    else {
-#ifdef DEBUG_SCENE_HIERARCHY
-        printf("No meshes\n");
-#endif
-    }
-
-    for (uint i = 0; i < pNode->mNumChildren; i++) {
-        TraverseNodeHierarchy(GlobalTransform, pNode->mChildren[i]);
-    }
 }
 
 
@@ -1492,14 +1490,14 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 
 glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)
 {
-    std::map<std::string, int>::iterator it = m_nodeMap.find(pNodeName);
+    std::map<std::string, int>::iterator it = m_modelData.m_nodeMap.find(pNodeName);
 
-    if (it == m_nodeMap.end()) {
+    if (it == m_modelData.m_nodeMap.end()) {
         OGLDEV_ERROR("Cannot find node %s in the hierarchy\n", pNodeName);
         assert(0);
     }
 
-    return m_transformationsGLM[it->second];
+    return m_modelData.m_transformationsGLM[it->second];
 }
 
 
