@@ -178,6 +178,18 @@ struct ModelData {
 
    // bool IsSkinned() const { return Skel != nullptr; }   // keyed on bones, not animation count
     bool IsPBR() const;
+
+    size_t NumVertices() const { 
+        size_t NumVertices = 0;
+
+        if (m_numAnimations > 0) {
+            NumVertices = m_skinnedVertices.size();
+        } else {
+            NumVertices = m_vertices.size();
+        }
+
+        return NumVertices;
+    }
 };
 
 class CoreRenderingSystem;
