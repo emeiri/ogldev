@@ -168,6 +168,9 @@ struct ModelData {
     std::vector<SpotLight>        m_spotLights;
     std::vector<GLMCameraFirstPerson> m_cameras;
     MeshDims m_dims;
+
+    Matrix4f m_globalInverseTransform;
+    u32 m_numAnimations = 0;
     vector<BoneInfo> m_boneInfo;
     std::map<std::string, uint> m_boneNameToIndexMap;
     std::map<std::string, NodeInfo> m_requiredNodeMap;
@@ -216,7 +219,6 @@ private:
     const aiScene* m_pScene = NULL;
     ModelData* m_pModelData = NULL;
     Assimp::Importer m_importer;
-    Matrix4f m_globalInverseTransform;
     u32 m_numAnimations = 0;
     bool m_flipTexCoordV = false;
 };
@@ -242,7 +244,7 @@ public:
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
-    uint NumBones() const { return (uint)m_BoneNameToIndexMap.size(); }
+    uint NumBones() const { return (uint)m_modelData.m_boneNameToIndexMap.size(); }
 
     // This is the main function to drive the animation. It receives the animation time
     // in seconds and a reference to a vector of transformation matrices (one matrix per bone).
@@ -419,7 +421,6 @@ private:
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     float m_textureScale = 1.0f;
-    u32 m_numAnimations = 0;
 
     bool m_flipTexCoordV = false;
 
@@ -427,9 +428,6 @@ private:
 	// Skeletal animation stuff
     /////////////////////////////////////
 
-    void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* paiMesh);
-    void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
-    int GetBoneId(const aiBone* pBone);
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -440,8 +438,6 @@ private:
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation);
     void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
                                   const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);
-    void MarkRequiredNodesForBone(const aiBone* pBone);
-    void InitializeRequiredNodeMap(const aiNode* pNode);
     float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
 
     struct LocalTransform {
@@ -451,9 +447,5 @@ private:
     };
 
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
-
-    std::map<std::string,uint> m_BoneNameToIndexMap;
-    vector<BoneInfo> m_BoneInfo;
-    std::map<std::string,NodeInfo> m_requiredNodeMap;
 };
 

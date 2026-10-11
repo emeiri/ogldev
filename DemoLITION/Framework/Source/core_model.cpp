@@ -109,8 +109,8 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
         int NumNodes = traverse(0, m_pScene->mRootNode);
         printf("Num nodes: %d\n", NumNodes);
         printf("--- END Node Hierarchy ---\n");
-        m_globalInverseTransform = m_pScene->mRootNode->mTransformation;
-        m_globalInverseTransform = m_globalInverseTransform.Inverse();
+        m_pModelData->m_globalInverseTransform = m_pScene->mRootNode->mTransformation;
+        m_pModelData->m_globalInverseTransform = m_pModelData->m_globalInverseTransform.Inverse();
         InitFromScene();
     } else {
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_importer.GetErrorString());
@@ -675,7 +675,7 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const std::string& Filename
 bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 {
     printf("\n*** Initializing geometry ***\n");
-    m_numAnimations = pScene->mNumAnimations;
+    
     m_Meshes.resize(pScene->mNumMeshes);
     m_Materials.resize(pScene->mNumMaterials);
 
@@ -707,11 +707,9 @@ void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, uns
     printf("Num animations %d\n", pScene->mNumAnimations);
 
     if (pScene->mNumAnimations > 0) {
-        InitializeRequiredNodeMap(m_pScene->mRootNode);
         PopulateBuffersSkinned(m_modelData.m_skinnedVertices);
     }
     else {
-        InitializeRequiredNodeMap(m_pScene->mRootNode);
         PopulateBuffers(m_modelData.m_vertices);
     }
 
@@ -1535,103 +1533,6 @@ void CoreModel::SetNodePositionXZ(const char* pNodeName, float x, float z)
 //
 
 
-void CoreModel::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
-{
-    if (pMesh->mNumBones > MAX_BONES) {
-        printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
-        printf("Make sure to increase the macro MAX_BONES in the C++ header as well as in the shader to the same value\n");
-        assert(0);
-    }
-
-    // printf("Loading mesh bones %d\n", MeshIndex);
-    for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
-        // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
-        LoadSingleBone(SkinnedVertices, MeshIndex, pMesh->mBones[i]);
-    }
-}
-
-
-void CoreModel::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone) 
-{
-    int BoneId = GetBoneId(pBone);
-
-    if (BoneId == m_BoneInfo.size()) {
-        BoneInfo bi(pBone->mOffsetMatrix);
-        // bi.OffsetMatrix.Print();
-        m_BoneInfo.push_back(bi);
-    }
-
-    for (uint i = 0; i < pBone->mNumWeights; i++) {
-        const aiVertexWeight& vw = pBone->mWeights[i];
-
-        // Fix: Use the isolated mesh layout offset safely.
-        // If optimizing with meshopt, ensure this logic runs BEFORE meshopt_remapVertexBuffer maps the array!
-        uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + vw.mVertexId;
-
-        if (GlobalVertexID < SkinnedVertices.size()) {
-            SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
-        }
-    }
-    MarkRequiredNodesForBone(pBone);
-}
-
-
-void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone) 
-{
-    std::string NodeName(pBone->mName.C_Str());
-
-    const aiNode* pParent = NULL;
-
-    do {
-        auto it = m_requiredNodeMap.find(NodeName);
-        if (it == m_requiredNodeMap.end()) {
-            printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
-            assert(0);
-        }
-
-        it->second.isRequired = true;
-
-        pParent = it->second.pNode->mParent;
-
-        if (pParent) {
-            NodeName = std::string(pParent->mName.C_Str());
-        }
-
-    } while (pParent);
-}
-
-
-void CoreModel::InitializeRequiredNodeMap(const aiNode* pNode)
-{
-    std::string NodeName(pNode->mName.C_Str());
-
-    NodeInfo info(pNode);
-
-    m_requiredNodeMap[NodeName] = info;
-
-    for (unsigned int i = 0 ; i < pNode->mNumChildren ; i++) {
-        InitializeRequiredNodeMap(pNode->mChildren[i]);
-    }
-}
-
-
-int CoreModel::GetBoneId(const aiBone* pBone)
-{
-    int BoneIndex = 0;
-    std::string BoneName(pBone->mName.C_Str());
-
-    if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
-        // Allocate an index for a new bone
-        BoneIndex = (int)m_BoneNameToIndexMap.size();
-        m_BoneNameToIndexMap[BoneName] = BoneIndex;
-    }
-    else {
-        BoneIndex = m_BoneNameToIndexMap[BoneName];
-    }
-
-    return BoneIndex;
-}
-
 
 uint CoreModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
@@ -1803,17 +1704,17 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode,
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 
-    if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
-        uint BoneIndex = m_BoneNameToIndexMap[NodeName];
-        m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
+    if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
+        uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
+        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
         std::string ChildName(pNode->mChildren[i]->mName.data);
 
-        std::map<std::string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
+        std::map<std::string,NodeInfo>::iterator it = m_modelData.m_requiredNodeMap.find(ChildName);
 
-        if (it == m_requiredNodeMap.end()) {
+        if (it == m_modelData.m_requiredNodeMap.end()) {
             printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
             assert(0);
         }
@@ -1888,15 +1789,15 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 
-    if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
-        uint BoneIndex = m_BoneNameToIndexMap[NodeName];
-        m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
+    if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
+        uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
+        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
     }
 
     for (uint i = 0; i < pNode->mNumChildren; i++) {
         std::string ChildName(pNode->mChildren[i]->mName.data);
-        auto it = m_requiredNodeMap.find(ChildName);
-        if (it == m_requiredNodeMap.end()) {
+        auto it = m_modelData.m_requiredNodeMap.find(ChildName);
+        if (it == m_modelData.m_requiredNodeMap.end()) {
             printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
             assert(0);
         }
@@ -1931,10 +1832,10 @@ void CoreModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transfo
     const aiAnimation& Animation = *m_pScene->mAnimations[AnimationIndex];
 
     ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity, Animation);
-    Transforms.resize(m_BoneInfo.size());
+    Transforms.resize(m_modelData.m_boneInfo.size());
 
-    for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
-        Transforms[i] = m_BoneInfo[i].FinalTransformation;
+    for (uint i = 0 ; i < m_modelData.m_boneInfo.size() ; i++) {
+        Transforms[i] = m_modelData.m_boneInfo[i].FinalTransformation;
     }
 }
 
@@ -1971,10 +1872,10 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
 
     ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
 
-    BlendedTransforms.resize(m_BoneInfo.size());
+    BlendedTransforms.resize(m_modelData.m_boneInfo.size());
 
-    for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
-        BlendedTransforms[i] = m_BoneInfo[i].FinalTransformation;
+    for (uint i = 0 ; i < m_modelData.m_boneInfo.size() ; i++) {
+        BlendedTransforms[i] = m_modelData.m_boneInfo[i].FinalTransformation;
     }
 }
 
@@ -2012,7 +1913,7 @@ const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation& Animation, const st
 
 bool CoreModel::IsAnimated() const
 {
-    bool ret = m_numAnimations > 0;
+    bool ret = m_modelData.m_numAnimations > 0;
 
     if (ret && (NumBones() == 0)) {
         printf("Animations without bones? need to check this\n");
