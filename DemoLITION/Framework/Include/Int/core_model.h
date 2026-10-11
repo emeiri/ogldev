@@ -194,7 +194,6 @@ struct ModelData {
     }
 };
 
-class CoreRenderingSystem;
 
 class AssimpModelLoader {
 public:
@@ -226,6 +225,11 @@ private:
     void MarkRequiredNodesForBone(const aiBone* pBone);
     void CalculateMeshTransformations();
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
+    void InitLights();
+    void InitSingleLight(const aiLight& light);
+    void InitDirectionalLight(const aiLight& light);
+    void InitPointLight(const aiLight& light);
+    void InitSpotLight(const aiLight& light);
 
     // Each of these is a private free function or small helper class in the .cpp:
     //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt
@@ -242,6 +246,8 @@ private:
     int m_windowWidth = 0;
     int m_windowHeight = 0;
 };
+
+class CoreRenderingSystem;
 
 class CoreModel : public Model
 {
@@ -281,21 +287,21 @@ public:
                                   unsigned int EndAnimIndex,
                                   float BlendFactor);
 
-    const std::vector<DirectionalLight>& GetDirLights() const { return m_dirLights; }
-    const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
-    const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
+    const std::vector<DirectionalLight>& GetDirLights() const { return m_modelData.m_dirLights; }
+    const std::vector<SpotLight>& GetSpotLights() const { return m_modelData.m_spotLights; }
+    const std::vector<PointLight>& GetPointLights() const { return m_modelData.m_pointLights; }
 
     void SetPointLight(int i, const PointLight& Light) 
     { 
-        if (i < m_pointLights.size()) { 
-            m_pointLights[i] = Light; 
+        if (i < m_modelData.m_pointLights.size()) { 
+            m_modelData.m_pointLights[i] = Light; 
         } 
     }
 
     void SetDirLight(int i, const DirectionalLight& Light)
     {
-        if (i < m_dirLights.size()) {
-            m_dirLights[i] = Light;
+        if (i < m_modelData.m_dirLights.size()) {
+            m_modelData.m_dirLights[i] = Light;
         }
     }
 
@@ -376,16 +382,6 @@ private:
 
     void InitBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices);
 
-    void InitLights(const aiScene* pScene);
-
-    void InitSingleLight(const aiScene* pScene, const aiLight& light);
-
-    void InitDirectionalLight(const aiScene* pScene, const aiLight& light);
-
-    void InitPointLight(const aiScene* pScene, const aiLight& light);
-
-    void InitSpotLight(const aiScene* pScene, const aiLight& light);
-
     template<typename VertexType>
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
 
@@ -418,9 +414,6 @@ private:
 
     const aiScene* m_pScene = NULL;
     Assimp::Importer m_Importer;
-    std::vector<DirectionalLight> m_dirLights;
-    std::vector<PointLight> m_pointLights;
-    std::vector<SpotLight> m_spotLights;
     float m_textureScale = 1.0f;
     bool m_flipTexCoordV = false;
 

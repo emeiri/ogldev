@@ -88,6 +88,18 @@ static uint CountValidFaces(const aiMesh& Mesh);
 static int traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
+inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
+{
+    Vector3f ret;
+
+    ret.x = v.x;
+    ret.y = v.y;
+    ret.z = v.z;
+
+    return ret;
+}
+
+
 void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData, int WindowWidth, int WindowHeight)
 {
     m_filename = Filename;
@@ -129,7 +141,7 @@ void AssimpModelLoader::InitFromScene()
 
     InitCameras();
 
-//  InitLights();
+    InitLights();
 }
 
 
@@ -512,6 +524,211 @@ void AssimpModelLoader::InitSingleCamera(int Index)
 }
 
 
+void AssimpModelLoader::InitLights()
+{
+    printf("\n*** Initializing lights ***\n");
+
+    for (int i = 0; i < (int)m_pScene->mNumLights; i++) {
+        InitSingleLight(*m_pScene->mLights[i]);
+    }
+}
+
+
+void AssimpModelLoader::InitSingleLight(const aiLight& light)
+{
+    printf("Init light '%s'\n", light.mName.C_Str());
+
+    switch (light.mType) {
+
+    case aiLightSource_DIRECTIONAL:
+        InitDirectionalLight(light);
+        break;
+
+    case aiLightSource_POINT:
+        InitPointLight(light);
+        break;
+
+    case aiLightSource_SPOT:
+        InitSpotLight(light);
+        break;
+
+    case aiLightSource_AMBIENT:
+        printf("Ambient light is not implemented\n");
+        exit(0);
+
+    case aiLightSource_AREA:
+        printf("Area light is not implemented\n");
+        exit(0);
+
+    case aiLightSource_UNDEFINED:
+    default:
+        printf("Light type is undefined\n");
+        exit(0);
+    }
+}
+
+
+static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation)
+{
+    Transformation.InitIdentity();
+
+    const aiNode* pNode = pRootNode->FindNode(pName);
+
+    if (!pNode) {
+        printf("Warning! Cannot find a node for '%s'\n", pName);
+        return false;
+    }
+
+    while (pNode) {
+        Matrix4f CurTransformation(pNode->mTransformation);
+        Transformation = CurTransformation * Transformation;
+        pNode = pNode->mParent;
+    }
+
+    return true;
+}
+
+
+void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
+{
+    DirectionalLight l;
+    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.Color = Vector3f(1.0f);
+    l.DiffuseIntensity = 1.0f; // TODO
+
+    Matrix4f Transformation;
+    GetFullTransformation(m_pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    /* Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+     printf("Original direction: "); Direction.Print();
+     Vector4f Dir4D(Direction, 0.0f);
+     Dir4D = Transformation * Dir4D;
+     l.WorldDirection = Dir4D;
+     printf("Transformed direction: "); l.WorldDirection.Print();*/
+
+     // Extract the components directly from your row-major matrix layout
+     // to bypass Blender's embedded glTF offset rotation
+    Vector3f TrueDirection;
+    TrueDirection.x = Transformation.m[0][2];
+    TrueDirection.y = Transformation.m[1][2];
+    TrueDirection.z = Transformation.m[2][2];
+
+    // Normalize to preserve clean calculations for your lighting equations
+    l.WorldDirection = TrueDirection.Normalize();
+
+    printf("Adjusted World Direction: "); l.WorldDirection.Print();
+
+    Vector3f Up = VectorFromAssimpVector(light.mUp);
+    printf("Original up: "); Up.Print();
+    Vector4f Up4D(Up, 0.0f);
+    Up4D = Transformation * Up4D;
+
+    l.Up = Vector3f(Up4D);
+    printf("Final up: "); l.Up.Print();
+
+    m_pModelData->m_dirLights.push_back(l);
+}
+
+
+void AssimpModelLoader::InitPointLight(const aiLight& light)
+{
+    PointLight l;
+    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    printf("Point light color [%f %f %f]\n", l.Color.x, l.Color.y, l.Color.z);
+    //l.Color = Vector3f(1.0f);
+    l.DiffuseIntensity = 1.0f; // TODO
+
+    Vector3f Position = VectorFromAssimpVector(light.mPosition);
+    printf("Original Position: "); Position.Print();
+
+    Matrix4f Transformation;
+
+    GetFullTransformation(m_pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    Vector4f Pos4D(Position, 1.0f);
+    Pos4D = Transformation * Pos4D;
+
+    l.WorldPosition = Vector3f(Pos4D);
+    printf("Final Position: "); l.WorldPosition.Print();
+
+    l.Attenuation.Constant = light.mAttenuationConstant;
+    l.Attenuation.Linear = light.mAttenuationLinear;
+    l.Attenuation.Exp = light.mAttenuationQuadratic;
+
+    printf("Attenuation: constant %f linear %f exp %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
+
+    m_pModelData->m_pointLights.push_back(l);
+}
+
+
+void AssimpModelLoader::InitSpotLight(const aiLight& light)
+{
+    SpotLight l;
+    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.Color = Vector3f(1.0f);
+    l.DiffuseIntensity = 1.0f; // TODO
+
+    Matrix4f Transformation;
+    GetFullTransformation(m_pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    /*    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+        printf("Original direction: "); Direction.Print();
+        Vector4f Dir4D(Direction, 0.0f);
+        Dir4D = Transformation * Dir4D;
+        l.WorldDirection = Dir4D;
+        printf("Final direction: "); l.WorldDirection.Print();*/
+
+    Vector3f TrueDirection;
+    TrueDirection.x = Transformation.m[0][2];
+    TrueDirection.y = Transformation.m[1][2];
+    TrueDirection.z = Transformation.m[2][2];
+
+    // Normalize to preserve clean calculations for your lighting equations
+    l.WorldDirection = TrueDirection.Normalize();
+
+    Vector3f Up = VectorFromAssimpVector(light.mUp);
+    printf("Original up: "); Up.Print();
+    if (Up.Length() == 0) {
+        // Use clean 3D vector literal dimensions for structural comparisons
+        if ((l.WorldDirection == Vector3f(0.0f, 1.0f, 0.0f)) || (l.WorldDirection == Vector3f(0.0f, -1.0f, 0.0f))) {
+            l.Up = Vector3f(1.0f, 0.0f, 0.0f);
+        } else {
+            l.Up = Vector3f(0.0f, 1.0f, 0.0f);
+        }
+    } else {
+        Vector4f Up4D(Up, 0.0f);
+        Up4D = Transformation * Up4D;
+        l.Up = Vector3f(Up4D);
+    }
+
+    printf("Final up: "); l.Up.Print();
+
+    Vector3f Position = VectorFromAssimpVector(light.mPosition);
+    printf("Original Position: "); Position.Print();
+    Vector4f Pos4D(Position, 1.0f);
+    Pos4D = Transformation * Pos4D;
+
+    l.WorldPosition = Vector3f(Pos4D);
+    printf("Final Position: "); l.WorldPosition.Print();
+
+    l.Attenuation.Constant = light.mAttenuationConstant;
+    l.Attenuation.Linear = light.mAttenuationLinear;
+    l.Attenuation.Exp = light.mAttenuationQuadratic / 100.0f;
+
+    printf("Attenuation: constant %f linear %f exp (adjusted!) %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
+
+    if (light.mAngleInnerCone != light.mAngleOuterCone) {
+        printf("Warning!!! Different values for spot light inner/outer cone angles is not supported\n");
+    }
+
+    l.Cutoff = ToDegree(light.mAngleOuterCone);
+
+    printf("Cutoff angle %f\n", l.Cutoff);
+
+    m_pModelData->m_spotLights.push_back(l);
+}
+
+
 void AssimpModelLoader::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode)
 {
 #ifdef DEBUG_SCENE_HIERARCHY
@@ -667,18 +884,6 @@ int AssimpModelLoader::GetBoneId(const aiBone* pBone)
 }
 
 
-inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
-{
-    Vector3f ret;
-
-    ret.x = v.x;
-    ret.y = v.y;
-    ret.z = v.z;
-
-    return ret;
-}
-
-
 static std::string GetFullPath(const std::string& Dir, const aiString& Path) 
 {
     std::filesystem::path p(Path.C_Str());
@@ -817,8 +1022,6 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const std::string& Filename
     if (!InitGeometry(pScene, Filename)) {
         return false;
     }    
-
-    InitLights(pScene);
 
     return true;
 }
@@ -1276,211 +1479,6 @@ static int traverse(int depth, aiNode* pNode)
     }
 
     return Count;
-}
-
-
-void CoreModel::InitLights(const aiScene* pScene)
-{   
-    printf("\n*** Initializing lights ***\n");
-
-    for (int i = 0; i < (int)pScene->mNumLights; i++) {
-        InitSingleLight(pScene, *pScene->mLights[i]);
-    }
-}
-
-
-void CoreModel::InitSingleLight(const aiScene* pScene, const aiLight& light)
-{
-    printf("Init light '%s'\n", light.mName.C_Str());
-
-    switch (light.mType) {
-
-    case aiLightSource_DIRECTIONAL:
-        InitDirectionalLight(pScene, light);
-        break;
-
-    case aiLightSource_POINT:
-        InitPointLight(pScene, light);
-        break;
-
-    case aiLightSource_SPOT:
-        InitSpotLight(pScene, light);
-        break;
-
-    case aiLightSource_AMBIENT:
-        printf("Ambient light is not implemented\n");
-        exit(0);
-
-    case aiLightSource_AREA:
-        printf("Area light is not implemented\n");
-        exit(0);
-
-    case aiLightSource_UNDEFINED:
-    default:
-        printf("Light type is undefined\n");
-        exit(0);
-    }
-}
-
-
-static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation)
-{
-    Transformation.InitIdentity();
-
-    const aiNode* pNode = pRootNode->FindNode(pName);
-    
-    if (!pNode) {
-        printf("Warning! Cannot find a node for '%s'\n", pName);
-        return false;
-    }    
-
-    while (pNode) {
-        Matrix4f CurTransformation(pNode->mTransformation);
-        Transformation = CurTransformation * Transformation;
-        pNode = pNode->mParent;
-    }
-
-    return true;
-}
-
-
-void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light) 
-{
-    DirectionalLight l;
-    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
-    l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = 1.0f; // TODO
-
-    Matrix4f Transformation;
-    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
-
-   /* Vector3f Direction = VectorFromAssimpVector(light.mDirection);
-    printf("Original direction: "); Direction.Print();
-    Vector4f Dir4D(Direction, 0.0f);
-    Dir4D = Transformation * Dir4D;
-    l.WorldDirection = Dir4D;
-    printf("Transformed direction: "); l.WorldDirection.Print();*/
-
-    // Extract the components directly from your row-major matrix layout
-    // to bypass Blender's embedded glTF offset rotation
-    Vector3f TrueDirection;
-    TrueDirection.x = Transformation.m[0][2];
-    TrueDirection.y = Transformation.m[1][2];
-    TrueDirection.z = Transformation.m[2][2];
-
-    // Normalize to preserve clean calculations for your lighting equations
-    l.WorldDirection = TrueDirection.Normalize();
-
-    printf("Adjusted World Direction: "); l.WorldDirection.Print();
-
-    Vector3f Up = VectorFromAssimpVector(light.mUp);
-    printf("Original up: "); Up.Print();
-    Vector4f Up4D(Up, 0.0f);
-    Up4D = Transformation * Up4D;
-
-    l.Up = Vector3f(Up4D);
-    printf("Final up: "); l.Up.Print();
-
-    m_dirLights.push_back(l);
-}
-
-
-void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light) 
-{
-    PointLight l;
-    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
-    printf("Point light color [%f %f %f]\n", l.Color.x, l.Color.y, l.Color.z);
-    //l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = 1.0f; // TODO
-
-    Vector3f Position = VectorFromAssimpVector(light.mPosition);
-    printf("Original Position: "); Position.Print();
-
-    Matrix4f Transformation;
-
-    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
-
-    Vector4f Pos4D(Position, 1.0f);
-    Pos4D = Transformation * Pos4D;
-
-    l.WorldPosition = Vector3f(Pos4D);
-    printf("Final Position: "); l.WorldPosition.Print();
-
-    l.Attenuation.Constant = light.mAttenuationConstant;
-    l.Attenuation.Linear = light.mAttenuationLinear;
-    l.Attenuation.Exp = light.mAttenuationQuadratic;
-
-    printf("Attenuation: constant %f linear %f exp %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
-
-    m_pointLights.push_back(l);
-}
-
-
-void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light) 
-{
-    SpotLight l;
-    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
-    l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = 1.0f; // TODO
-
-    Matrix4f Transformation;
-    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
-
-/*    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
-    printf("Original direction: "); Direction.Print();
-    Vector4f Dir4D(Direction, 0.0f);
-    Dir4D = Transformation * Dir4D;
-    l.WorldDirection = Dir4D;
-    printf("Final direction: "); l.WorldDirection.Print();*/
-
-    Vector3f TrueDirection;
-    TrueDirection.x = Transformation.m[0][2];
-    TrueDirection.y = Transformation.m[1][2];
-    TrueDirection.z = Transformation.m[2][2];
-
-    // Normalize to preserve clean calculations for your lighting equations
-    l.WorldDirection = TrueDirection.Normalize();
-
-    Vector3f Up = VectorFromAssimpVector(light.mUp);
-    printf("Original up: "); Up.Print();
-    if (Up.Length() == 0) {
-        // Use clean 3D vector literal dimensions for structural comparisons
-        if ((l.WorldDirection == Vector3f(0.0f, 1.0f, 0.0f)) || (l.WorldDirection == Vector3f(0.0f, -1.0f, 0.0f))) {
-            l.Up = Vector3f(1.0f, 0.0f, 0.0f);
-        } else {
-            l.Up = Vector3f(0.0f, 1.0f, 0.0f);
-        }
-    } else {
-        Vector4f Up4D(Up, 0.0f);
-        Up4D = Transformation * Up4D;
-        l.Up = Vector3f(Up4D);
-    }
-
-    printf("Final up: "); l.Up.Print();
-
-    Vector3f Position = VectorFromAssimpVector(light.mPosition);
-    printf("Original Position: "); Position.Print();
-    Vector4f Pos4D(Position, 1.0f);
-    Pos4D = Transformation * Pos4D;
-
-    l.WorldPosition = Vector3f(Pos4D);
-    printf("Final Position: "); l.WorldPosition.Print();
-
-    l.Attenuation.Constant = light.mAttenuationConstant;
-    l.Attenuation.Linear = light.mAttenuationLinear;
-    l.Attenuation.Exp = light.mAttenuationQuadratic / 100.0f;
-
-    printf("Attenuation: constant %f linear %f exp (adjusted!) %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
-
-    if (light.mAngleInnerCone != light.mAngleOuterCone) {
-        printf("Warning!!! Different values for spot light inner/outer cone angles is not supported\n");
-    }
-
-    l.Cutoff = ToDegree(light.mAngleOuterCone);
-
-    printf("Cutoff angle %f\n", l.Cutoff);
-
-    m_spotLights.push_back(l);
 }
 
 
