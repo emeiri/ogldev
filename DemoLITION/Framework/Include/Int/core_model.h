@@ -200,7 +200,7 @@ class AssimpModelLoader {
 public:
     // Returns null on failure; GetError() says why. All Assimp types stay inside the .cpp.
     AssimpModelLoader() = default;
-    void Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData);
+    void Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData, int WindowWidth, int WindowHeight);
     const std::string& GetError() const { return m_error; }
 
 private:
@@ -217,6 +217,8 @@ private:
     template<typename VertexType>
     void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, 
                       std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices);
+    void InitCameras();
+    void InitSingleCamera(int Index);
     void InitializeRequiredNodeMap(const aiNode* pNode);
     void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
@@ -237,6 +239,8 @@ private:
     Assimp::Importer m_importer;
     u32 m_numAnimations = 0;
     bool m_flipTexCoordV = false;
+    int m_windowWidth = 0;
+    int m_windowHeight = 0;
 };
 
 class CoreModel : public Model
@@ -258,7 +262,7 @@ public:
 
     bool LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags);
 
-    const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
+    const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_modelData.m_cameras; }
 
     uint NumBones() const { return (uint)m_modelData.m_boneNameToIndexMap.size(); }
 
@@ -412,13 +416,8 @@ private:
     void ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMaterial& material);
     void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
 
-    void InitCameras(const aiScene* pScene);
-
-    void InitSingleCamera(int Index, const aiScene* pScene);
-
     const aiScene* m_pScene = NULL;
     Assimp::Importer m_Importer;
-    std::vector<GLMCameraFirstPerson> m_cameras;
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;

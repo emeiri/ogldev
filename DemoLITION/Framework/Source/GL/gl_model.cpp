@@ -230,7 +230,6 @@ void GLModel::InitGeometryPost()
 }
 
 
-
 template<typename VertexType>
 void GLModel::PopulateBuffersInternal(std::vector<VertexType>& Vertices)
 {

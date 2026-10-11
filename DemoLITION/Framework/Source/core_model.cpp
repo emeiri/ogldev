@@ -85,11 +85,15 @@ aiProcess_ValidateDataStructure)
 
 static int traverse(int depth, aiNode* pNode);
 static uint CountValidFaces(const aiMesh& Mesh);
+static int traverse(int depth, aiNode* pNode);
+static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
-void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData)
+void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData, int WindowWidth, int WindowHeight)
 {
     m_filename = Filename;
     m_pModelData = &OutModelData;
+    m_windowWidth = WindowWidth;
+    m_windowHeight = WindowHeight;
 
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
@@ -123,7 +127,7 @@ void AssimpModelLoader::InitFromScene()
 {
     InitGeometry();
 
-  //InitCameras();
+    InitCameras();
 
 //  InitLights();
 }
@@ -430,6 +434,84 @@ void AssimpModelLoader::CalculateMeshTransformations()
 }
 
 
+void AssimpModelLoader::InitCameras()
+{
+    printf("\n*** Initializing cameras ***\n");
+    printf("Loading %d cameras\n", m_pScene->mNumCameras);
+
+    m_pModelData->m_cameras.resize(m_pScene->mNumCameras);
+
+    for (unsigned int i = 0; i < m_pScene->mNumCameras; i++) {
+        InitSingleCamera(i);
+    }
+}
+
+
+void AssimpModelLoader::InitSingleCamera(int Index)
+{
+    const aiCamera* pCamera = m_pScene->mCameras[Index];
+    printf("Loading Camera: '%s'\n", pCamera->mName.C_Str());
+
+    // 1. Get the hierarchy matrix (Order: Parent * Child)
+    Matrix4f Transformation;
+    GetFullTransformation(m_pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
+
+    aiMatrix4x4 aiCameraMatrix;
+    pCamera->GetCameraMatrix(aiCameraMatrix);
+    Matrix4f CameraMatrix(aiCameraMatrix);
+    printf("Camera internal transformation:\n");
+    CameraMatrix.Print();
+
+    Matrix4f FinalWorld = Transformation;
+
+    printf("Final camera transformation:\n");
+    FinalWorld.Print();
+
+    // 3. Extract World Position
+    Vector4f Pos4D(0.0f, 0.0f, 0.0f, 1.0f);
+    Pos4D = FinalWorld * Pos4D;
+    Vector3f FinalPos(pCamera->mPosition.x, pCamera->mPosition.y, -pCamera->mPosition.z);
+
+    // 4. Extract World Direction (Blender Camera Forward is -Z)
+    Vector4f Target4D(0.0f, 0.0f, -1.0f, 0.0f);
+    Target4D = FinalWorld * Target4D;
+    //Vector3f FinalTargetDir = Vector3f(pCamera->mLookAt.x, pCamera->mLookAt.y, -pCamera->mLookAt.z).Normalize();
+    Vector3f FinalTargetDir(Transformation.m[0][2], -Transformation.m[1][2], Transformation.m[2][2]);
+
+    FinalTargetDir = FinalTargetDir.Normalize();
+
+    // 5. Extract World Up (Blender Camera Up is +Y)
+    Vector4f Up4D(0.0f, 1.0f, 0.0f, 0.0f);
+    Up4D = FinalWorld * Up4D;
+    Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, Up4D.z).Normalize();
+
+    // 6. Setup Perspective Projection
+    PersProjInfo persProjInfo;
+    persProjInfo.zNear = pCamera->mClipPlaneNear;
+    persProjInfo.zFar = pCamera->mClipPlaneFar;
+    persProjInfo.Width = (float)m_windowWidth;
+    persProjInfo.Height = (float)m_windowHeight;
+
+    float FullHorizontalDeg = ToDegree(pCamera->mHorizontalFOV);
+
+    float AspectRatio = persProjInfo.Width / persProjInfo.Height;
+
+    // 3. Mathematical conversion: Full Horizontal FOV -> Full Vertical FOV
+    float FullVerticalRad = 2.0f * atan(tan(ToRadian(FullHorizontalDeg) / 2.0f) / AspectRatio);
+    float FullVerticalDeg = ToDegree(FullVerticalRad);
+
+    // 4. Assign the FULL vertical degree angle straight to your projection settings
+    // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
+    persProjInfo.FOV = FullVerticalDeg;
+
+    m_pModelData->m_cameras[Index].Init(FinalPos.ToGLM(), FinalTargetDir.ToGLM(), FinalUp.ToGLM(), persProjInfo);
+
+    printf("Final Pos: "); FinalPos.Print();
+    printf("Final Dir: "); FinalTargetDir.Print();
+    printf("Final Up: "); FinalUp.Print();
+}
+
+
 void AssimpModelLoader::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode)
 {
 #ifdef DEBUG_SCENE_HIERARCHY
@@ -485,8 +567,6 @@ void AssimpModelLoader::TraverseNodeHierarchy(const Matrix4f& ParentTransformati
         TraverseNodeHierarchy(GlobalTransform, pNode->mChildren[i]);
     }
 }
-
-
 
 
 void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
@@ -586,10 +666,6 @@ int AssimpModelLoader::GetBoneId(const aiBone* pBone)
     return BoneIndex;
 }
 
-
-
-static int traverse(int depth, aiNode* pNode);
-static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 {
@@ -692,8 +768,15 @@ void CoreModel::DestroyModel()
 
 bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
 {
+    int WindowWidth, WindowHeight;
+#ifdef OGLDEV_VULKAN
+    GetWindowSize(WindowWidth, WindowHeight);
+#else
+    m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+#endif
+
     AssimpModelLoader Loader;
-    Loader.Load(Filename, Flags, m_modelData);
+    Loader.Load(Filename, Flags, m_modelData, WindowWidth, WindowHeight);
 
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
@@ -734,8 +817,6 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const std::string& Filename
     if (!InitGeometry(pScene, Filename)) {
         return false;
     }    
-
-    InitCameras(pScene);
 
     InitLights(pScene);
 
@@ -1195,91 +1276,6 @@ static int traverse(int depth, aiNode* pNode)
     }
 
     return Count;
-}
-
-
-void CoreModel::InitCameras(const aiScene* pScene)
-{
-    printf("\n*** Initializing cameras ***\n");
-    printf("Loading %d cameras\n", pScene->mNumCameras);
-
-    m_cameras.resize(pScene->mNumCameras);
-
-    for (unsigned int i = 0; i < pScene->mNumCameras; i++) {
-        InitSingleCamera(i, pScene);
-    }
-}
-
-
-void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
-{
-    const aiCamera* pCamera = pScene->mCameras[Index];
-    printf("Loading Camera: '%s'\n", pCamera->mName.C_Str());
-
-    // 1. Get the hierarchy matrix (Order: Parent * Child)
-    Matrix4f Transformation;
-    GetFullTransformation(pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
-
-    aiMatrix4x4 aiCameraMatrix;
-    pCamera->GetCameraMatrix(aiCameraMatrix);
-    Matrix4f CameraMatrix(aiCameraMatrix);
-    printf("Camera internal transformation:\n");
-    CameraMatrix.Print();
-
-    Matrix4f FinalWorld = Transformation;
-    
-    printf("Final camera transformation:\n");
-    FinalWorld.Print();
-
-    // 3. Extract World Position
-    Vector4f Pos4D(0.0f, 0.0f, 0.0f, 1.0f);
-    Pos4D = FinalWorld * Pos4D;
-    Vector3f FinalPos(pCamera->mPosition.x, pCamera->mPosition.y, -pCamera->mPosition.z);
-
-    // 4. Extract World Direction (Blender Camera Forward is -Z)
-    Vector4f Target4D(0.0f, 0.0f, -1.0f, 0.0f);
-    Target4D = FinalWorld * Target4D;
-    //Vector3f FinalTargetDir = Vector3f(pCamera->mLookAt.x, pCamera->mLookAt.y, -pCamera->mLookAt.z).Normalize();
-    Vector3f FinalTargetDir(Transformation.m[0][2], -Transformation.m[1][2], Transformation.m[2][2]);
-
-    FinalTargetDir = FinalTargetDir.Normalize();
-
-    // 5. Extract World Up (Blender Camera Up is +Y)
-    Vector4f Up4D(0.0f, 1.0f, 0.0f, 0.0f);
-    Up4D = FinalWorld * Up4D;
-    Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, Up4D.z).Normalize();
-
-    // 6. Setup Perspective Projection
-    PersProjInfo persProjInfo;
-    persProjInfo.zNear = pCamera->mClipPlaneNear;
-    persProjInfo.zFar = pCamera->mClipPlaneFar;
-
-    int WindowWidth, WindowHeight;
-#ifdef OGLDEV_VULKAN
-    GetWindowSize(WindowWidth, WindowHeight);
-#else
-    m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
-#endif
-    persProjInfo.Width = (float)WindowWidth;
-    persProjInfo.Height = (float)WindowHeight;
-
-    float FullHorizontalDeg = ToDegree(pCamera->mHorizontalFOV);
-
-    float AspectRatio = persProjInfo.Width / persProjInfo.Height;
-
-    // 3. Mathematical conversion: Full Horizontal FOV -> Full Vertical FOV
-    float FullVerticalRad = 2.0f * atan(tan(ToRadian(FullHorizontalDeg) / 2.0f) / AspectRatio);
-    float FullVerticalDeg = ToDegree(FullVerticalRad);
-
-    // 4. Assign the FULL vertical degree angle straight to your projection settings
-    // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
-    persProjInfo.FOV = FullVerticalDeg;
-
-    m_cameras[Index].Init(FinalPos.ToGLM(), FinalTargetDir.ToGLM(), FinalUp.ToGLM(), persProjInfo);
-
-    printf("Final Pos: "); FinalPos.Print();
-    printf("Final Dir: "); FinalTargetDir.Print();
-    printf("Final Up: "); FinalUp.Print();
 }
 
 
