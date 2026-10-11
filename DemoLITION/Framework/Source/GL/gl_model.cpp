@@ -204,7 +204,6 @@ void GLModel::AllocBuffers()
     }
     else {
         glGenVertexArrays(1, &m_VAO);
-        glBindVertexArray(m_VAO);
         glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
     }
 }
@@ -270,6 +269,7 @@ void GLModel::PopulateBuffersPVP(std::vector<VertexType>& Vertices)
 template<typename VertexType>
 void GLModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
 {
+    glBindVertexArray(m_VAO);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
 
@@ -324,6 +324,8 @@ void GLModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
         glVertexAttribPointer(BONE_WEIGHT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
         NumFloats += NumElements;
     }
+
+    glBindVertexArray(0);
 }
 
 

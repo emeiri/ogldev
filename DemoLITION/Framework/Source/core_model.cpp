@@ -928,11 +928,6 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
     }
 
-#ifndef OGLDEV_VULKAN // TODO: move to GLModel using virtual function
-    // Make sure the VAO is not changed from the outside
-    glBindVertexArray(0);
-#endif
-
     return Ret;
 }
 
