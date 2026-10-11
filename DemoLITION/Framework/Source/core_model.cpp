@@ -167,7 +167,7 @@ void AssimpModelLoader::InitBuffers(unsigned int NumVertices, unsigned int NumIn
 {
     printf("Num animations %d\n", m_numAnimations);
 
-   // m_pModelData->m_numAnimations = pScene->mNumAnimations;
+    m_pModelData->m_numAnimations = m_pScene->mNumAnimations;
     m_pModelData->m_indices.reserve(NumIndices);
 
     if (m_pScene->mNumAnimations > 0) {
