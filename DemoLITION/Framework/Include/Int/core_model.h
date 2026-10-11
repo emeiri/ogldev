@@ -342,9 +342,6 @@ protected:
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<CoreMaterial> m_Materials;
 
-    // Temporary space for vertex stuff before we load them into the GPU
-    std::vector<uint> m_Indices;
-
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
     std::string m_fileName;
