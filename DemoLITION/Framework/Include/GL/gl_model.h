@@ -24,7 +24,6 @@
 class GLModel : public CoreModel
 {
 public:
-    GLModel();
 
     GLModel(CoreRenderingSystem* pCoreRenderingSystem);
 

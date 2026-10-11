@@ -92,13 +92,6 @@ static void BindWhiteNormalTexture(GLenum TextureUnit)
 }
 
 
-GLModel::GLModel()
-{
-    CreateWhiteTexture();
-    CreateWhiteNormalTexture();
-}
-
-
 GLModel::GLModel(CoreRenderingSystem* pCoreRenderingSystem) : CoreModel(pCoreRenderingSystem) 
 {
     CreateWhiteTexture();
