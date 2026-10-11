@@ -147,6 +147,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\big_texture_array.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\DemoLITION\Framework\Source\assimp_model_loader.cpp">
+      <Filter>Source Files\DemoLITION</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">

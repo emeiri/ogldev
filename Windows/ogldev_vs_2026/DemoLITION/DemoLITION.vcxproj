@@ -220,6 +220,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssbo_db.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssgi_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_tone_map_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\assimp_model_loader.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_material.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_mesh.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
@@ -251,6 +252,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\assimp_model_loader.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_mesh.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_model.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_rendering_system.cpp" />

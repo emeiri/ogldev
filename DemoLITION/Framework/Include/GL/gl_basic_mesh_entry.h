@@ -17,6 +17,8 @@
 
 */
 
+// TODO: this file should not be in the GL folder, it is used by both GL and Vulkan models.
+
 #pragma once
 
 #include <string>

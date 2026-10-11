@@ -178,6 +178,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\terrain_grid.cpp">
       <Filter>Source\Services</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\assimp_model_loader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -371,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\terrain_grid.h">
       <Filter>Include\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\assimp_model_loader.h">
+      <Filter>Include\Int</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
