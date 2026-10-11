@@ -618,8 +618,6 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
     AssimpModelLoader Loader;
     Loader.Load(Filename, Flags, m_modelData);
 
-    m_fileName = Filename;
-
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
     m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");

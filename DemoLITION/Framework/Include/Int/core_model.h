@@ -358,8 +358,6 @@ protected:
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
-    std::string m_fileName;
-
 private:
 
     virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) = 0;
