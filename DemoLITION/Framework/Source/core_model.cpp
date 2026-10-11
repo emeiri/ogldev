@@ -709,13 +709,13 @@ void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, uns
     if (pScene->mNumAnimations > 0) {
         InitializeRequiredNodeMap(m_pScene->mRootNode);
         PopulateBuffersSkinned(m_modelData.m_skinnedVertices);
-        InitAllMeshes<SkinnedVertex>(m_pScene, m_modelData.m_skinnedVertices);
     }
     else {
         InitializeRequiredNodeMap(m_pScene->mRootNode);
         PopulateBuffers(m_modelData.m_vertices);
-        m_Meshes = m_modelData.m_meshes;
     }
+
+    m_Meshes = m_modelData.m_meshes;
 }
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices)
@@ -741,30 +741,6 @@ static uint CountValidFaces(const aiMesh& Mesh)
     }
 
     return NumValidFaces;
-}
-
-
-template<typename VertexType>
-void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices)
-{
-    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-        const aiMesh* paiMesh = pScene->mMeshes[i];
-
-        aiAABB BBox = paiMesh->mAABB;
-        m_Meshes[i].Dims.BboxMin = glm::vec3(BBox.mMin.x, BBox.mMin.y, BBox.mMin.z);
-        m_Meshes[i].Dims.BboxMax = glm::vec3(BBox.mMax.x, BBox.mMax.y, BBox.mMax.z);
-
-        float Width = BBox.mMax.x - BBox.mMin.x;
-        float Height = BBox.mMax.y - BBox.mMin.y;
-        float Depth = BBox.mMax.z - BBox.mMin.z;
-        m_Meshes[i].Dims.Size = glm::vec3(Width, Height, Depth);
-
-        if (UseMeshOptimizer) {
-            InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
-        } else {
-            InitSingleMesh<VertexType>(Vertices, i, paiMesh);
-        }
-    }
 }
 
 
@@ -841,208 +817,6 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
     for (uint i = 0; i < pNode->mNumChildren; i++) {
         TraverseNodeHierarchy(GlobalTransform, pNode->mChildren[i]);
     }
-}
-
-
-template<typename VertexType>
-void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh) 
-{
-    printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
-    printf("Size: %f, %f, %f\n", m_Meshes[MeshIndex].Dims.Size.x, m_Meshes[MeshIndex].Dims.Size.y, m_Meshes[MeshIndex].Dims .Size.z);
-
-    // Update exact data tracking directly from current dynamic array size to prevent offset corruption
-    m_Meshes[MeshIndex].BaseVertex = (uint)(Vertices.size());
-    m_Meshes[MeshIndex].BaseIndex = (uint)(m_Indices.size());
-
-    unsigned int AddedVertices = 0;
-    unsigned int AddedIndices = 0;
-
-    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
-        VertexType v;
-        const aiVector3D& Pos = paiMesh->mVertices[i];
-        v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
-    
-        if (paiMesh->mNormals) {
-            v.Normal = Vector3f(paiMesh->mNormals[i].x, paiMesh->mNormals[i].y, paiMesh->mNormals[i].z);
-        } else {
-            v.Normal = Vector3f(0.0f, 1.0f, 0.0f);
-        }
-
-        v.TexCoords0 = paiMesh->HasTextureCoords(0) ? Vector2f(paiMesh->mTextureCoords[0][i].x, paiMesh->mTextureCoords[0][i].y) : Vector2f(0.0f);
-        v.TexCoords1 = paiMesh->HasTextureCoords(1) ? Vector2f(paiMesh->mTextureCoords[1][i].x, paiMesh->mTextureCoords[1][i].y) : Vector2f(0.0f);
-
-        if (m_flipTexCoordV) {
-            v.TexCoords0.y = 1.0f - v.TexCoords0.y;
-            v.TexCoords1.y = 1.0f - v.TexCoords1.y;
-        }
-
-        v.Tangent = paiMesh->mTangents ? Vector3f(paiMesh->mTangents[i].x, paiMesh->mTangents[i].y, paiMesh->mTangents[i].z) : Vector3f(0.0f);
-        v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
-
-        if (paiMesh->mColors[0]) {
-            const aiColor4D& Color = paiMesh->mColors[0][i];
-            v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
-        } else {
-            v.Color = Vector4f(1.0f);
-        }
-
-        //printf("Pos %d: ", i); v.Position.Print();
-      //  printf("Normal: "); v.Normal.Print();
-      //  printf("Tangent: "); v.Tangent.Print();
-      //  printf("Bitangent: "); v.Bitangent.Print();
-     //   printf("Color: "); v.Color.Print();
-
-        Vertices.push_back(v);
-        AddedVertices++;
-    }
-
-    // Populate the index buffer
-    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
-        const aiFace& Face = paiMesh->mFaces[i];
-        //  printf("num indices %d\n", Face.mNumIndices);
-        if (Face.mNumIndices != 3) {
-            continue; // Safely skip non-triangle data without corrupting pre-calculated indices
-        }
-     /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
-        printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
-        printf("%d: %d\n", i * 3 + 2, Face.mIndices[2]);*/
-        m_Indices.push_back(Face.mIndices[0]);
-        m_Indices.push_back(Face.mIndices[1]);
-        m_Indices.push_back(Face.mIndices[2]);
-        AddedIndices += 3;
-    }
-
-    // Re-assign accurate post-parsing count figures
-    m_Meshes[MeshIndex].NumVertices = AddedVertices;
-    m_Meshes[MeshIndex].NumIndices = AddedIndices;
-
-    if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
-        LoadMeshBones(Vertices, MeshIndex, paiMesh);
-    }
-}
-
-
-template<typename VertexType>
-void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint MeshIndex, const aiMesh* paiMesh) {
-    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
-
-    std::vector<VertexType> Vertices(paiMesh->mNumVertices);
-    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
-        VertexType v;
-        const aiVector3D& Pos = paiMesh->mVertices[i];
-
-        v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
-
-        if (paiMesh->mNormals) {
-            const aiVector3D& pNormal = paiMesh->mNormals[i];
-            v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
-        } else {
-            v.Normal = Vector3f(0.0f, 1.0f, 0.0f);
-        }
-
-        const aiVector3D& pTexCoord0 = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
-        v.TexCoords0 = Vector2f(pTexCoord0.x, pTexCoord0.y);
-
-        const aiVector3D& pTexCoord1 = paiMesh->HasTextureCoords(1) ? paiMesh->mTextureCoords[1][i] : Zero3D;
-        v.TexCoords1 = Vector2f(pTexCoord1.x, pTexCoord1.y);
-
-        v.Tangent = paiMesh->mTangents ? Vector3f(paiMesh->mTangents[i].x, paiMesh->mTangents[i].y, paiMesh->mTangents[i].z) : Vector3f(0.0f);
-        v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
-
-        if (paiMesh->mColors[0]) {
-            const aiColor4D& Color = paiMesh->mColors[0][i];
-            v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
-        } else {
-            v.Color = Vector4f(1.0f);
-        }
-
-     /*   printf("Pos %d: ", i); v.Position.Print();
-        printf("Normal: "); v.Normal.Print();
-        printf("Tangent: "); v.Tangent.Print();
-        printf("Bitangent: "); v.Bitangent.Print();*/
-	
-        Vertices[i] = v;
-    }
-
-    m_Meshes[MeshIndex].BaseVertex = (uint)AllVertices.size();
-    m_Meshes[MeshIndex].BaseIndex = (uint)m_Indices.size();
-
-    std::vector<uint> Indices;
-    Indices.reserve(paiMesh->mNumFaces * 3);
-
-    // Populate the index buffer
-    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
-        const aiFace& Face = paiMesh->mFaces[i];
-
-        if (Face.mNumIndices != 3) {
-            printf("Warning! face %d has %d indices\n", i, Face.mNumIndices);
-            continue;
-        }
-
-        Indices.push_back(Face.mIndices[0]);
-        Indices.push_back(Face.mIndices[1]);
-        Indices.push_back(Face.mIndices[2]);
-    }
-
-    if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
-        LoadMeshBones(Vertices, MeshIndex, paiMesh);
-    }
-
-    OptimizeMesh(MeshIndex, Indices, Vertices, AllVertices);
-}
-
-
-template<typename VertexType>
-void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices) 
-{
-    size_t NumIndices = Indices.size();
-    size_t NumVertices = Vertices.size();
-    if (NumIndices == 0 || NumVertices == 0) return;
-
-    // Create a remap table
-    std::vector<unsigned int> remap(NumIndices);
-    size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(),    // dst addr
-                                                        Indices.data(),  // src indices
-                                                        NumIndices,      // ...and size
-                                                        Vertices.data(), // src vertices
-                                                        NumVertices,     // ...and size
-                                                        sizeof(VertexType)); // stride
-    // Allocate a local index/vertex arrays
-    std::vector<uint> OptIndices(NumIndices);
-    std::vector<VertexType> OptVertices(OptVertexCount);
-
-    // Optimization #1: remove duplicate vertices    
-    meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), NumIndices, remap.data());
-
-    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), NumVertices, sizeof(VertexType), remap.data());
-
-    // Optimization #2: improve the locality of the vertices
-    meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), NumIndices, OptVertexCount);
-
-    // Optimization #3: reduce pixel overdraw
-    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), NumIndices, &(OptVertices[0].Position.x), OptVertexCount, sizeof(VertexType), 1.05f);
-
-    // Optimization #4: optimize access to the vertex buffer
-    meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(VertexType));
-
-    m_Meshes[MeshIndex].NumVertices = (uint)OptVertexCount;
-
-    float Threshold = 1.0f;
-    if (Threshold < 1.0f) { // Only run simplification code if reduction threshold is requested
-        size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
-        float TargetError = 0.01f;
-        std::vector<unsigned int> SimplifiedIndices(OptIndices.size());
-        size_t OptIndexCount = meshopt_simplify(SimplifiedIndices.data(), OptIndices.data(), NumIndices, &OptVertices[0].Position.x, OptVertexCount, sizeof(VertexType), TargetIndexCount, TargetError);
-        SimplifiedIndices.resize(OptIndexCount);
-
-        m_Indices.insert(m_Indices.end(), SimplifiedIndices.begin(), SimplifiedIndices.end());
-        m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
-    } else {
-        m_Indices.insert(m_Indices.end(), OptIndices.begin(), OptIndices.end());
-        m_Meshes[MeshIndex].NumIndices = (uint)NumIndices;
-    }
-
-    AllVertices.insert(AllVertices.end(), OptVertices.begin(), OptVertices.end());
 }
 
 

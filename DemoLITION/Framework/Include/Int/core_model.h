@@ -351,12 +351,6 @@ protected:
 
 private:
 
-    template<typename VertexType>
-    void InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
-
-    template<typename VertexType>
-    void InitSingleMeshOpt(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
-
     virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) = 0;
 
     virtual void PopulateBuffers(std::vector<Vertex>& Vertices) = 0;    
@@ -381,9 +375,6 @@ private:
 
     template<typename VertexType>
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
-
-    template<typename VertexType>
-    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices);
 
     void CalculateMeshTransformations(const aiScene* pScene);
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
