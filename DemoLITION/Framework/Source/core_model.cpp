@@ -641,8 +641,6 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
         m_numNodes = traverse(0, m_pScene->mRootNode);
         printf("Num nodes: %d\n", m_numNodes);
         printf("--- END Node Hierarchy ---\n");
-        m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
-        m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
         Ret = InitFromScene(m_pScene, Filename);
     }
     else {
@@ -1693,7 +1691,7 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode,
 
     if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
         uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
-        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
+        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
@@ -1778,7 +1776,7 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
 
     if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
         uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
-        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
+        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
     }
 
     for (uint i = 0; i < pNode->mNumChildren; i++) {

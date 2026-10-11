@@ -419,10 +419,7 @@ private:
 
     const aiScene* m_pScene = NULL;
     Assimp::Importer m_Importer;
-
     int m_numNodes = 0;
-    Matrix4f m_GlobalInverseTransform;
-
     std::vector<Matrix4f> m_transformations;
     std::vector<glm::mat4> m_transformationsGLM;
     std::map<std::string, int> m_nodeMap;
@@ -431,7 +428,6 @@ private:
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     float m_textureScale = 1.0f;
-
     bool m_flipTexCoordV = false;
 
     /////////////////////////////////////
