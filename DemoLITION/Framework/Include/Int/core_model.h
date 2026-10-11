@@ -169,9 +169,6 @@ struct ModelData {
     std::vector<GLMCameraFirstPerson> m_cameras;
     MeshDims m_dims;
     Matrix4f m_globalInverseTransform;
-    std::map<std::string, int> m_nodeMap;
-    std::vector<Matrix4f> m_transformations;
-    std::vector<glm::mat4> m_transformationsGLM;
     u32 m_numAnimations = 0;
     vector<BoneInfo> m_boneInfo;
     std::map<std::string, uint> m_boneNameToIndexMap;
@@ -206,7 +203,7 @@ private:
     void InitFromScene();
     void InitGeometry();
     void CountVerticesAndIndices(uint& NumVertices, uint& NumIndices);
-    void InitBuffers(unsigned int NumVertices, unsigned int NumIndices);
+    void InitMeshes(unsigned int NumVertices, unsigned int NumIndices);
     template<typename VertexType>
     void InitAllMeshes(std::vector<VertexType>& Vertices);
     template<typename VertexType>
@@ -223,7 +220,6 @@ private:
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
     void MarkRequiredNodesForBone(const aiBone* pBone);
-    void CalculateMeshTransformations();
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
     void InitLights();
     void InitSingleLight(const aiLight& light);
@@ -325,21 +321,21 @@ public:
 
     void SetNodePositionXZ(const char* pNodeName, float x, float z);
 
-    const std::vector<glm::mat4>& GetTransformations() const { return m_modelData.m_transformationsGLM; }
+    const std::vector<glm::mat4>& GetTransformations() const { return m_transformationsGLM; }
 
-    std::vector<glm::mat4>& GetTransformationsMutable() { return m_modelData.m_transformationsGLM; }
+    std::vector<glm::mat4>& GetTransformationsMutable() { return m_transformationsGLM; }
 
     const MeshDims& GetNodeDims(const char* pNodeName) const 
     { 
-        auto it = m_modelData.m_nodeMap.find(pNodeName);
-        if (it == m_modelData.m_nodeMap.end()) {
+        auto it = m_nodeMap.find(pNodeName);
+        if (it == m_nodeMap.end()) {
             printf("Invalid node name '%s'\n", pNodeName);
             assert(0);
         }
 
         int MeshIndex = it->second;
 
-        return m_modelData.m_meshes[MeshIndex].Dims; 
+        return m_Meshes[MeshIndex].Dims; 
     }
 
 protected:
@@ -385,6 +381,7 @@ private:
     template<typename VertexType>
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
 
+    void CalculateMeshTransformations(const aiScene* pScene);
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
@@ -414,6 +411,9 @@ private:
 
     const aiScene* m_pScene = NULL;
     Assimp::Importer m_Importer;
+    std::vector<Matrix4f> m_transformations;
+    std::vector<glm::mat4> m_transformationsGLM;
+    std::map<std::string, int> m_nodeMap;
     float m_textureScale = 1.0f;
     bool m_flipTexCoordV = false;
 
