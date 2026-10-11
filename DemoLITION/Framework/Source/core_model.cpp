@@ -112,6 +112,7 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
         m_pModelData->m_globalInverseTransform = m_pScene->mRootNode->mTransformation;
         m_pModelData->m_globalInverseTransform = m_pModelData->m_globalInverseTransform.Inverse();
         InitFromScene();
+        m_importer.FreeScene();
     } else {
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_importer.GetErrorString());
     }
