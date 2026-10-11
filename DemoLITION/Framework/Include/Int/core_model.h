@@ -69,6 +69,30 @@ struct Vertex {
     }
 };
 
+struct NodeInfo {
+
+    NodeInfo() {}
+
+    NodeInfo(const aiNode* n) { pNode = n; }
+
+    const aiNode* pNode = NULL;
+    bool isRequired = false;
+};
+
+struct BoneInfo
+{
+    Matrix4f OffsetMatrix;
+    Matrix4f FinalTransformation;
+
+    BoneInfo(const Matrix4f& Offset)
+    {
+        OffsetMatrix = Offset;
+        FinalTransformation.SetZero();
+    }
+};
+
+
+
 #define MAX_NUM_BONES_PER_VERTEX 4
 
 struct VertexBoneData
@@ -143,7 +167,10 @@ struct ModelData {
     std::vector<PointLight>       m_pointLights;
     std::vector<SpotLight>        m_spotLights;
     std::vector<GLMCameraFirstPerson> m_cameras;
-    Vector3f m_minPos, m_maxPos;
+    MeshDims m_dims;
+    vector<BoneInfo> m_boneInfo;
+    std::map<std::string, uint> m_boneNameToIndexMap;
+    std::map<std::string, NodeInfo> m_requiredNodeMap;
    // std::shared_ptr<const Skeleton> Skel;         // null for static models
 
    // bool IsSkinned() const { return Skel != nullptr; }   // keyed on bones, not animation count
@@ -160,9 +187,24 @@ public:
     const std::string& GetError() const { return m_error; }
 
 private:
-    void InitFromScene(const aiScene* pScene);
-    void InitGeometry(const aiScene* pScene);
-    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
+    void InitFromScene();
+    void InitGeometry();
+    void CountVerticesAndIndices(uint& NumVertices, uint& NumIndices);
+    void InitBuffers(unsigned int NumVertices, unsigned int NumIndices);
+    template<typename VertexType>
+    void InitAllMeshes(std::vector<VertexType>& Vertices);
+    template<typename VertexType>
+    void InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
+    template<typename VertexType>
+    void InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint MeshIndex, const aiMesh* paiMesh);
+    template<typename VertexType>
+    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, 
+                      std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices);
+    void InitializeRequiredNodeMap(const aiNode* pNode);
+    void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
+    void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
+    int GetBoneId(const aiBone* pBone);
+    void MarkRequiredNodesForBone(const aiBone* pBone);
 
     // Each of these is a private free function or small helper class in the .cpp:
     //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt
@@ -176,6 +218,7 @@ private:
     Assimp::Importer m_importer;
     Matrix4f m_globalInverseTransform;
     u32 m_numAnimations = 0;
+    bool m_flipTexCoordV = false;
 };
 
 class CoreModel : public Model
@@ -429,31 +472,7 @@ private:
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
     std::map<std::string,uint> m_BoneNameToIndexMap;
-
-    struct BoneInfo
-    {
-        Matrix4f OffsetMatrix;
-        Matrix4f FinalTransformation;
-
-        BoneInfo(const Matrix4f& Offset)
-        {
-            OffsetMatrix = Offset;
-            FinalTransformation.SetZero();
-        }
-    };
-
     vector<BoneInfo> m_BoneInfo;
-
-    struct NodeInfo {
-
-        NodeInfo() {}
-
-        NodeInfo(const aiNode* n) { pNode = n;}
-
-        const aiNode* pNode = NULL;
-        bool isRequired = false;
-    };
-
     std::map<std::string,NodeInfo> m_requiredNodeMap;
 };
 
