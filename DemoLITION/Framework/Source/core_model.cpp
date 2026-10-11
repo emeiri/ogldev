@@ -676,7 +676,7 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 {
     printf("\n*** Initializing geometry ***\n");
     
-    m_Meshes.resize(pScene->mNumMeshes);
+    m_Meshes = m_modelData.m_meshes;
     m_Materials.resize(pScene->mNumMaterials);
 
     unsigned int NumVertices = 0;
@@ -712,8 +712,6 @@ void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, uns
     else {
         PopulateBuffers(m_modelData.m_vertices);
     }
-
-    m_Meshes = m_modelData.m_meshes;
 }
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices)
