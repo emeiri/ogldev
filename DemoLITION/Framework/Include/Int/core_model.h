@@ -338,6 +338,7 @@ protected:
 
     virtual void InitGeometryPost() {}
 
+    ModelData m_modelData;
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<CoreMaterial> m_Materials;
 
@@ -348,12 +349,7 @@ protected:
 
     std::string m_fileName;
 
-    ModelData m_modelData;
-
 private:
-
-    template<typename VertexType>
-    void ReserveSpace(std::vector<VertexType>& Vertices, uint NumVertices, uint NumIndices);
 
     template<typename VertexType>
     void InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
@@ -370,9 +366,6 @@ private:
     bool InitGeometry(const aiScene* pScene, const std::string& Filename);
 
     void InitBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices);
-
-    template<typename VertexType>
-    void InitGeometryInternal(std::vector<VertexType>& Vertices, int NumVertices, int NumIndices);
 
     void InitLights(const aiScene* pScene);
 

@@ -167,14 +167,14 @@ void AssimpModelLoader::InitBuffers(unsigned int NumVertices, unsigned int NumIn
     printf("Num animations %d\n", m_numAnimations);
 
    // m_pModelData->m_numAnimations = pScene->mNumAnimations;
-    m_pModelData->m_indices.resize(NumIndices);
+    m_pModelData->m_indices.reserve(NumIndices);
 
     if (m_pScene->mNumAnimations > 0) {
-        m_pModelData->m_skinnedVertices.resize(NumVertices);
-        InitAllMeshes(m_pModelData->m_skinnedVertices);
+        m_pModelData->m_skinnedVertices.reserve(NumVertices);
         InitializeRequiredNodeMap(m_pScene->mRootNode);
+        InitAllMeshes(m_pModelData->m_skinnedVertices);
     } else {
-        m_pModelData->m_vertices.resize(NumVertices);
+        m_pModelData->m_vertices.reserve(NumVertices);
         InitAllMeshes(m_pModelData->m_vertices);
     }
     
@@ -707,26 +707,16 @@ void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, uns
     printf("Num animations %d\n", pScene->mNumAnimations);
 
     if (pScene->mNumAnimations > 0) {
-        std::vector<SkinnedVertex> Vertices;
-        InitGeometryInternal<SkinnedVertex>(Vertices, NumVertices, NumIndices);
-        PopulateBuffersSkinned(Vertices);
+        InitializeRequiredNodeMap(m_pScene->mRootNode);
+        PopulateBuffersSkinned(m_modelData.m_skinnedVertices);
+        InitAllMeshes<SkinnedVertex>(m_pScene, m_modelData.m_skinnedVertices);
     }
     else {
-        std::vector<Vertex> Vertices;
-        InitGeometryInternal<Vertex>(Vertices, NumVertices, NumIndices);
-        PopulateBuffers(Vertices);
+        InitializeRequiredNodeMap(m_pScene->mRootNode);
+        PopulateBuffers(m_modelData.m_vertices);
+        m_Meshes = m_modelData.m_meshes;
     }
 }
-
-
-template<typename VertexType>
-void CoreModel::InitGeometryInternal(std::vector<VertexType>& Vertices, int NumVertices, int NumIndices)
-{
-    ReserveSpace<VertexType>(Vertices, NumVertices, NumIndices);
-
-    InitAllMeshes<VertexType>(m_pScene, Vertices);
-}
-
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices)
 {
@@ -751,16 +741,6 @@ static uint CountValidFaces(const aiMesh& Mesh)
     }
 
     return NumValidFaces;
-}
-
-
-template<typename VertexType>
-void CoreModel::ReserveSpace(std::vector<VertexType>& Vertices, unsigned int NumVertices, unsigned int NumIndices)
-{
-    Vertices.reserve(NumVertices);
-    m_Indices.reserve(NumIndices);
-    //m_Bones.resize(NumVertices); // TODO: only if there are any bones
-    InitializeRequiredNodeMap(m_pScene->mRootNode);	
 }
 
 

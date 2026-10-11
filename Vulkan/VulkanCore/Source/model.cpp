@@ -146,7 +146,7 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	assert(m_alignedIndices.pMem == NULL);
 	m_alignedIndices.Size = IndexBufferSize;
 	m_alignedIndices.pMem = (char*)malloc(IndexBufferSize);
-	char* pSrcIndices = (char*)m_Indices.data();
+	char* pSrcIndices = (char*)m_modelData.m_indices.data();
 
 	// Copy the segments from the non aligned offsets to the aligned offsets
 	// in the temporary buffer.
