@@ -623,8 +623,6 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
     m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");
 #endif
 
-    AllocBuffers();
-
     bool Ret = false;
 
     uint LoadFlags = DEMOLITION_ASSIMP_LOAD_FLAGS;

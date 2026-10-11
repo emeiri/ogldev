@@ -59,9 +59,7 @@ public:
 
     Texture* GetAOMap() const { return m_pAOMap; }
 
-protected:
-
-    virtual void AllocBuffers();
+protected:    
 
     virtual void PopulateBuffersSkinned(vector<SkinnedVertex>& Vertices);
 
@@ -70,6 +68,8 @@ protected:
     virtual void InitGeometryPost();
 
 private:
+
+    void AllocBuffers();
 
     template<typename VertexType>
     void PopulateBuffersInternal(vector<VertexType>& Vertices);

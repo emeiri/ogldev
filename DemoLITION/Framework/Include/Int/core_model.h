@@ -336,8 +336,6 @@ protected:
         assert(0);
     }
 
-    virtual void AllocBuffers() = 0;
-
     virtual Texture* AllocTexture2D() = 0;
 
     virtual void DestroyTexture(Texture* pTexture) = 0;

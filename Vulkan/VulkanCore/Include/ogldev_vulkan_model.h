@@ -69,8 +69,6 @@ public:
 
 protected:
 
-	virtual void AllocBuffers() { /* Nothing to do here */ }
-
 	virtual Texture* AllocTexture2D();
 
 	virtual void DestroyTexture(Texture* pTexture);
