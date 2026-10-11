@@ -162,8 +162,6 @@ void AssimpModelLoader::InitGeometry()
     InitBuffers(NumVertices, NumIndices);
 
     CalculateMeshTransformations();
-
-  //  InitGeometryPost();
 }
 
 
