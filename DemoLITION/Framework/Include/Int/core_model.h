@@ -48,7 +48,135 @@ public:
 };
 
 
+struct Vertex {
+    Vector3f Position;
+    Vector2f TexCoords0;
+    Vector2f TexCoords1;
+    Vector3f Normal;
+    Vector3f Tangent;
+    Vector3f Bitangent;
+    Vector4f Color;
+
+    void Print()
+    {
+        Position.Print();
+        TexCoords0.Print();
+        TexCoords1.Print();
+        Normal.Print();
+        Tangent.Print();
+        Bitangent.Print();
+        Color.Print();
+    }
+};
+
+#define MAX_NUM_BONES_PER_VERTEX 4
+
+struct VertexBoneData
+{
+    uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
+    float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
+    int index = 0;  // slot for the next update
+
+    VertexBoneData() {}
+
+    void AddBoneData(uint BoneID, float Weight)
+    {
+        for (int i = 0; i < index; i++) {
+            if (BoneIDs[i] == BoneID) {
+                //  printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
+                return;
+            }
+        }
+
+        // The iClone 7 Raptoid Mascot (https://sketchfab.com/3d-models/iclone-7-raptoid-mascot-free-download-56a3e10a73924843949ae7a9800c97c7)
+        // has a problem of zero weights causing an overflow and the assertion below. This fixes it.
+        if (Weight == 0.0f) {
+            return;
+        }
+
+        // printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
+
+        if (index == MAX_NUM_BONES_PER_VERTEX) {
+            return;
+            assert(0);
+        }
+
+        BoneIDs[index] = BoneID;
+        Weights[index] = Weight;
+
+        index++;
+    }
+};
+
+
+struct SkinnedVertex {
+    Vector3f Position;
+    Vector2f TexCoords0;
+    Vector2f TexCoords1;
+    Vector3f Normal;
+    Vector3f Tangent;
+    Vector3f Bitangent;
+    Vector4f Color;
+    VertexBoneData Bones;
+};
+
+struct TextureSource {
+    std::string Path;                  // resolved full path, or empty
+    std::vector<u8> EmbeddedBytes;     // non-empty for embedded textures
+    bool IsSRGB = false;
+    bool IsValid() const { return !Path.empty() || !EmbeddedBytes.empty(); }
+};
+
+struct MaterialData {
+    CoreMaterial Params;               // colors, factors, type flags (no Texture* inside)
+    TextureSource Textures[TEX_TYPE_NUM];
+};
+
+
+struct ModelData {
+    std::vector<BasicMeshEntry>     m_meshes;
+    std::vector<Vertex>        m_vertices;          // used when !IsSkinned()
+    std::vector<SkinnedVertex> m_skinnedVertices;   // used when IsSkinned()
+    std::vector<u32>           m_indices;
+    std::vector<MaterialData>  m_materials;
+    std::vector<DirectionalLight> m_dirLights;
+    std::vector<PointLight>       m_pointLights;
+    std::vector<SpotLight>        m_spotLights;
+    std::vector<GLMCameraFirstPerson> m_cameras;
+    Vector3f m_minPos, m_maxPos;
+   // std::shared_ptr<const Skeleton> Skel;         // null for static models
+
+   // bool IsSkinned() const { return Skel != nullptr; }   // keyed on bones, not animation count
+    bool IsPBR() const;
+};
+
 class CoreRenderingSystem;
+
+class AssimpModelLoader {
+public:
+    // Returns null on failure; GetError() says why. All Assimp types stay inside the .cpp.
+    AssimpModelLoader() = default;
+    void Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData);
+    const std::string& GetError() const { return m_error; }
+
+private:
+    void InitFromScene(const aiScene* pScene);
+    void InitGeometry(const aiScene* pScene);
+    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
+
+    // Each of these is a private free function or small helper class in the .cpp:
+    //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt
+    //   MaterialBuilder  - table-driven texture slots + LoadColors + ProcessClearCoat
+    //   SceneExtractor   - node transforms, lights, cameras
+    //   SkeletonBuilder  - bones, node tree, animation channels -> Skeleton
+    std::string m_error;
+    std::string m_filename;
+    const aiScene* m_pScene = NULL;
+    ModelData* m_pModelData = NULL;
+    Assimp::Importer m_importer;
+    Matrix4f m_globalInverseTransform;
+    u32 m_numAnimations = 0;
+};
 
 class CoreModel : public Model
 {
@@ -165,78 +293,6 @@ protected:
         NUM_BUFFERS = 4
     };
 
-
-    struct Vertex {
-        Vector3f Position;
-        Vector2f TexCoords0;
-        Vector2f TexCoords1;
-        Vector3f Normal;
-        Vector3f Tangent;
-        Vector3f Bitangent;
-        Vector4f Color;
-
-        void Print()
-        {
-            Position.Print();
-            TexCoords0.Print();
-            TexCoords1.Print();
-            Normal.Print();
-            Tangent.Print();
-            Bitangent.Print();
-            Color.Print();
-        }
-    };
-
-#define MAX_NUM_BONES_PER_VERTEX 4
-
-    struct VertexBoneData
-    {
-        uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
-        float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
-        int index = 0;  // slot for the next update
-
-        VertexBoneData() { }
-
-        void AddBoneData(uint BoneID, float Weight)
-        {
-            for (int i = 0; i < index; i++) {
-                if (BoneIDs[i] == BoneID) {
-                    //  printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
-                    return;
-                }
-            }
-
-            // The iClone 7 Raptoid Mascot (https://sketchfab.com/3d-models/iclone-7-raptoid-mascot-free-download-56a3e10a73924843949ae7a9800c97c7)
-            // has a problem of zero weights causing an overflow and the assertion below. This fixes it.
-            if (Weight == 0.0f) {
-                return;
-            }
-
-            // printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
-
-            if (index == MAX_NUM_BONES_PER_VERTEX) {
-                return;
-                assert(0);
-            }
-
-            BoneIDs[index] = BoneID;
-            Weights[index] = Weight;
-
-            index++;
-        }
-    };
-
-    struct SkinnedVertex {
-        Vector3f Position;
-        Vector2f TexCoords0;
-        Vector2f TexCoords1;
-        Vector3f Normal;
-        Vector3f Tangent;
-        Vector3f Bitangent;
-        Vector4f Color;
-        VertexBoneData Bones;
-    };
-
     virtual void InitGeometryPost() {}
 
     std::vector<BasicMeshEntry> m_Meshes;
@@ -248,6 +304,8 @@ protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
     std::string m_fileName;
+
+    ModelData m_modelData;
 
 private:
 
@@ -262,9 +320,7 @@ private:
 
     virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) = 0;
 
-    virtual void PopulateBuffers(std::vector<Vertex>& Vertices) = 0;
-
-    uint CountValidFaces(const aiMesh& Mesh);
+    virtual void PopulateBuffers(std::vector<Vertex>& Vertices) = 0;    
 
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 

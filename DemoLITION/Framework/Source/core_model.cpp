@@ -84,6 +84,82 @@ aiProcess_ValidateDataStructure)
 #endif
 
 static int traverse(int depth, aiNode* pNode);
+static uint CountValidFaces(const aiMesh& Mesh);
+
+void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData)
+{
+    m_filename = Filename;
+    m_pModelData = &OutModelData;
+
+    uint LoadFlags = DEMOLITION_ASSIMP_LOAD_FLAGS;
+
+    if (Flags.ConvertToLeftHanded) {
+        LoadFlags |= aiProcess_ConvertToLeftHanded;
+    }
+
+    m_pScene = m_importer.ReadFile(Filename.c_str(), LoadFlags);
+
+    if (m_pScene) {
+        printf("--- START Node Hierarchy ---\n");
+        int NumNodes = traverse(0, m_pScene->mRootNode);
+        printf("Num nodes: %d\n", NumNodes);
+        printf("--- END Node Hierarchy ---\n");
+        m_globalInverseTransform = m_pScene->mRootNode->mTransformation;
+        m_globalInverseTransform = m_globalInverseTransform.Inverse();
+        InitFromScene(m_pScene);
+    } else {
+        printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_importer.GetErrorString());
+    }
+}
+
+
+void AssimpModelLoader::InitFromScene(const aiScene* pScene)
+{
+    InitGeometry(pScene);
+
+  //InitCameras(pScene);
+
+//  InitLights(pScene);
+}
+
+
+void AssimpModelLoader::InitGeometry(const aiScene* pScene)
+{
+    printf("\n*** Initializing geometry ***\n");
+    m_numAnimations = pScene->mNumAnimations;
+    m_pModelData->m_meshes.resize(pScene->mNumMeshes);
+    m_pModelData->m_materials.resize(pScene->mNumMaterials);
+
+    uint NumVertices = 0;
+    uint NumIndices = 0;
+
+    CountVerticesAndIndices(pScene, NumVertices, NumIndices);
+
+    //InitMaterials(pScene, Filename);
+
+   // InitBuffers(pScene, NumVertices, NumIndices);
+
+   // CalculateMeshTransformations(pScene);
+
+  //  InitGeometryPost();
+}
+
+
+void AssimpModelLoader::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices)
+{
+    for (unsigned int i = 0; i < m_pModelData->m_meshes.size(); i++) {
+        m_pModelData->m_meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        m_pModelData->m_meshes[i].ValidFaces = CountValidFaces(*pScene->mMeshes[i]);
+
+        NumVertices += pScene->mMeshes[i]->mNumVertices;
+        NumIndices += m_pModelData->m_meshes[i].NumIndices;
+    }
+}
+
+
+
+
+static int traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
@@ -187,6 +263,9 @@ void CoreModel::DestroyModel()
 
 bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
 {
+    AssimpModelLoader Loader;
+    Loader.Load(Filename, Flags, m_modelData);
+
     m_fileName = Filename;
 
 #ifndef OGLDEV_VULKAN
@@ -310,7 +389,7 @@ void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices
 }
 
 
-uint CoreModel::CountValidFaces(const aiMesh& Mesh)
+static uint CountValidFaces(const aiMesh& Mesh)
 {
     uint NumValidFaces = 0;
 
