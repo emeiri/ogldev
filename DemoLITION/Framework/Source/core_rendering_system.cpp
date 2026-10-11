@@ -90,12 +90,24 @@ void CoreRenderingSystem::InitializeBasicShapes()
     ModelLoadFlags DefaultFlags;
 
     CoreModel* pModel = LoadModelInternal("../Content/sphere.obj", DefaultFlags);
+    if (!pModel) {
+        printf("%s:%d - failed to load sphere.obj\n", __FILE__, __LINE__);
+        exit(0);
+    }
     m_shapeToModel["sphere"] = pModel;
     
     pModel = LoadModelInternal("../Content/box.obj", DefaultFlags);
+    if (!pModel) {
+        printf("%s:%d - failed to load box.obj\n", __FILE__, __LINE__);
+        exit(0);
+    }
     m_shapeToModel["cube"] = pModel;
 
     pModel = LoadModelInternal("../Content/quad.obj", DefaultFlags);
+    if (!pModel) {
+        printf("%s:%d - failed to load quad.obj\n", __FILE__, __LINE__);
+        exit(0);
+    }
     m_shapeToModel["square"] = pModel;
 }
 
