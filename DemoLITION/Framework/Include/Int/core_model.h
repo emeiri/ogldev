@@ -382,8 +382,6 @@ private:
 
     void InitSpotLight(const aiScene* pScene, const aiLight& light);
 
-    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
-
     template<typename VertexType>
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
 

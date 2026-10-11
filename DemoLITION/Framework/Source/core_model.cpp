@@ -679,10 +679,10 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
     m_Meshes = m_modelData.m_meshes;
     m_Materials.resize(pScene->mNumMaterials);
 
-    unsigned int NumVertices = 0;
-    unsigned int NumIndices = 0;
+    unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
+    unsigned int NumIndices = (unsigned int)m_modelData.m_indices.size();
 
-    CountVerticesAndIndices(pScene, NumVertices, NumIndices);
+  //  CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
     if (!InitMaterials(pScene, Filename)) {
         return false;
@@ -711,17 +711,6 @@ void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, uns
     }
     else {
         PopulateBuffers(m_modelData.m_vertices);
-    }
-}
-
-void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices)
-{
-    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-        m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        m_Meshes[i].ValidFaces = CountValidFaces(*pScene->mMeshes[i]);
-
-        NumVertices += pScene->mMeshes[i]->mNumVertices;
-        NumIndices  += m_Meshes[i].NumIndices;
     }
 }
 
