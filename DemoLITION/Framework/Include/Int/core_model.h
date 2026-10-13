@@ -163,7 +163,7 @@ protected:
     virtual void InitGeometryPost() {}
 
     ModelData m_modelData;
-    std::vector<BasicMeshEntry> m_Meshes;
+    std::vector<BasicMeshEntry>& m_Meshes = m_modelData.m_meshes;
     std::vector<CoreMaterial> m_Materials;
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
@@ -174,13 +174,11 @@ private:
 
     virtual void PopulateBuffers(std::vector<Vertex>& Vertices) = 0;    
 
-    void InitFromScene();
+    void InitModel();
 
     void InitMaterials();
     void LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
     void LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
-
-    void InitGeometry();
 
     void InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices);
 

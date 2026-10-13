@@ -118,15 +118,14 @@ void CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
     m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");
 #endif
 
-    return InitGeometry();
+    InitModel();
 }
 
 
-void CoreModel::InitGeometry()
+void CoreModel::InitModel()
 {
-    printf("\n*** Initializing geometry ***\n");
+    printf("\n*** Initializing model ***\n");
     
-    m_Meshes = m_modelData.m_meshes;
     m_Materials.resize(m_modelData.m_materials.size());
 
     unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
