@@ -328,7 +328,6 @@ private:
     std::string m_filename;
     const aiScene* m_pScene = NULL;
     ModelData* m_pModelData = NULL;
-    Assimp::Importer* m_pImporter = NULL;
     u32 m_numAnimations = 0;
     bool m_flipTexCoordV = false;
     int m_windowWidth = 0;

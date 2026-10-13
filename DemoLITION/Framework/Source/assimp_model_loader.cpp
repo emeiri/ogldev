@@ -223,8 +223,8 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
         LoadFlags |= aiProcess_ConvertToLeftHanded;
     }
 
-    m_pImporter = new Assimp::Importer();
-    m_pScene = m_pImporter->ReadFile(Filename.c_str(), LoadFlags);
+    Assimp::Importer Importer;
+    m_pScene = Importer.ReadFile(Filename.c_str(), LoadFlags);
 
     if (m_pScene) {
         printf("--- START Node Hierarchy ---\n");
@@ -234,13 +234,9 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
         m_pModelData->m_globalInverseTransform = m_pScene->mRootNode->mTransformation;
         m_pModelData->m_globalInverseTransform = m_pModelData->m_globalInverseTransform.Inverse();
         InitFromScene();
-        m_pImporter->FreeScene();
     } else {
-        printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_pImporter->GetErrorString());
+        printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());
     }
-
-    delete m_pImporter;
-    m_pImporter = NULL;
 }
 
 
