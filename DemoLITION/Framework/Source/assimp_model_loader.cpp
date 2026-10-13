@@ -1305,6 +1305,8 @@ void AssimpModelLoader::InitSingleNodeAnimation(AnimationClip& MyAnim, AnimChann
         exit(0);
     }
 
+    MyChannel.m_nodeName = NodeName;
+
     MyChannel.m_positions.resize(pNodeAnim->mNumPositionKeys);
     for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys; i++) {
         const aiVectorKey& key = pNodeAnim->mPositionKeys[i];

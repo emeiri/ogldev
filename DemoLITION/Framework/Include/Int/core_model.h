@@ -206,24 +206,24 @@ private:
 	// Skeletal animation stuff
     /////////////////////////////////////
 
-    void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation& Animation, const std::string& NodeName);
-    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation);
-    void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
-                                  const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);
+    void CalcInterpolatedScaling(glm::vec3& Out, float AnimationTime, const AnimChannel& NodeAnim);
+    void CalcInterpolatedRotation(glm::quat& Out, float AnimationTime, const AnimChannel& NodeAnim);
+    void CalcInterpolatedPosition(glm::vec3& Out, float AnimationTime, const AnimChannel& NodeAnim);
+    uint FindScaling(float AnimationTime, const AnimChannel& NodeAnim);
+    uint FindRotation(float AnimationTime, const AnimChannel& NodeAnim);
+    uint FindPosition(float AnimationTime, const AnimChannel& NodeAnim);
+    const AnimChannel* FindNodeAnim(const AnimationClip& Animation, const std::string& NodeName);
+    void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation);
+   // void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
+   //                               const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);
     float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
 
     struct LocalTransform {
-        aiVector3D Scaling;
-        aiQuaternion Rotation;
-        aiVector3D Translation;
+        glm::vec3 Scaling;
+        glm::quat Rotation;
+        glm::vec3 Translation;
     };
 
-    void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+    void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim);
 };
 

@@ -329,10 +329,10 @@ void CoreModel::SetNodePositionXZ(const char* pNodeName, float x, float z)
 
 
 
-uint CoreModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint CoreModel::FindPosition(float AnimationTimeTicks, const AnimChannel& NodeAnim)
 {
-    for (uint i = 0 ; i < pNodeAnim->mNumPositionKeys - 1 ; i++) {
-        float t = (float)pNodeAnim->mPositionKeys[i + 1].mTime;
+    for (uint i = 0 ; i < NodeAnim.m_positions.size() - 1 ; i++) {
+        float t = (float)NodeAnim.m_positions[i + 1].m_time;
         if (AnimationTimeTicks < t) {
             return i;
         }
@@ -342,26 +342,26 @@ uint CoreModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAn
 }
 
 
-void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim) 
+void CoreModel::CalcInterpolatedPosition(glm::vec3& Out, float AnimationTimeTicks, const AnimChannel& NodeAnim)
 {
     // we need at least two values to interpolate...
-    if (pNodeAnim->mNumPositionKeys == 1) {
-        Out = pNodeAnim->mPositionKeys[0].mValue;
+    if (NodeAnim.m_positions.size() == 1) {
+        Out = NodeAnim.m_positions[0].m_value;
         return;
     }
 
-    float MaxTime = (float)pNodeAnim->mPositionKeys[pNodeAnim->mNumPositionKeys - 1].mTime;
+    float MaxTime = (float)NodeAnim.m_positions[NodeAnim.m_positions.size() - 1].m_time;
     if (AnimationTimeTicks >= MaxTime) {
-        Out = pNodeAnim->mPositionKeys[pNodeAnim->mNumPositionKeys - 1].mValue;
+        Out = NodeAnim.m_positions[NodeAnim.m_positions.size() - 1].m_value;
         return;
     }
 
-    uint PositionIndex = FindPosition(AnimationTimeTicks, pNodeAnim);
+    uint PositionIndex = FindPosition(AnimationTimeTicks, NodeAnim);
     uint NextPositionIndex = PositionIndex + 1;
-    assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
+    assert(NextPositionIndex < NodeAnim.m_positions.size());
 
-    float t1 = (float)pNodeAnim->mPositionKeys[PositionIndex].mTime;
-    float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
+    float t1 = (float)NodeAnim.m_positions[PositionIndex].m_time;
+    float t2 = (float)NodeAnim.m_positions[NextPositionIndex].m_time;
 
     // Fix: Stripped redundant unreachable 'if (t1 > AnimationTimeTicks)' check and safe-guarded division
     float DeltaTime = t2 - t1;
@@ -372,18 +372,18 @@ void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTic
 
     Factor = std::clamp(Factor, 0.0f, 1.0f);
 
-    const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
-    const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
+    const glm::vec3& Start = NodeAnim.m_positions[PositionIndex].m_value;
+    const glm::vec3& End = NodeAnim.m_positions[NextPositionIndex].m_value;
     Out = Start + Factor * (End - Start);
 }
 
 
-uint CoreModel::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint CoreModel::FindRotation(float AnimationTimeTicks, const AnimChannel& NodeAnim)
 {
-    assert(pNodeAnim->mNumRotationKeys > 0);
+    assert(NodeAnim.m_rotations.size() > 0);
 
-    for (uint i = 0 ; i < pNodeAnim->mNumRotationKeys - 1 ; i++) {
-        float t = (float)pNodeAnim->mRotationKeys[i + 1].mTime;
+    for (uint i = 0 ; i < NodeAnim.m_rotations.size() - 1 ; i++) {
+        float t = (float)NodeAnim.m_rotations[i + 1].m_time;
         if (AnimationTimeTicks < t) {
             return i;
         }
@@ -393,26 +393,26 @@ uint CoreModel::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAn
 }
 
 
-void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim) 
+void CoreModel::CalcInterpolatedRotation(glm::quat& Out, float AnimationTimeTicks, const AnimChannel& NodeAnim) 
 {
     // we need at least two values to interpolate...
-    if (pNodeAnim->mNumRotationKeys == 1) {
-        Out = pNodeAnim->mRotationKeys[0].mValue;
+    if (NodeAnim.m_rotations.size() == 1) {
+        Out = NodeAnim.m_rotations[0].m_value;
         return;
     }
 
-    float MaxTime = (float)pNodeAnim->mRotationKeys[pNodeAnim->mNumRotationKeys - 1].mTime;
+    float MaxTime = (float)NodeAnim.m_rotations[NodeAnim.m_rotations.size() - 1].m_time;
     if (AnimationTimeTicks >= MaxTime) {
-        Out = pNodeAnim->mRotationKeys[pNodeAnim->mNumRotationKeys - 1].mValue;
+        Out = NodeAnim.m_rotations[NodeAnim.m_rotations.size() - 1].m_value;
         return;
     }
 
-    uint RotationIndex = FindRotation(AnimationTimeTicks, pNodeAnim);
+    uint RotationIndex = FindRotation(AnimationTimeTicks, NodeAnim);
     uint NextRotationIndex = RotationIndex + 1;
-    assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
+    assert(NextRotationIndex < NodeAnim.m_rotations.size());
 
-    float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime;
-    float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
+    float t1 = (float)NodeAnim.m_rotations[RotationIndex].m_time;
+    float t2 = (float)NodeAnim.m_rotations[NextRotationIndex].m_time;
 
     float DeltaTime = t2 - t1;
     float Factor = 0.0f;
@@ -422,19 +422,19 @@ void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeT
     
     Factor = std::clamp(Factor, 0.0f, 1.0f);
 
-    const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-    const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
-    aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-    Out.Normalize();
+    const glm::quat& StartRotationQ = NodeAnim.m_rotations[RotationIndex].m_value;
+    const glm::quat& EndRotationQ = NodeAnim.m_rotations[NextRotationIndex].m_value;
+    Out = glm::slerp(StartRotationQ, EndRotationQ, Factor);
+    Out = glm::normalize(Out);
 }
 
 
-uint CoreModel::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint CoreModel::FindScaling(float AnimationTimeTicks, const AnimChannel& NodeAnim)
 {
-    assert(pNodeAnim->mNumScalingKeys > 0);
+    assert(NodeAnim.m_scalings.size() > 0);
 
-    for (uint i = 0 ; i < pNodeAnim->mNumScalingKeys - 1 ; i++) {
-        float t = (float)pNodeAnim->mScalingKeys[i + 1].mTime;
+    for (uint i = 0 ; i < NodeAnim.m_scalings.size() - 1 ; i++) {
+        float t = (float)NodeAnim.m_scalings[i + 1].m_time;
         if (AnimationTimeTicks < t) {
             return i;
         }
@@ -444,145 +444,142 @@ uint CoreModel::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAni
 }
 
 
-void CoreModel::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcInterpolatedScaling(glm::vec3& Out, float AnimationTimeTicks, const AnimChannel& NodeAnim)
 {
     // we need at least two values to interpolate...
-    if (pNodeAnim->mNumScalingKeys == 1) {
-        Out = pNodeAnim->mScalingKeys[0].mValue;
+    if (NodeAnim.m_scalings.size() == 1) {
+        Out = NodeAnim.m_scalings[0].m_value;
         return;
     }
 
-    uint ScalingIndex = FindScaling(AnimationTimeTicks, pNodeAnim);
+    uint ScalingIndex = FindScaling(AnimationTimeTicks, NodeAnim);
     uint NextScalingIndex = ScalingIndex + 1;
-    assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
-    float t1 = (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime;
+    assert(NextScalingIndex < NodeAnim.m_scalings.size());
+    float t1 = (float)NodeAnim.m_scalings[ScalingIndex].m_time;
     if (t1 > AnimationTimeTicks) {
-        Out = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
+        Out = NodeAnim.m_scalings[ScalingIndex].m_value;
     } else {
-        float t2 = (float)pNodeAnim->mScalingKeys[NextScalingIndex].mTime;
+        float t2 = (float)NodeAnim.m_scalings[NextScalingIndex].m_time;
         float DeltaTime = t2 - t1;
         float Factor = (AnimationTimeTicks - (float)t1) / DeltaTime;
         assert(Factor >= 0.0f && Factor <= 1.0f);
-        const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
-        const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
-        aiVector3D Delta = End - Start;
+        const glm::vec3& Start = NodeAnim.m_scalings[ScalingIndex].m_value;
+        const glm::vec3& End   = NodeAnim.m_scalings[NextScalingIndex].m_value;
+        glm::vec3 Delta = End - Start;
         Out = Start + Factor * Delta;
     }
 }
 
 
-void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation)
+void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip& Animation)
 {
-    std::string NodeName(pNode->mName.data);
+    // The nodes are stored parent-first so the parent's global transform is always ready
+    std::vector<Matrix4f> GlobalTransforms(m_modelData.m_nodes.size());
 
-    Matrix4f NodeTransformation(pNode->mTransformation);
+    for (uint i = 0; i < m_modelData.m_nodes.size(); i++) {
+        const SkelNode& Node = m_modelData.m_nodes[i];
+        std::string NodeName(Node.m_name);
 
-    const aiNodeAnim* pNodeAnim = FindNodeAnim(Animation, NodeName);
+        Matrix4f NodeTransformation(Node.m_localTransform);
 
-    if (pNodeAnim) {
-        LocalTransform Transform;
-        CalcLocalTransform(Transform, AnimationTimeTicks, pNodeAnim);
+        const AnimChannel* pNodeAnim = FindNodeAnim(Animation, NodeName);
 
-        Matrix4f ScalingM;
-        ScalingM.InitScaleTransform(Transform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
-        //        printf("Scaling %f %f %f\n", Transoform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
+        if (pNodeAnim) {
+            LocalTransform Transform;
+            CalcLocalTransform(Transform, AnimationTimeTicks, *pNodeAnim);
 
-        Matrix4f RotationM = Matrix4f(Transform.Rotation.GetMatrix());
+            Matrix4f ScalingM;
+            ScalingM.InitScaleTransform(Transform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
+            // printf("Scaling %f %f %f\n", Transform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
 
-        Matrix4f TranslationM;
-        TranslationM.InitTranslationTransform(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
-        //        printf("Translation %f %f %f\n", Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
+            glm::mat4 RotationGLM = glm::mat4_cast(Transform.Rotation);
+            Matrix4f RotationM = Matrix4f(RotationGLM);
 
-        // Combine the above transformations
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    }
+            Matrix4f TranslationM;
+            TranslationM.InitTranslationTransform(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
+            //printf("Translation %f %f %f\n", Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
 
-    Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
-
-    if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
-        uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
-        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
-    }
-
-    for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        std::string ChildName(pNode->mChildren[i]->mName.data);
-
-        std::map<std::string,NodeInfo>::iterator it = m_modelData.m_requiredNodeMap.find(ChildName);
-
-        if (it == m_modelData.m_requiredNodeMap.end()) {
-            printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
-            assert(0);
+            // Combine the above transformations
+            NodeTransformation = TranslationM * RotationM * ScalingM;
         }
 
-        if (it->second.isRequired) {
-            ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, Animation);
+        if (Node.m_parentIndex >= 0) {
+            GlobalTransforms[i] = GlobalTransforms[Node.m_parentIndex] * NodeTransformation;
+        } else {
+            GlobalTransforms[i] = NodeTransformation;
+        }
+
+        if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
+            uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
+            m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
+                GlobalTransforms[i] *
+                m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }
 }
 
 
-void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
+/*void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
                                          const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor) 
 {
     std::string NodeName(pNode->mName.data);
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
-    const aiNodeAnim* pStartNodeAnim = FindNodeAnim(StartAnimation, NodeName);
+    const AnimChannel* pStartNodeAnim = FindNodeAnim(StartAnimation, NodeName);
 
     LocalTransform StartTransform;
 
     if (pStartNodeAnim) {
-        CalcLocalTransform(StartTransform, StartAnimationTimeTicks, pStartNodeAnim);
+        CalcLocalTransform(StartTransform, StartAnimationTimeTicks, *pStartNodeAnim);
     }
 
-    const aiNodeAnim* pEndNodeAnim = FindNodeAnim(EndAnimation, NodeName);
+    const AnimChannel* pEndNodeAnim = FindNodeAnim(EndAnimation, NodeName);
     LocalTransform EndTransform;
     if (pEndNodeAnim) {
-        CalcLocalTransform(EndTransform, EndAnimationTimeTicks, pEndNodeAnim);
+        CalcLocalTransform(EndTransform, EndAnimationTimeTicks, *pEndNodeAnim);
     }
 
     if (pStartNodeAnim && !pEndNodeAnim) {
         // Fallback to start transform only
         Matrix4f ScalingM, RotationM, TranslationM;
         ScalingM.InitScaleTransform(StartTransform.Scaling.x, StartTransform.Scaling.y, StartTransform.Scaling.z);
-        RotationM = Matrix4f(StartTransform.Rotation.GetMatrix());
+        glm::mat4 RotationGLM = glm::mat4_cast(StartTransform.Rotation);
+        RotationM = Matrix4f(RotationGLM);
         TranslationM.InitTranslationTransform(StartTransform.Translation.x, StartTransform.Translation.y, StartTransform.Translation.z);
         NodeTransformation = TranslationM * RotationM * ScalingM;
     } else if (!pStartNodeAnim && pEndNodeAnim) {
         // Fallback to end transform only
         Matrix4f ScalingM, RotationM, TranslationM;
         ScalingM.InitScaleTransform(EndTransform.Scaling.x, EndTransform.Scaling.y, EndTransform.Scaling.z);
-        RotationM = Matrix4f(EndTransform.Rotation.GetMatrix());
+        glm::mat4 RotationGLM = glm::mat4_cast(EndTransform.Rotation);
+        RotationM = Matrix4f(RotationGLM);
         TranslationM.InitTranslationTransform(EndTransform.Translation.x, EndTransform.Translation.y, EndTransform.Translation.z);
         NodeTransformation = TranslationM * RotationM * ScalingM;
     } else if (pStartNodeAnim && pEndNodeAnim) {
         // Interpolate scaling
-        const aiVector3D& Scale0 = StartTransform.Scaling;
-        const aiVector3D& Scale1 = EndTransform.Scaling;
-        aiVector3D BlendedScaling = (1.0f - BlendFactor) * Scale0 + Scale1 * BlendFactor;
+        const glm::vec3& Scale0 = StartTransform.Scaling;
+        const glm::vec3& Scale1 = EndTransform.Scaling;
+        glm::vec3 BlendedScaling = (1.0f - BlendFactor) * Scale0 + Scale1 * BlendFactor;
         Matrix4f ScalingM;
         ScalingM.InitScaleTransform(BlendedScaling.x, BlendedScaling.y, BlendedScaling.z);
 
         // Interpolate rotation
-        const aiQuaternion& Rot0 = StartTransform.Rotation;
-        const aiQuaternion& Rot1 = EndTransform.Rotation;
-        aiQuaternion BlendedRot;
-        aiQuaternion::Interpolate(BlendedRot, Rot0, Rot1, BlendFactor);
-        Matrix4f RotationM = Matrix4f(BlendedRot.GetMatrix());
+        const glm::quat& Rot0 = StartTransform.Rotation;
+        const glm::quat& Rot1 = EndTransform.Rotation;
+        glm::quat BlendedRot = glm::slerp(Rot0, Rot1, BlendFactor);
+        Matrix4f RotationM = Matrix4f(glm::mat4_cast(BlendedRot));
 
         // Interpolate translation
-        const aiVector3D& Pos0 = StartTransform.Translation;
-        const aiVector3D& Pos1 = EndTransform.Translation;
-        aiVector3D BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
+        const glm::vec3& Pos0 = StartTransform.Translation;
+        const glm::vec3& Pos1 = EndTransform.Translation;
+        glm::vec3 BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
         Matrix4f TranslationM;
         TranslationM.InitTranslationTransform(BlendedTranslation.x, BlendedTranslation.y, BlendedTranslation.z);
 
         // Combine it all
         NodeTransformation = TranslationM * RotationM * ScalingM;
     }
-
-    Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 
     if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
         uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
@@ -602,31 +599,28 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
                                      pNode->mChildren[i], GlobalTransformation, StartAnimation, EndAnimation, BlendFactor);
         }
     }
-}
+}*/
 
 
-void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim)
 {
-    CalcInterpolatedScaling(Transform.Scaling, AnimationTimeTicks, pNodeAnim);
-    CalcInterpolatedRotation(Transform.Rotation, AnimationTimeTicks, pNodeAnim);
-    CalcInterpolatedPosition(Transform.Translation, AnimationTimeTicks, pNodeAnim);
+    CalcInterpolatedScaling(Transform.Scaling, AnimationTimeTicks, NodeAnim);
+    CalcInterpolatedRotation(Transform.Rotation, AnimationTimeTicks, NodeAnim);
+    CalcInterpolatedPosition(Transform.Translation, AnimationTimeTicks, NodeAnim);
 }
 
 
 void CoreModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
 {
-    if (AnimationIndex >= m_pScene->mNumAnimations) {
-        printf("Invalid animation index %d, max is %d\n", AnimationIndex, m_pScene->mNumAnimations);
+    if (AnimationIndex >= m_modelData.m_animations.size()) {
+        printf("Invalid animation index %d, max is %d\n", AnimationIndex, (int)(m_modelData.m_animations.size() - 1));
         assert(0);
     }
 
-    Matrix4f Identity;
-    Identity.InitIdentity();
-
     float AnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, AnimationIndex);
-    const aiAnimation& Animation = *m_pScene->mAnimations[AnimationIndex];
+    const AnimationClip& Animation = m_modelData.m_animations[AnimationIndex];
 
-    ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity, Animation);
+    ReadNodeHierarchy(AnimationTimeTicks, Animation);
     Transforms.resize(m_modelData.m_boneInfo.size());
 
     for (uint i = 0 ; i < m_modelData.m_boneInfo.size() ; i++) {
@@ -641,13 +635,13 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
                                            unsigned int EndAnimIndex,
                                            float BlendFactor)
 {
-    if (StartAnimIndex >= m_pScene->mNumAnimations) {
-        printf("Invalid start animation index %d, max is %d\n", StartAnimIndex, m_pScene->mNumAnimations);
+    if (StartAnimIndex >= m_modelData.m_animations.size()) {
+        printf("Invalid start animation index %d, max is %d\n", StartAnimIndex, (int)(m_modelData.m_animations.size() - 1));
         assert(0);
     }
 
-    if (EndAnimIndex >= m_pScene->mNumAnimations) {
-        printf("Invalid end animation index %d, max is %d\n", EndAnimIndex, m_pScene->mNumAnimations);
+    if (EndAnimIndex >= m_modelData.m_animations.size()) {
+        printf("Invalid end animation index %d, max is %d\n", EndAnimIndex, (int)(m_modelData.m_animations.size() - 1));
         assert(0);
     }
 
@@ -665,7 +659,7 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
     Matrix4f Identity;
     Identity.InitIdentity();
 
-    ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
+   // ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
 
     BlendedTransforms.resize(m_modelData.m_boneInfo.size());
 
@@ -695,13 +689,13 @@ float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Animat
 
 
 // TODO: Optimize this function by using a hash map for faster lookups if performance becomes an issue.
-const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation& Animation, const std::string& NodeName)
+const AnimChannel* CoreModel::FindNodeAnim(const AnimationClip& Animation, const std::string& NodeName)
 {
-    for (uint i = 0 ; i < Animation.mNumChannels ; i++) {
-        const aiNodeAnim* pNodeAnim = Animation.mChannels[i];
+    for (uint i = 0 ; i < Animation.m_channels.size() ; i++) {
+        const AnimChannel& AnimChannel = Animation.m_channels[i];
 
-        if (string(pNodeAnim->mNodeName.data) == NodeName) {
-            return pNodeAnim;
+        if (AnimChannel.m_nodeName == NodeName) {
+            return &AnimChannel;
         }
     }
 

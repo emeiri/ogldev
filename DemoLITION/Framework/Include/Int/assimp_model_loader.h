@@ -195,6 +195,7 @@ struct QuatKey {
 
 
 struct AnimChannel {
+    std::string m_nodeName;
     std::vector<VectorKey> m_positions;
     std::vector<VectorKey> m_scalings;
     std::vector<QuatKey>   m_rotations;
