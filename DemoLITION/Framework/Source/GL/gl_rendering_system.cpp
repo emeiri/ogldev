@@ -121,10 +121,7 @@ CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename, con
 {
     GLModel* pModel = new GLModel(this);
 
-    if (!pModel->LoadAssimpModel(Filename, Flags)) {
-        delete pModel;
-        pModel = NULL;
-    }
+    pModel->LoadAssimpModel(Filename, Flags);
 
     return pModel;
 }
@@ -134,10 +131,7 @@ CoreModel* RenderingSystemGL::LoadMeshInternal(const std::string& Filename)
 {
     GLModel* pModel = new GLModel(this);
 
-    if (!pModel->LoadMesh(Filename)) {
-        delete pModel;
-        pModel = NULL;
-    }
+    pModel->LoadMesh(Filename);
 
     return pModel;
 }

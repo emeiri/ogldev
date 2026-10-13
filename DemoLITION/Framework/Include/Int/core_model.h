@@ -22,10 +22,6 @@
 #include <vector>
 #include <string>
 
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>       // Output data structure
-#include <assimp/postprocess.h> // Post processing flags
-
 #include "Int/core_material.h"
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
@@ -62,13 +58,13 @@ public:
 
     void DestroyModel();
 
-    bool LoadAssimpModel(const std::string& Filename)
+    void LoadAssimpModel(const std::string& Filename)
     {
         ModelLoadFlags DefaultFlags;
-        return LoadAssimpModel(Filename, DefaultFlags);
+        LoadAssimpModel(Filename, DefaultFlags);
     }
 
-    bool LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags);
+    void LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags);
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_modelData.m_cameras; }
 
@@ -178,24 +174,22 @@ private:
 
     virtual void PopulateBuffers(std::vector<Vertex>& Vertices) = 0;    
 
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+    void InitFromScene();
 
     void InitMaterials();
     void LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
     void LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
 
-    bool InitGeometry(const aiScene* pScene, const std::string& Filename);
+    void InitGeometry();
 
     void InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices);
 
     template<typename VertexType>
-    void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
+    void InitAllMeshes(const std::string& Filename, std::vector<VertexType>& Vertices);
 
-    void CalculateMeshTransformations(const aiScene* pScene);
+    void CalculateMeshTransformations();
     void TraverseNodeHierarchy();
 
-    const aiScene* m_pScene = NULL;
-    Assimp::Importer m_Importer;
     std::vector<Matrix4f> m_transformations;
     std::vector<glm::mat4> m_transformationsGLM;
     std::map<std::string, int> m_nodeMap;

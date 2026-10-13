@@ -75,9 +75,7 @@ aiProcess_ValidateDataStructure)
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
 #endif
-
-int traverse(int depth, aiNode* pNode);
-    
+   
 bool CoreModel::IsPBR() const
 {
     bool ret = false;
@@ -103,7 +101,7 @@ void CoreModel::DestroyModel()
 }
 
 
-bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
+void CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
 {
     int WindowWidth, WindowHeight;
 #ifdef OGLDEV_VULKAN
@@ -120,46 +118,16 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
     m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");
 #endif
 
-    bool Ret = false;
-
-    uint LoadFlags = DEMOLITION_ASSIMP_LOAD_FLAGS;
-
-    if (Flags.ConvertToLeftHanded) {
-        LoadFlags |= aiProcess_ConvertToLeftHanded;
-    }
-
-    m_pScene = m_Importer.ReadFile(Filename.c_str(), LoadFlags);
-
-    if (m_pScene) {
-        printf("--- START Node Hierarchy ---\n");
-        traverse(0, m_pScene->mRootNode);
-        printf("--- END Node Hierarchy ---\n");
-        Ret = InitFromScene(m_pScene, Filename);
-    }
-    else {
-        printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
-    }
-
-    return Ret;
+    return InitGeometry();
 }
 
 
-bool CoreModel::InitFromScene(const aiScene* pScene, const std::string& Filename)
-{
-    if (!InitGeometry(pScene, Filename)) {
-        return false;
-    }    
-
-    return true;
-}
-
-
-bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
+void CoreModel::InitGeometry()
 {
     printf("\n*** Initializing geometry ***\n");
     
     m_Meshes = m_modelData.m_meshes;
-    m_Materials.resize(pScene->mNumMaterials);
+    m_Materials.resize(m_modelData.m_materials.size());
 
     unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
     unsigned int NumIndices = (unsigned int)m_modelData.m_indices.size();
@@ -168,14 +136,12 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 
     InitGPUBuffers(NumVertices, NumIndices);
 
-    CalculateMeshTransformations(pScene);
+    CalculateMeshTransformations();
 
     InitGeometryPost();
 
-#ifdef OGLDEV_VULKAN
-    return true;
-#else
-    return GLCheckError();
+#ifndef OGLDEV_VULKAN
+    assert(GLCheckError());
 #endif
 }
 
@@ -193,7 +159,7 @@ void CoreModel::InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices
 }
 
 
-void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
+void CoreModel::CalculateMeshTransformations()
 {
     printf("----------------------------------------\n");
     printf("Calculating mesh transformations\n");
