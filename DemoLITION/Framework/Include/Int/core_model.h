@@ -192,7 +192,7 @@ private:
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
 
     void CalculateMeshTransformations(const aiScene* pScene);
-    void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
+    void TraverseNodeHierarchy();
 
     const aiScene* m_pScene = NULL;
     Assimp::Importer m_Importer;

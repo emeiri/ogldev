@@ -20,6 +20,7 @@
 
 #include <map>
 #include <vector>
+#include <unordered_map>
 
 #include "ogldev_math_3d.h"
 #include "GL/gl_basic_mesh_entry.h"
@@ -158,6 +159,16 @@ struct MaterialData {
 };
 
 
+struct SkelNode {
+    std::string m_name;
+    int m_parentIndex = -1;
+    Matrix4f m_localTransform;
+    Matrix4f m_globalTransform;
+    std::vector<int> m_meshes;
+    bool m_isRequired = false;
+};
+
+
 struct ModelData {
     std::vector<BasicMeshEntry>     m_meshes;
     std::vector<Vertex>        m_vertices;          // used when !IsSkinned()
@@ -172,9 +183,11 @@ struct ModelData {
     Matrix4f m_globalInverseTransform;
     u32 m_numAnimations = 0;
     vector<BoneInfo> m_boneInfo;
+    std::vector<SkelNode> m_nodes;
+    std::unordered_map<std::string, int> m_nodeMap;
     std::map<std::string, uint> m_boneNameToIndexMap;
     std::map<std::string, NodeInfo> m_requiredNodeMap;
-    // std::shared_ptr<const Skeleton> Skel;         // null for static models
+    
 
     // bool IsSkinned() const { return Skel != nullptr; }   // keyed on bones, not animation count
     bool IsPBR() const;
@@ -254,6 +267,9 @@ private:
     void LoadColors(const aiMaterial* pMaterial, MaterialData& MyMaterial);
     void ProcessClearCoat(const aiMaterial* pMaterial, MaterialData& MyMaterial);
     void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
+
+    // Skeleton
+    void InitSkeletonHierarchy();
 
     // Each of these is a private free function or small helper class in the .cpp:
     //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt

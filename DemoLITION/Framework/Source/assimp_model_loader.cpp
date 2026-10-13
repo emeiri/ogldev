@@ -253,6 +253,8 @@ void AssimpModelLoader::InitFromScene()
     InitCameras();
 
     InitLights();
+
+    InitSkeletonHierarchy();
 }
 
 
@@ -1201,3 +1203,46 @@ void AssimpModelLoader::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
         Color = Vector4f(1.0f);
     }
 }
+
+
+static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex, 
+                                 const Matrix4f& ParentTransform,
+                                 std::vector<SkelNode>& Out, std::unordered_map<std::string, int>& NodeNameToIndexMap)
+{
+    int Index = (int)Out.size();
+
+    SkelNode node;
+    node.m_name = pNode->mName.C_Str();
+    node.m_parentIndex = ParenIndex;
+    node.m_localTransform = Matrix4f(pNode->mTransformation);
+    node.m_globalTransform = ParentTransform * node.m_localTransform;
+    node.m_meshes.resize(pNode->mNumMeshes);
+    for (unsigned int i = 0; i < pNode->mNumMeshes; i++) {
+        node.m_meshes[i] = pNode->mMeshes[i];
+    }
+
+    Out.push_back(node);
+
+    if (NodeNameToIndexMap.find(node.m_name) != NodeNameToIndexMap.end()) {
+        printf("Warning! Duplicate node name '%s' found in the hierarchy\n", node.m_name.c_str());
+        exit(0);
+    }
+
+    NodeNameToIndexMap[node.m_name] = Index;
+
+    printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), Index, ParenIndex);
+
+    for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
+        FlattenNodeHierarchy(pNode->mChildren[i], Index, node.m_globalTransform, Out, NodeNameToIndexMap);
+    }
+}
+
+
+void AssimpModelLoader::InitSkeletonHierarchy()
+{
+    printf("\n*** Initializing skeleton ***\n");
+    std::unordered_map<std::string, int> NodeNameToIndexMap;
+    Matrix4f Identity;
+    Identity.InitIdentity();
+    FlattenNodeHierarchy(m_pScene->mRootNode, -1, Identity, m_pModelData->m_nodes, NodeNameToIndexMap);
+}   
