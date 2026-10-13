@@ -212,7 +212,6 @@ private:
     uint FindScaling(float AnimationTime, const AnimChannel& NodeAnim);
     uint FindRotation(float AnimationTime, const AnimChannel& NodeAnim);
     uint FindPosition(float AnimationTime, const AnimChannel& NodeAnim);
-    const AnimChannel* FindNodeAnim(const AnimationClip& Animation, const std::string& NodeName);
     void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation);
    // void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
    //                               const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);

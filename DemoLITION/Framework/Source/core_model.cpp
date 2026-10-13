@@ -476,13 +476,13 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
     // The nodes are stored parent-first so the parent's global transform is always ready
     std::vector<Matrix4f> GlobalTransforms(m_modelData.m_nodes.size());
 
-    for (uint i = 0; i < m_modelData.m_nodes.size(); i++) {
-        const SkelNode& Node = m_modelData.m_nodes[i];
+    for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
+        const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
         std::string NodeName(Node.m_name);
 
         Matrix4f NodeTransformation(Node.m_localTransform);
 
-        const AnimChannel* pNodeAnim = FindNodeAnim(Animation, NodeName);
+        const AnimChannel* pNodeAnim = Animation.FindNodeAnim(NodeIndex);
 
         if (pNodeAnim) {
             LocalTransform Transform;
@@ -504,16 +504,16 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
         }
 
         if (Node.m_parentIndex >= 0) {
-            GlobalTransforms[i] = GlobalTransforms[Node.m_parentIndex] * NodeTransformation;
+            GlobalTransforms[NodeIndex] = GlobalTransforms[Node.m_parentIndex] * NodeTransformation;
         } else {
-            GlobalTransforms[i] = NodeTransformation;
+            GlobalTransforms[NodeIndex] = NodeTransformation;
         }
 
         if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
             uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
             m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
-                GlobalTransforms[i] *
-                m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
+                                                                    GlobalTransforms[NodeIndex] *
+                                                                    m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }
 }
@@ -526,7 +526,7 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
-    const AnimChannel* pStartNodeAnim = FindNodeAnim(StartAnimation, NodeName);
+    const AnimChannel* pStartNodeAnim = StartAnimation.FindNodeAnim(NodeIndex);
 
     LocalTransform StartTransform;
 
@@ -534,7 +534,7 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
         CalcLocalTransform(StartTransform, StartAnimationTimeTicks, *pStartNodeAnim);
     }
 
-    const AnimChannel* pEndNodeAnim = FindNodeAnim(EndAnimation, NodeName);
+    const AnimChannel* pEndNodeAnim = EndAnimation.FindNodeAnim(NodeIndex);
     LocalTransform EndTransform;
     if (pEndNodeAnim) {
         CalcLocalTransform(EndTransform, EndAnimationTimeTicks, *pEndNodeAnim);
@@ -685,21 +685,6 @@ float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Animat
     }
 
     return std::fmod(TimeInTicks, Duration);
-}
-
-
-// TODO: Optimize this function by using a hash map for faster lookups if performance becomes an issue.
-const AnimChannel* CoreModel::FindNodeAnim(const AnimationClip& Animation, const std::string& NodeName)
-{
-    for (uint i = 0 ; i < Animation.m_channels.size() ; i++) {
-        const AnimChannel& AnimChannel = Animation.m_channels[i];
-
-        if (AnimChannel.m_nodeName == NodeName) {
-            return &AnimChannel;
-        }
-    }
-
-    return NULL;
 }
 
 

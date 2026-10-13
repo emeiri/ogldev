@@ -1286,15 +1286,17 @@ void AssimpModelLoader::InitSingleAnimation(int Index)
 
     printf("Animation duration: %f ticks, ticks per second: %f\n", MyAnim.m_durationTicks, MyAnim.m_ticksPerSecond);
 
+    MyAnim.m_nodeToChannel.assign(m_pModelData->m_nodes.size(), -1);
+
     MyAnim.m_channels.resize(pAnim->mNumChannels);
 
     for (unsigned int i = 0; i < pAnim->mNumChannels; i++) {
-        InitSingleNodeAnimation(MyAnim, MyAnim.m_channels[i], pAnim->mChannels[i]);
+        InitSingleNodeAnimation(MyAnim, i, MyAnim.m_channels[i], pAnim->mChannels[i]);
     }
 }
 
 
-void AssimpModelLoader::InitSingleNodeAnimation(AnimationClip& MyAnim, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim)
+void AssimpModelLoader::InitSingleNodeAnimation(AnimationClip& MyAnim, int ChannelIndex, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim)
 {
     std::string NodeName(pNodeAnim->mNodeName.C_Str());
 
@@ -1306,6 +1308,9 @@ void AssimpModelLoader::InitSingleNodeAnimation(AnimationClip& MyAnim, AnimChann
     }
 
     MyChannel.m_nodeName = NodeName;
+
+    int NodeIndex = it->second;
+    MyAnim.m_nodeToChannel[NodeIndex] = ChannelIndex;
 
     MyChannel.m_positions.resize(pNodeAnim->mNumPositionKeys);
     for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys; i++) {

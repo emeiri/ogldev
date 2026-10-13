@@ -208,6 +208,18 @@ struct AnimationClip {
     float m_ticksPerSecond = 25.0f;
     std::vector<AnimChannel> m_channels;
     std::vector<int> m_nodeToChannel;   // per flat node, -1 = not animated
+
+    const AnimChannel* FindNodeAnim(int NodeIndex) const 
+    {
+        assert(NodeIndex >= 0 && NodeIndex < (int)m_nodeToChannel.size());
+        int ChannelIndex = m_nodeToChannel[NodeIndex];
+        const AnimChannel* pChannel = NULL;
+        if (ChannelIndex != -1) {
+            assert(ChannelIndex >= 0 && ChannelIndex < (int)m_channels.size());
+            pChannel = &m_channels[ChannelIndex];
+        }
+        return pChannel;
+    }
 };
 
 
@@ -317,7 +329,7 @@ private:
     // Skeleton
     void InitSkeletonHierarchy();
 
-    void InitSingleNodeAnimation(AnimationClip& MyAnim, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim);
+    void InitSingleNodeAnimation(AnimationClip& MyAnim, int ChannelIndex, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim);
 
     // Each of these is a private free function or small helper class in the .cpp:
     //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt
