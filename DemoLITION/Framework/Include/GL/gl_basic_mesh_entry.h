@@ -40,8 +40,6 @@ struct BasicMeshEntry {
     uint BaseIndex = 0;
     uint ValidFaces = 0;
     int MaterialIndex = -1;
-    // Moved to the node hierarchy. This is still here to ease the transition.
-    Matrix4f TransformationDeprecated;
     std::string Name;
     MeshDims Dims;
 };

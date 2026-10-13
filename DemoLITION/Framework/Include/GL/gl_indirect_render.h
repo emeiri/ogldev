@@ -24,6 +24,7 @@
 #include "ogldev_math_3d.h"
 #include "Int/core_material.h"
 #include "GL/gl_basic_mesh_entry.h"
+#include "Int/assimp_model_loader.h"
 
 class IndirectRender {
 
@@ -33,7 +34,9 @@ public:
 
     ~IndirectRender() {}
 
-    void Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<CoreMaterial>& Materials);
+    void Init(const std::vector<MeshInstance>& Instances,
+              const std::vector<BasicMeshEntry>& Meshes, 
+              const std::vector<CoreMaterial>& Materials);
 
     void Render(const Matrix4f& ObjectMatrix);
 
@@ -41,7 +44,8 @@ public:
 
 private:
 
-    void InitMeshes(const std::vector<BasicMeshEntry>& Meshes);
+    void InitMeshes(const std::vector<MeshInstance>& Instances, 
+                    const std::vector<BasicMeshEntry>& Meshes);
 
     void InitDrawCmdsBuffer(const std::vector<BasicMeshEntry>& Meshes);
 

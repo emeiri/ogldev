@@ -175,7 +175,6 @@ bool GLModel::LoadMesh(const std::string& Filename)
         m_Meshes[i].BaseIndex = mesh.m_meshes[i].m_baseIndex;
         //m_Meshes[i].ValidFaces =
         m_Meshes[i].MaterialIndex = 0;
-        m_Meshes[i].TransformationDeprecated.InitIdentity();
     }
 
     m_modelData.m_indices.resize(mesh.m_totalIndices);
@@ -224,7 +223,7 @@ void GLModel::PopulateBuffers(std::vector<Vertex>& Vertices)
 void GLModel::InitGeometryPost()
 {
     if (UseIndirectRender) {
-        m_indirectRender.Init(m_Meshes, m_Materials);
+        m_indirectRender.Init(m_modelData.m_instances, m_Meshes, m_Materials);
     }
 }
 
@@ -411,37 +410,34 @@ void GLModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
-    for (unsigned int i = 0; i < m_Meshes.size(); i++) {
-        RenderMesh(i, pRenderCallbacks);
+    for (int i = 0; i < m_modelData.m_instances.size(); i++) {
+        RenderInstance(i, pRenderCallbacks);
     }
 
-    // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
 
 
-void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks)
+void GLModel::RenderInstance(int InstanceIndex, DemolitionRenderCallbacks* pRenderCallbacks)
 {
-    int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
-    assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
+    const MeshInstance& Inst = m_modelData.m_instances[InstanceIndex];
+    const BasicMeshEntry& Mesh = m_Meshes[Inst.m_meshIndex];
 
+    int MaterialIndex = Mesh.MaterialIndex;
+    assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
     BindTextures(MaterialIndex);
 
     if (pRenderCallbacks) {
         bool HasSpecularTexure = m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] != NULL;
         pRenderCallbacks->ControlSpecularExponent_CB(HasSpecularTexure);
-        pRenderCallbacks->DrawStart_CB(MeshIndex);
+        pRenderCallbacks->DrawStart_CB(InstanceIndex);                 // see the note below
         pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
-        pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].TransformationDeprecated);
+        pRenderCallbacks->SetWorldMatrix_CB(Inst.m_worldTransform);               // per instance, not per mesh
     }
 
-    glDrawElementsBaseVertex(GL_TRIANGLES,
-                             m_Meshes[MeshIndex].NumIndices,
-                             GL_UNSIGNED_INT,
-                             (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
-                             m_Meshes[MeshIndex].BaseVertex);
+    glDrawElementsBaseVertex(GL_TRIANGLES, Mesh.NumIndices, GL_UNSIGNED_INT,
+        (void*)(sizeof(unsigned int) * Mesh.BaseIndex), Mesh.BaseVertex);
 }
-
 
 void GLModel::BindTextures(int MaterialIndex)
 {

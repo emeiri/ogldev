@@ -33,6 +33,8 @@ struct aiBone;
 struct aiMesh;
 struct aiLight;
 struct aiScene;
+struct aiMaterial;
+enum aiTextureType;
 namespace Assimp {
     class Importer;
 }

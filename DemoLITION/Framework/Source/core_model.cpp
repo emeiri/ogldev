@@ -232,7 +232,6 @@ void CoreModel::TraverseNodeHierarchy()
             printf("%d ", MeshIndex);
 #endif
             m_nodeMap[Node.m_name] = MeshIndex;
-            m_Meshes[MeshIndex].TransformationDeprecated = Node.m_globalTransform;
         }
 #ifdef DEBUG_SCENE_HIERARCHY
         printf("\n");

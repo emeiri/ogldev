@@ -34,11 +34,13 @@ struct DrawElementsIndirectCommand {
 };
 
 
-void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<CoreMaterial>& Materials)
+void IndirectRender::Init(const std::vector<MeshInstance>& Instances, 
+                          const std::vector<BasicMeshEntry>& Meshes, 
+                          const std::vector<CoreMaterial>& Materials)
 {
     assert(Meshes.size() > 0);
 
-    InitMeshes(Meshes);
+    InitMeshes(Instances, Meshes);
 
     InitDrawCmdsBuffer(Meshes);
 
@@ -48,13 +50,15 @@ void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, const std::
 }
 
 
-void IndirectRender::InitMeshes(const std::vector<BasicMeshEntry>& Meshes)
+void IndirectRender::InitMeshes(const std::vector<MeshInstance>& Instances, 
+                                const std::vector<BasicMeshEntry>& Meshes)
 {
-    m_meshes.resize(Meshes.size());
+    m_meshes.resize(Instances.size());
 
-    for (int i = 0; i < Meshes.size(); i++) {
-        m_meshes[i].m_transformation = Meshes[i].TransformationDeprecated;
-        m_meshes[i].m_materialIndex = Meshes[i].MaterialIndex;
+    for (int i = 0; i < Instances.size(); i++) {
+        m_meshes[i].m_transformation = Instances[i].m_worldTransform;
+        int MeshIndex = Instances[i].m_meshIndex;
+        m_meshes[i].m_materialIndex = Meshes[MeshIndex].MaterialIndex;
     }
 }
 

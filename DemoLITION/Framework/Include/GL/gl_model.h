@@ -83,7 +83,7 @@ private:
     template<typename VertexType>
     void PopulateBuffersDSA(vector<VertexType>& Vertices);
 
-    void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
+    void RenderInstance(int InstanceIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
     void BindTextures(int MaterialIndex);
 
