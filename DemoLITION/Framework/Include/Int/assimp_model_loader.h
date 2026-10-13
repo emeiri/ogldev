@@ -35,6 +35,7 @@ struct aiLight;
 struct aiScene;
 struct aiMaterial;
 enum aiTextureType;
+struct aiNodeAnim;
 namespace Assimp {
     class Importer;
 }
@@ -135,6 +136,7 @@ struct SkinnedVertex {
     VertexBoneData Bones;
 };
 
+
 struct TextureSource {
     std::string Path;                  // resolved full path, or empty
     std::vector<u8> EmbeddedBytes;     // non-empty for embedded textures
@@ -180,6 +182,34 @@ struct MeshInstance {
 };
 
 
+struct VectorKey { 
+    float m_time; 
+    glm::vec3 m_value; 
+};
+
+
+struct QuatKey { 
+    float m_time; 
+    glm::quat m_value; 
+};
+
+
+struct AnimChannel {
+    std::vector<VectorKey> m_positions;
+    std::vector<VectorKey> m_scalings;
+    std::vector<QuatKey>   m_rotations;
+};
+
+
+struct AnimationClip {
+    std::string m_name;
+    float m_durationTicks = 0.0f;
+    float m_ticksPerSecond = 25.0f;
+    std::vector<AnimChannel> m_channels;
+    std::vector<int> m_nodeToChannel;   // per flat node, -1 = not animated
+};
+
+
 struct ModelData {
     std::vector<BasicMeshEntry>     m_meshes;
     std::vector<Vertex>        m_vertices;          // used when !IsSkinned()
@@ -191,6 +221,7 @@ struct ModelData {
     std::vector<PointLight>       m_pointLights;
     std::vector<SpotLight>        m_spotLights;
     std::vector<GLMCameraFirstPerson> m_cameras;
+    std::vector<AnimationClip> m_animations;
     MeshDims m_dims;
     Matrix4f m_globalInverseTransform;
     u32 m_numAnimations = 0;
@@ -229,6 +260,8 @@ private:
     void InitFromScene();
     void InitMaterials();
     void InitGeometry();
+    void InitAnimations();
+    void InitSingleAnimation(int Index);
     void CountVerticesAndIndices(uint& NumVertices, uint& NumIndices);
     void InitMeshes(unsigned int NumVertices, unsigned int NumIndices);
     template<typename VertexType>
@@ -273,7 +306,7 @@ private:
     void LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType);
+    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, int aiTextureType, int AssimpTexIndex, TEXTURE_TYPE MyType);
 
     // Colors
     void LoadColors(const aiMaterial* pMaterial, MaterialData& MyMaterial);
@@ -282,6 +315,8 @@ private:
 
     // Skeleton
     void InitSkeletonHierarchy();
+
+    void InitSingleNodeAnimation(AnimationClip& MyAnim, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim);
 
     // Each of these is a private free function or small helper class in the .cpp:
     //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt

@@ -677,11 +677,14 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
 
 float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex) 
 {
-    float TicksPerSecond = (float)(m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond != 0 ? m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond : 25.0f);
+    float TicksPerSecond = (float)(m_modelData.m_animations[AnimationIndex].m_ticksPerSecond != 0 ? 
+                                   m_modelData.m_animations[AnimationIndex].m_ticksPerSecond : 25.0f);
+
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
+
     // we need to use the integral part of mDuration for the total length of the animation
     float Duration = 0.0f;
-    modf((float)m_pScene->mAnimations[AnimationIndex]->mDuration, &Duration);
+    modf((float)m_modelData.m_animations[AnimationIndex].m_durationTicks, &Duration);
 
     if (Duration <= 0.0f) {
         return 0.0f;

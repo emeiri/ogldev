@@ -255,6 +255,8 @@ void AssimpModelLoader::InitFromScene()
     InitLights();
 
     InitSkeletonHierarchy();
+
+    InitAnimations();
 }
 
 
@@ -1038,14 +1040,14 @@ void AssimpModelLoader::LoadClearCoatNormalTexture(const std::string& Dir, const
 
 
 void AssimpModelLoader::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
-                                    aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType)
+                                    int AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType)
 {
     assert(MyType < TEX_TYPE_NUM);
 
-    if (pMaterial->GetTextureCount(AssimpType) > 0) {
+    if (pMaterial->GetTextureCount((aiTextureType)AssimpType) > 0) {
         aiString Path;
 
-        if (pMaterial->GetTexture(AssimpType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+        if (pMaterial->GetTexture((aiTextureType)AssimpType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
             bool IsSRGB = (MyType == TEX_TYPE_BASE);
@@ -1256,3 +1258,71 @@ void AssimpModelLoader::InitSkeletonHierarchy()
     FlattenNodeHierarchy(m_pScene->mRootNode, -1, Identity, 
                          m_pModelData->m_nodes, m_pModelData->m_nodeMap, m_pModelData->m_instances);
 }   
+
+
+void AssimpModelLoader::InitAnimations()
+{
+    printf("\n*** Initializing animations ***\n");
+    printf("Loading %d animations\n", m_pScene->mNumAnimations);
+    m_pModelData->m_animations.resize(m_pScene->mNumAnimations);
+
+    for (unsigned int i = 0; i < m_pScene->mNumAnimations; i++) {
+        InitSingleAnimation(i);
+    }
+}
+
+
+void AssimpModelLoader::InitSingleAnimation(int Index)
+{
+    const aiAnimation* pAnim = m_pScene->mAnimations[Index];
+    
+    printf("Loading Animation: '%s'\n", pAnim->mName.C_Str());
+
+    AnimationClip& MyAnim = m_pModelData->m_animations[Index];
+
+    MyAnim.m_name = pAnim->mName.C_Str();
+    MyAnim.m_durationTicks = (float)pAnim->mDuration;
+    MyAnim.m_ticksPerSecond = (float)pAnim->mTicksPerSecond;
+
+    printf("Animation duration: %f ticks, ticks per second: %f\n", MyAnim.m_durationTicks, MyAnim.m_ticksPerSecond);
+
+    MyAnim.m_channels.resize(pAnim->mNumChannels);
+
+    for (unsigned int i = 0; i < pAnim->mNumChannels; i++) {
+        InitSingleNodeAnimation(MyAnim, MyAnim.m_channels[i], pAnim->mChannels[i]);
+    }
+}
+
+
+void AssimpModelLoader::InitSingleNodeAnimation(AnimationClip& MyAnim, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim)
+{
+    std::string NodeName(pNodeAnim->mNodeName.C_Str());
+
+    auto it = m_pModelData->m_nodeMap.find(NodeName);
+
+    if (it == m_pModelData->m_nodeMap.end()) {
+        printf("Warning! Animation channel for node '%s' not found in the hierarchy\n", NodeName.c_str());
+        exit(0);
+    }
+
+    MyChannel.m_positions.resize(pNodeAnim->mNumPositionKeys);
+    for (unsigned int i = 0; i < pNodeAnim->mNumPositionKeys; i++) {
+        const aiVectorKey& key = pNodeAnim->mPositionKeys[i];
+        MyChannel.m_positions[i].m_time = (float)key.mTime;
+        MyChannel.m_positions[i].m_value = glm::vec3(key.mValue.x, key.mValue.y, key.mValue.z);
+    }
+
+    MyChannel.m_rotations.resize(pNodeAnim->mNumRotationKeys);    
+    for (unsigned int i = 0; i < pNodeAnim->mNumRotationKeys; i++) {
+        const aiQuatKey& key = pNodeAnim->mRotationKeys[i];
+        MyChannel.m_rotations[i].m_time = (float)key.mTime;
+        MyChannel.m_rotations[i].m_value = glm::quat(key.mValue.w, key.mValue.x, key.mValue.y, key.mValue.z);
+    }
+
+    MyChannel.m_scalings.resize(pNodeAnim->mNumScalingKeys);
+    for (unsigned int i = 0; i < pNodeAnim->mNumScalingKeys; i++) {
+        const aiVectorKey& key = pNodeAnim->mScalingKeys[i];
+        MyChannel.m_scalings[i].m_time = (float)key.mTime;
+        MyChannel.m_scalings[i].m_value = glm::vec3(key.mValue.x, key.mValue.y, key.mValue.z);
+    }
+}
