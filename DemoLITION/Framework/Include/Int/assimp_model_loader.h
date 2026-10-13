@@ -251,8 +251,9 @@ struct ModelData {
 
 
 class AssimpModelLoader {
+
 public:
-    // Returns null on failure; GetError() says why. All Assimp types stay inside the .cpp.
+
     AssimpModelLoader() = default;
     void Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData, int WindowWidth, int WindowHeight);
     const std::string& GetError() const { return m_error; }
