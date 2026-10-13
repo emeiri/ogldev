@@ -248,13 +248,13 @@ void AssimpModelLoader::InitFromScene()
 {
     InitMaterials();
 
+    InitSkeletonHierarchy();
+
     InitGeometry();
 
     InitCameras();
 
     InitLights();
-
-    InitSkeletonHierarchy();
 
     InitAnimations();
 }
@@ -297,7 +297,6 @@ void AssimpModelLoader::InitMeshes(unsigned int NumVertices, unsigned int NumInd
 
     if (m_pScene->mNumAnimations > 0) {
         m_pModelData->m_skinnedVertices.reserve(NumVertices);
-        InitializeRequiredNodeMap(m_pScene->mRootNode);
         InitAllMeshes(m_pModelData->m_skinnedVertices);
     } else {
         m_pModelData->m_vertices.reserve(NumVertices);
@@ -844,38 +843,27 @@ void AssimpModelLoader::MarkRequiredNodesForBone(const aiBone* pBone)
 {
     std::string NodeName(pBone->mName.C_Str());
 
-    const aiNode* pParent = NULL;
+    auto NodeIter = m_pModelData->m_nodeMap.find(NodeName);
+
+    if (NodeIter == m_pModelData->m_nodeMap.end()) {
+        printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
+        assert(0);
+    }
+
+    int NodeIndex = NodeIter->second;
 
     do {
-        auto it = m_pModelData->m_requiredNodeMap.find(NodeName);
-        if (it == m_pModelData->m_requiredNodeMap.end()) {
-            printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
-            assert(0);
+        SkelNode& Node = m_pModelData->m_nodes[NodeIndex];
+        Node.m_isRequired = true;
+
+        int ParentIndex = Node.m_parentIndex;
+
+        if (ParentIndex == -1) {
+            break;            
+        } else {
+            NodeIndex = ParentIndex;
         }
-
-        it->second.isRequired = true;
-
-        pParent = it->second.pNode->mParent;
-
-        if (pParent) {
-            NodeName = std::string(pParent->mName.C_Str());
-        }
-
-    } while (pParent);
-}
-
-
-void AssimpModelLoader::InitializeRequiredNodeMap(const aiNode* pNode)
-{
-    std::string NodeName(pNode->mName.C_Str());
-
-    NodeInfo info(pNode);
-
-    m_pModelData->m_requiredNodeMap[NodeName] = info;
-
-    for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-        InitializeRequiredNodeMap(pNode->mChildren[i]);
-    }
+    } while (true);
 }
 
 

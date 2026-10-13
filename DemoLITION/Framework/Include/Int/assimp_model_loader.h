@@ -61,16 +61,6 @@ struct Vertex {
     }
 };
 
-struct NodeInfo {
-
-    NodeInfo() {}
-
-    NodeInfo(const aiNode* n) { pNode = n; }
-
-    const aiNode* pNode = NULL;
-    bool isRequired = false;
-};
-
 struct BoneInfo
 {
     Matrix4f OffsetMatrix;
@@ -242,7 +232,6 @@ struct ModelData {
     std::vector<SkelNode> m_nodes;
     std::unordered_map<std::string, int> m_nodeMap;
     std::map<std::string, uint> m_boneNameToIndexMap;
-    std::map<std::string, NodeInfo> m_requiredNodeMap;
     
 
     // bool IsSkinned() const { return Skel != nullptr; }   // keyed on bones, not animation count
@@ -289,8 +278,7 @@ private:
     
     void InitCameras();
     void InitSingleCamera(int Index);
-    
-    void InitializeRequiredNodeMap(const aiNode* pNode);
+        
     void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
