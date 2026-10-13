@@ -165,7 +165,16 @@ struct SkelNode {
     Matrix4f m_localTransform;
     Matrix4f m_globalTransform;
     std::vector<int> m_meshes;
+    int m_firstInstance = -1;
+    int m_numInstances = 0;
     bool m_isRequired = false;
+};
+
+
+struct MeshInstance {
+    u32      m_meshIndex;   // geometry + material
+    int      m_nodeIndex;   // flat node it came from
+    Matrix4f m_worldTransform;
 };
 
 
@@ -174,6 +183,7 @@ struct ModelData {
     std::vector<Vertex>        m_vertices;          // used when !IsSkinned()
     std::vector<SkinnedVertex> m_skinnedVertices;   // used when IsSkinned()
     std::vector<u32>           m_indices;
+    std::vector<MeshInstance> m_instances;
     std::vector<MaterialData>  m_materials;
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight>       m_pointLights;

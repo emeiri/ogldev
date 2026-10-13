@@ -1207,9 +1207,11 @@ void AssimpModelLoader::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
 
 static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex, 
                                  const Matrix4f& ParentTransform,
-                                 std::vector<SkelNode>& Out, std::unordered_map<std::string, int>& NodeNameToIndexMap)
+                                 std::vector<SkelNode>& Out, 
+                                 std::unordered_map<std::string, int>& NodeNameToIndexMap,
+                                 std::vector<MeshInstance>& Instances)
 {
-    int Index = (int)Out.size();
+    int NodeIndex = (int)Out.size();
 
     SkelNode node;
     node.m_name = pNode->mName.C_Str();
@@ -1217,9 +1219,17 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
     node.m_localTransform = Matrix4f(pNode->mTransformation);
     node.m_globalTransform = ParentTransform * node.m_localTransform;
     node.m_meshes.resize(pNode->mNumMeshes);
+    node.m_firstInstance = (int)Instances.size();
     for (unsigned int i = 0; i < pNode->mNumMeshes; i++) {
-        node.m_meshes[i] = pNode->mMeshes[i];
+        int MeshIndex = pNode->mMeshes[i];
+        node.m_meshes[i] = MeshIndex;
+        MeshInstance mi;
+        mi.m_meshIndex = MeshIndex;
+        mi.m_nodeIndex = NodeIndex;
+        mi.m_worldTransform = node.m_globalTransform;
+        Instances.push_back(mi);
     }
+    node.m_numInstances = pNode->mNumMeshes;
 
     Out.push_back(node);
 
@@ -1228,12 +1238,12 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
         exit(0);
     }
 
-    NodeNameToIndexMap[node.m_name] = Index;
+    NodeNameToIndexMap[node.m_name] = NodeIndex;
 
-    printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), Index, ParenIndex);
+    printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), NodeIndex, ParenIndex);
 
     for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-        FlattenNodeHierarchy(pNode->mChildren[i], Index, node.m_globalTransform, Out, NodeNameToIndexMap);
+        FlattenNodeHierarchy(pNode->mChildren[i], NodeIndex, node.m_globalTransform, Out, NodeNameToIndexMap, Instances);
     }
 }
 
@@ -1241,8 +1251,8 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
 void AssimpModelLoader::InitSkeletonHierarchy()
 {
     printf("\n*** Initializing skeleton ***\n");
-    std::unordered_map<std::string, int> NodeNameToIndexMap;
     Matrix4f Identity;
     Identity.InitIdentity();
-    FlattenNodeHierarchy(m_pScene->mRootNode, -1, Identity, m_pModelData->m_nodes, NodeNameToIndexMap);
+    FlattenNodeHierarchy(m_pScene->mRootNode, -1, Identity, 
+                         m_pModelData->m_nodes, m_pModelData->m_nodeMap, m_pModelData->m_instances);
 }   
