@@ -213,8 +213,8 @@ private:
     uint FindRotation(float AnimationTime, const AnimChannel& NodeAnim);
     uint FindPosition(float AnimationTime, const AnimChannel& NodeAnim);
     void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation);
-   // void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
-   //                               const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);
+    void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, 
+                                  const AnimationClip &StartAnimation, const AnimationClip& EndAnimation, float BlendFactor);
     float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
 
     struct LocalTransform {

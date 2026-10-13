@@ -519,87 +519,86 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
 }
 
 
-/*void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
-                                         const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor) 
+void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks,
+                                         const AnimationClip& StartAnimation, const AnimationClip& EndAnimation, float BlendFactor) 
 {
-    std::string NodeName(pNode->mName.data);
+    std::vector<Matrix4f> GlobalTransforms(m_modelData.m_nodes.size());
 
-    Matrix4f NodeTransformation(pNode->mTransformation);
+    for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
+        const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
+        std::string NodeName(Node.m_name);
 
-    const AnimChannel* pStartNodeAnim = StartAnimation.FindNodeAnim(NodeIndex);
+        Matrix4f NodeTransformation(Node.m_localTransform);
 
-    LocalTransform StartTransform;
+        const AnimChannel* pStartNodeAnim = StartAnimation.FindNodeAnim(NodeIndex);
+   
+        LocalTransform StartTransform;
 
-    if (pStartNodeAnim) {
-        CalcLocalTransform(StartTransform, StartAnimationTimeTicks, *pStartNodeAnim);
-    }
-
-    const AnimChannel* pEndNodeAnim = EndAnimation.FindNodeAnim(NodeIndex);
-    LocalTransform EndTransform;
-    if (pEndNodeAnim) {
-        CalcLocalTransform(EndTransform, EndAnimationTimeTicks, *pEndNodeAnim);
-    }
-
-    if (pStartNodeAnim && !pEndNodeAnim) {
-        // Fallback to start transform only
-        Matrix4f ScalingM, RotationM, TranslationM;
-        ScalingM.InitScaleTransform(StartTransform.Scaling.x, StartTransform.Scaling.y, StartTransform.Scaling.z);
-        glm::mat4 RotationGLM = glm::mat4_cast(StartTransform.Rotation);
-        RotationM = Matrix4f(RotationGLM);
-        TranslationM.InitTranslationTransform(StartTransform.Translation.x, StartTransform.Translation.y, StartTransform.Translation.z);
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    } else if (!pStartNodeAnim && pEndNodeAnim) {
-        // Fallback to end transform only
-        Matrix4f ScalingM, RotationM, TranslationM;
-        ScalingM.InitScaleTransform(EndTransform.Scaling.x, EndTransform.Scaling.y, EndTransform.Scaling.z);
-        glm::mat4 RotationGLM = glm::mat4_cast(EndTransform.Rotation);
-        RotationM = Matrix4f(RotationGLM);
-        TranslationM.InitTranslationTransform(EndTransform.Translation.x, EndTransform.Translation.y, EndTransform.Translation.z);
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    } else if (pStartNodeAnim && pEndNodeAnim) {
-        // Interpolate scaling
-        const glm::vec3& Scale0 = StartTransform.Scaling;
-        const glm::vec3& Scale1 = EndTransform.Scaling;
-        glm::vec3 BlendedScaling = (1.0f - BlendFactor) * Scale0 + Scale1 * BlendFactor;
-        Matrix4f ScalingM;
-        ScalingM.InitScaleTransform(BlendedScaling.x, BlendedScaling.y, BlendedScaling.z);
-
-        // Interpolate rotation
-        const glm::quat& Rot0 = StartTransform.Rotation;
-        const glm::quat& Rot1 = EndTransform.Rotation;
-        glm::quat BlendedRot = glm::slerp(Rot0, Rot1, BlendFactor);
-        Matrix4f RotationM = Matrix4f(glm::mat4_cast(BlendedRot));
-
-        // Interpolate translation
-        const glm::vec3& Pos0 = StartTransform.Translation;
-        const glm::vec3& Pos1 = EndTransform.Translation;
-        glm::vec3 BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
-        Matrix4f TranslationM;
-        TranslationM.InitTranslationTransform(BlendedTranslation.x, BlendedTranslation.y, BlendedTranslation.z);
-
-        // Combine it all
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    }
-
-    if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
-        uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
-        m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform * GlobalTransformation * m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
-    }
-
-    for (uint i = 0; i < pNode->mNumChildren; i++) {
-        std::string ChildName(pNode->mChildren[i]->mName.data);
-        auto it = m_modelData.m_requiredNodeMap.find(ChildName);
-        if (it == m_modelData.m_requiredNodeMap.end()) {
-            printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
-            assert(0);
+        if (pStartNodeAnim) {
+            CalcLocalTransform(StartTransform, StartAnimationTimeTicks, *pStartNodeAnim);
         }
 
-        if (it->second.isRequired) {
-            ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks,
-                                     pNode->mChildren[i], GlobalTransformation, StartAnimation, EndAnimation, BlendFactor);
+        const AnimChannel* pEndNodeAnim = EndAnimation.FindNodeAnim(NodeIndex);
+        LocalTransform EndTransform;
+        if (pEndNodeAnim) {
+            CalcLocalTransform(EndTransform, EndAnimationTimeTicks, *pEndNodeAnim);
+        }
+
+        if (pStartNodeAnim && !pEndNodeAnim) {
+            // Fallback to start transform only
+            Matrix4f ScalingM, RotationM, TranslationM;
+            ScalingM.InitScaleTransform(StartTransform.Scaling.x, StartTransform.Scaling.y, StartTransform.Scaling.z);
+            glm::mat4 RotationGLM = glm::mat4_cast(StartTransform.Rotation);
+            RotationM = Matrix4f(RotationGLM);
+            TranslationM.InitTranslationTransform(StartTransform.Translation.x, StartTransform.Translation.y, StartTransform.Translation.z);
+            NodeTransformation = TranslationM * RotationM * ScalingM;
+        } else if (!pStartNodeAnim && pEndNodeAnim) {
+            // Fallback to end transform only
+            Matrix4f ScalingM, RotationM, TranslationM;
+            ScalingM.InitScaleTransform(EndTransform.Scaling.x, EndTransform.Scaling.y, EndTransform.Scaling.z);
+            glm::mat4 RotationGLM = glm::mat4_cast(EndTransform.Rotation);
+            RotationM = Matrix4f(RotationGLM);
+            TranslationM.InitTranslationTransform(EndTransform.Translation.x, EndTransform.Translation.y, EndTransform.Translation.z);
+            NodeTransformation = TranslationM * RotationM * ScalingM;
+        } else if (pStartNodeAnim && pEndNodeAnim) {
+            // Interpolate scaling
+            const glm::vec3& Scale0 = StartTransform.Scaling;
+            const glm::vec3& Scale1 = EndTransform.Scaling;
+            glm::vec3 BlendedScaling = (1.0f - BlendFactor) * Scale0 + Scale1 * BlendFactor;
+            Matrix4f ScalingM;
+            ScalingM.InitScaleTransform(BlendedScaling.x, BlendedScaling.y, BlendedScaling.z);
+
+            // Interpolate rotation
+            const glm::quat& Rot0 = StartTransform.Rotation;
+            const glm::quat& Rot1 = EndTransform.Rotation;
+            glm::quat BlendedRot = glm::slerp(Rot0, Rot1, BlendFactor);
+            Matrix4f RotationM = Matrix4f(glm::mat4_cast(BlendedRot));
+
+            // Interpolate translation
+            const glm::vec3& Pos0 = StartTransform.Translation;
+            const glm::vec3& Pos1 = EndTransform.Translation;
+            glm::vec3 BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
+            Matrix4f TranslationM;
+            TranslationM.InitTranslationTransform(BlendedTranslation.x, BlendedTranslation.y, BlendedTranslation.z);
+
+            // Combine it all
+            NodeTransformation = TranslationM * RotationM * ScalingM;
+        }
+
+        if (Node.m_parentIndex >= 0) {
+            GlobalTransforms[NodeIndex] = GlobalTransforms[Node.m_parentIndex] * NodeTransformation;
+        } else {
+            GlobalTransforms[NodeIndex] = NodeTransformation;
+        }
+
+        if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
+            uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
+            m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
+                                                                    GlobalTransforms[NodeIndex] *
+                                                                    m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }
-}*/
+}
 
 
 void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim)
@@ -653,13 +652,10 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
     float StartAnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, StartAnimIndex);
     float EndAnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, EndAnimIndex);
 
-    const aiAnimation& StartAnimation = *m_pScene->mAnimations[StartAnimIndex];
-    const aiAnimation& EndAnimation = *m_pScene->mAnimations[EndAnimIndex];
+    const AnimationClip& StartAnimation = m_modelData.m_animations[StartAnimIndex];
+    const AnimationClip& EndAnimation = m_modelData.m_animations[EndAnimIndex];
 
-    Matrix4f Identity;
-    Identity.InitIdentity();
-
-   // ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
+    ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, StartAnimation, EndAnimation, BlendFactor);
 
     BlendedTransforms.resize(m_modelData.m_boneInfo.size());
 
