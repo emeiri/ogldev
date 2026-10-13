@@ -226,7 +226,6 @@ struct ModelData {
     std::vector<AnimationClip> m_animations;
     MeshDims m_dims;
     Matrix4f m_globalInverseTransform;
-    u32 m_numAnimations = 0;
     std::vector<BoneInfo> m_boneInfo;
     std::vector<SkelNode> m_nodes;
     std::unordered_map<std::string, int> m_nodeMap;
@@ -239,7 +238,7 @@ struct ModelData {
     size_t NumVertices() const {
         size_t NumVertices = 0;
 
-        if (m_numAnimations > 0) {
+        if (m_skinnedVertices.size() > 0) {
             NumVertices = m_skinnedVertices.size();
         } else {
             NumVertices = m_vertices.size();
@@ -328,7 +327,6 @@ private:
     std::string m_filename;
     const aiScene* m_pScene = NULL;
     ModelData* m_pModelData = NULL;
-    u32 m_numAnimations = 0;
     bool m_flipTexCoordV = false;
     int m_windowWidth = 0;
     int m_windowHeight = 0;

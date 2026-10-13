@@ -259,9 +259,8 @@ void AssimpModelLoader::InitFromScene()
 void AssimpModelLoader::InitGeometry()
 {
     printf("\n*** Initializing geometry ***\n");
-    m_numAnimations = m_pScene->mNumAnimations;
+
     m_pModelData->m_meshes.resize(m_pScene->mNumMeshes);
-    //m_pModelData->m_materials.resize(m_pScene->mNumMaterials);
 
     uint NumVertices = 0;
     uint NumIndices = 0;
@@ -286,9 +285,6 @@ void AssimpModelLoader::CountVerticesAndIndices(uint& NumVertices, uint& NumIndi
 
 void AssimpModelLoader::InitMeshes(unsigned int NumVertices, unsigned int NumIndices)
 {
-    printf("Num animations %d\n", m_numAnimations);
-
-    m_pModelData->m_numAnimations = m_pScene->mNumAnimations;
     m_pModelData->m_indices.reserve(NumIndices);
 
     if (m_pScene->mNumAnimations > 0) {
