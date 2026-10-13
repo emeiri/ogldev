@@ -173,7 +173,7 @@ void SkinnedMesh::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::v
 }
 
 
-void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex)
+void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh, std::vector<SkinnedVertex>& SkinnedVertices, int BaseVertex)
 {
     if (pMesh->mNumBones > MAX_BONES) {
         printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
@@ -189,7 +189,7 @@ void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh, vector<Skin
 }
 
 
-void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex)
+void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone, std::vector<SkinnedVertex>& SkinnedVertices, int BaseVertex)
 {
     int BoneId = GetBoneId(pBone);
 
@@ -212,12 +212,12 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone, vector<Ski
 
 void SkinnedMesh::MarkRequiredNodesForBone(const aiBone* pBone)
 {
-    string NodeName(pBone->mName.C_Str());
+    std::string NodeName(pBone->mName.C_Str());
 
     const aiNode* pParent = NULL;
 
     do {
-        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(NodeName);
+        std::map<std::string,NodeInfo>::iterator it = m_requiredNodeMap.find(NodeName);
 
         if (it == m_requiredNodeMap.end()) {
             printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
@@ -229,7 +229,7 @@ void SkinnedMesh::MarkRequiredNodesForBone(const aiBone* pBone)
         pParent = it->second.pNode->mParent;
 
         if (pParent) {
-            NodeName = string(pParent->mName.C_Str());
+            NodeName = std::string(pParent->mName.C_Str());
         }
 
     } while (pParent);
@@ -238,7 +238,7 @@ void SkinnedMesh::MarkRequiredNodesForBone(const aiBone* pBone)
 
 void SkinnedMesh::InitializeRequiredNodeMap(const aiNode* pNode)
 {
-    string NodeName(pNode->mName.C_Str());
+    std::string NodeName(pNode->mName.C_Str());
 
     NodeInfo info(pNode);
 
@@ -253,7 +253,7 @@ void SkinnedMesh::InitializeRequiredNodeMap(const aiNode* pNode)
 int SkinnedMesh::GetBoneId(const aiBone* pBone)
 {
     int BoneIndex = 0;
-    string BoneName(pBone->mName.C_Str());
+    std::string BoneName(pBone->mName.C_Str());
 
     if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
         // Allocate an index for a new bone
@@ -475,7 +475,7 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTi
 
 void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation)
 {
-    string NodeName(pNode->mName.data);
+    std::string NodeName(pNode->mName.data);
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
@@ -507,9 +507,9 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        string ChildName(pNode->mChildren[i]->mName.data);
+        std::string ChildName(pNode->mChildren[i]->mName.data);
 
-        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
+        std::map<std::string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
 
         if (it == m_requiredNodeMap.end()) {
             printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
@@ -526,7 +526,7 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
                                            const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor)
 {
-    string NodeName(pNode->mName.data);
+    std::string NodeName(pNode->mName.data);
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
@@ -586,9 +586,9 @@ void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float 
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        string ChildName(pNode->mChildren[i]->mName.data);
+        std::string ChildName(pNode->mChildren[i]->mName.data);
 
-        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
+        std::map<std::string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
 
         if (it == m_requiredNodeMap.end()) {
             printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
@@ -611,7 +611,7 @@ void SkinnedMesh::CalcLocalTransform(LocalTransform& Transform, float AnimationT
 }
 
 
-void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
+void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, std::vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
 {
     if (AnimationIndex >= m_pScene->mNumAnimations) {
         printf("Invalid animation index %d, max is %d\n", AnimationIndex, m_pScene->mNumAnimations);
@@ -634,7 +634,7 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
 
 
 void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
-                                           vector<Matrix4f>& BlendedTransforms,
+                                           std::vector<Matrix4f>& BlendedTransforms,
                                            unsigned int StartAnimIndex,
                                            unsigned int EndAnimIndex,
                                            float BlendFactor)
@@ -686,12 +686,12 @@ float SkinnedMesh::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Anim
 
 
 const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation&
-                                            Animation, const string& NodeName)
+                                            Animation, const std::string& NodeName)
 {
     for (uint i = 0 ; i < Animation.mNumChannels ; i++) {
         const aiNodeAnim* pNodeAnim = Animation.mChannels[i];
 
-        if (string(pNodeAnim->mNodeName.data) == NodeName) {
+        if (std::string(pNodeAnim->mNodeName.data) == NodeName) {
             return pNodeAnim;
         }
     }

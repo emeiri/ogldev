@@ -48,7 +48,7 @@ GLFXTechnique::~GLFXTechnique()
 bool GLFXTechnique::CompileProgram(const char* pProgram)
 {
     if (!glfxParseEffectFromFile(m_effect, m_pEffectFile)) {
-        string log = glfxGetEffectLog(m_effect);
+        std::string log = glfxGetEffectLog(m_effect);
         printf("Error creating effect from file '%s':\n", m_pEffectFile);
         printf("%s\n", log.c_str());
         return false;
@@ -57,7 +57,7 @@ bool GLFXTechnique::CompileProgram(const char* pProgram)
     m_shaderProg = glfxCompileProgram(m_effect, pProgram);
     
     if (m_shaderProg < 0) {
-        string log = glfxGetEffectLog(m_effect);
+        std::string log = glfxGetEffectLog(m_effect);
         printf("Error compiling program '%s' in effect file '%s':\n", pProgram, m_pEffectFile);
         printf("%s\n", log.c_str());
         return false;

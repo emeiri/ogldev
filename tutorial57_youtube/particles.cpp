@@ -48,7 +48,7 @@ void Particles::Init()
 
 void Particles::InitBuffers()
 {
-    vector<Vector4f> Positions(m_totalParticles);
+    std::vector<Vector4f> Positions(m_totalParticles);
     CalcPositions(Positions);
 
     glCreateBuffers(1, &m_posBuf);
@@ -59,7 +59,7 @@ void Particles::InitBuffers()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Positions.data(), GL_DYNAMIC_DRAW);
 
-    vector<Vector4f> Velocities(Positions.size(), Vector4f(0.0f));
+    std::vector<Vector4f> Velocities(Positions.size(), Vector4f(0.0f));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_velBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Velocities.data(), GL_DYNAMIC_COPY);
 
@@ -88,7 +88,7 @@ void Particles::InitBuffers()
 }
 
 
-void Particles::CalcPositions(vector<Vector4f>& Positions)
+void Particles::CalcPositions(std::vector<Vector4f>& Positions)
 {
     Vector4f p(0.0f, 0.0f, 0.0f, 1.0f);
 

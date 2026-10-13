@@ -248,7 +248,7 @@ void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, 
 {
     RenderAnimationCommon(pMesh);
 
-    vector<Matrix4f> Transforms;
+    std::vector<Matrix4f> Transforms;
     pMesh->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
@@ -267,7 +267,7 @@ void PhongRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
 {
     RenderAnimationCommon(pMesh);
 
-    vector<Matrix4f> Transforms;
+    std::vector<Matrix4f> Transforms;
     pMesh->GetBoneTransformsBlended(AnimationTimeSec,
                                     Transforms,
                                     StartAnimIndex,

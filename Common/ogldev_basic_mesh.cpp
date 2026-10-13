@@ -26,9 +26,9 @@
 #define NORMAL_LOCATION    2
 
 
-std::string GetFullPath(const string& Dir, const aiString& Path)
+std::string GetFullPath(const std::string& Dir, const aiString& Path)
 {
-    string p(Path.data);
+    std::string p(Path.data);
 
     if (p == "C:\\\\") {
         p = "";
@@ -37,7 +37,7 @@ std::string GetFullPath(const string& Dir, const aiString& Path)
         p = p.substr(2, p.size() - 2);
     }
 
-    string FullPath = Dir + "/" + p;
+    std::string FullPath = Dir + "/" + p;
 
     return FullPath;
 }
@@ -62,7 +62,7 @@ void BasicMesh::Clear()
 }
 
 
-bool BasicMesh::LoadMesh(const string& Filename, int AssimpFlags)
+bool BasicMesh::LoadMesh(const std::string& Filename, int AssimpFlags)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -98,7 +98,7 @@ bool BasicMesh::LoadMesh(const string& Filename, int AssimpFlags)
     return Ret;
 }
 
-bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
+bool BasicMesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {
     m_Meshes.resize(pScene->mNumMeshes);
     m_Materials.resize(pScene->mNumMaterials);
@@ -303,9 +303,9 @@ void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
 }
 
 
-bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+bool BasicMesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 {
-    string Dir = GetDirFromFilename(Filename);
+    std::string Dir = GetDirFromFilename(Filename);
 
     bool Ret = true;
 
@@ -324,7 +324,7 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
-void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int Index)
+void BasicMesh::LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int Index)
 {
     LoadDiffuseTexture(Dir, pMaterial, Index);
     LoadSpecularTexture(Dir, pMaterial, Index);
@@ -336,7 +336,7 @@ void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 }
 
 
-void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void BasicMesh::LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = NULL;
 
@@ -366,9 +366,9 @@ void BasicMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int Mate
 }
 
 
-void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void BasicMesh::LoadDiffuseTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string FullPath = GetFullPath(Dir, Path);
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -384,7 +384,7 @@ void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 }
 
 
-void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void BasicMesh::LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = NULL;
 
@@ -414,9 +414,9 @@ void BasicMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int Mat
 }
 
 
-void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void BasicMesh::LoadSpecularTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string FullPath = GetFullPath(Dir, Path);
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -432,7 +432,7 @@ void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
 }
 
 
-void BasicMesh::LoadAlbedoTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void BasicMesh::LoadAlbedoTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].PBRmaterial.pAlbedo = NULL;
 
@@ -462,9 +462,9 @@ void BasicMesh::LoadAlbedoTextureEmbedded(const aiTexture* paiTexture, int Mater
 }
 
 
-void BasicMesh::LoadAlbedoTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void BasicMesh::LoadAlbedoTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string FullPath = GetFullPath(Dir, Path);
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].PBRmaterial.pAlbedo = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -480,7 +480,7 @@ void BasicMesh::LoadAlbedoTextureFromFile(const string& Dir, const aiString& Pat
 }
 
 
-void BasicMesh::LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void BasicMesh::LoadMetalnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].PBRmaterial.pMetallic = NULL;
 
@@ -515,9 +515,9 @@ void BasicMesh::LoadMetalnessTextureEmbedded(const aiTexture* paiTexture, int Ma
 }
 
 
-void BasicMesh::LoadMetalnessTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void BasicMesh::LoadMetalnessTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string FullPath = GetFullPath(Dir, Path);
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].PBRmaterial.pMetallic = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -533,7 +533,7 @@ void BasicMesh::LoadMetalnessTextureFromFile(const string& Dir, const aiString& 
 }
 
 
-void BasicMesh::LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void BasicMesh::LoadRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].PBRmaterial.pRoughness = NULL;
 
@@ -568,9 +568,9 @@ void BasicMesh::LoadRoughnessTextureEmbedded(const aiTexture* paiTexture, int Ma
 }
 
 
-void BasicMesh::LoadRoughnessTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void BasicMesh::LoadRoughnessTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string FullPath = GetFullPath(Dir, Path);
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].PBRmaterial.pRoughness = new Texture(GL_TEXTURE_2D, FullPath.c_str());
     bool IsSRGB = false;

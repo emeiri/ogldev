@@ -45,7 +45,7 @@ void SkinnedMesh::Clear()
 }
 
 
-bool SkinnedMesh::LoadMesh(const string& Filename)
+bool SkinnedMesh::LoadMesh(const std::string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -75,7 +75,7 @@ bool SkinnedMesh::LoadMesh(const string& Filename)
     return Ret;
 }
 
-bool SkinnedMesh::InitFromScene(const aiScene* pScene, const string& Filename)
+bool SkinnedMesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {
     m_Meshes.resize(pScene->mNumMeshes);
     m_Materials.resize(pScene->mNumMaterials);
@@ -191,7 +191,7 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
 int SkinnedMesh::GetBoneId(const aiBone* pBone)
 {
     int BoneIndex = 0;
-    string BoneName(pBone->mName.C_Str());
+    std::string BoneName(pBone->mName.C_Str());
 
     if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
         // Allocate an index for a new bone
@@ -206,9 +206,9 @@ int SkinnedMesh::GetBoneId(const aiBone* pBone)
 }
 
 
-bool SkinnedMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+bool SkinnedMesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 {
-    string Dir = GetDirFromFilename(Filename);
+    std::string Dir = GetDirFromFilename(Filename);
 
     bool Ret = true;
 
@@ -227,14 +227,14 @@ bool SkinnedMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
-void SkinnedMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
+void SkinnedMesh::LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index)
 {
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
 }
 
 
-void SkinnedMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index)
+void SkinnedMesh::LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int index)
 {
     m_Materials[index].pTextures[TEX_TYPE_BASE] = NULL;
 
@@ -242,13 +242,13 @@ void SkinnedMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMater
         aiString Path;
 
         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            string p(Path.data);
+            std::string p(Path.data);
 
             if (p.substr(0, 2) == ".\\") {
                 p = p.substr(2, p.size() - 2);
             }
 
-            string FullPath = Dir + "/" + p;
+            std::string FullPath = Dir + "/" + p;
 
             m_Materials[index].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -264,7 +264,7 @@ void SkinnedMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMater
 }
 
 
-void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index)
+void SkinnedMesh::LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int index)
 {
     m_Materials[index].pTextures[TEX_TYPE_SPECULAR] = NULL;
 
@@ -272,7 +272,7 @@ void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMate
         aiString Path;
 
         if (pMaterial->GetTexture(aiTextureType_SHININESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            string p(Path.data);
+            std::string p(Path.data);
 
             if (p == "C:\\\\") {
                 p = "";
@@ -280,7 +280,7 @@ void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMate
                 p = p.substr(2, p.size() - 2);
             }
 
-            string FullPath = Dir + "/" + p;
+            std::string FullPath = Dir + "/" + p;
 
             m_Materials[index].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 

@@ -104,7 +104,7 @@ void SpriteBatch::ScreenPosToNDC(float mouse_x, float mouse_y, float& ndc_x, flo
 }
 
 
-void SpriteBatch::Render(const vector<SpriteInfo>& sprites)
+void SpriteBatch::Render(const std::vector<SpriteInfo>& sprites)
 {
     m_spriteTech.Enable();
 

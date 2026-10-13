@@ -31,7 +31,7 @@ class ShadowMapOffsetTexture {
  private:
     GLuint m_textureObj;
 
-    void CreateTexture(int WindowSize, int FilterSize, const vector<float>& Data);
+    void CreateTexture(int WindowSize, int FilterSize, const std::vector<float>& Data);
 };
 
 #endif

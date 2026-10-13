@@ -882,7 +882,7 @@ int AssimpModelLoader::GetBoneId(const aiBone* pBone)
 
 void AssimpModelLoader::InitMaterials()
 {
-    string Dir = GetDirFromFilename(m_filename);
+    std::string Dir = GetDirFromFilename(m_filename);
 
     uint NumMaterials = m_pScene->mNumMaterials;
     printf("Num materials: %d\n", NumMaterials);
@@ -1023,7 +1023,7 @@ void AssimpModelLoader::LoadClearCoatNormalTexture(const std::string& Dir, const
 }
 
 
-void AssimpModelLoader::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
+void AssimpModelLoader::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
                                     int AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType)
 {
     assert(MyType < TEX_TYPE_NUM);

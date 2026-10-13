@@ -41,7 +41,7 @@ void QuadArray::CreateVertexBuffer()
                             Vector2f(1.0f, 1.0f),   // top right
                             Vector2f(1.0f, 0.0f) }; // bottom right
 
-    vector<Vector2f> vertices_vec;
+    std::vector<Vector2f> vertices_vec;
     vertices_vec.resize(m_maxNumQuads * NUM_VERTICES);
 
     for (uint i = 0 ; i < m_maxNumQuads ; i++) {
@@ -59,7 +59,7 @@ void QuadArray::CreateVertexBuffer()
 
 void QuadArray::CreateQuadIDBuffer()
 {
-    vector<GLuint> quad_id_vec;
+    std::vector<GLuint> quad_id_vec;
     quad_id_vec.resize(m_maxNumQuads * NUM_VERTICES);
 
     for (uint i = 0 ; i < m_maxNumQuads ; i++) {

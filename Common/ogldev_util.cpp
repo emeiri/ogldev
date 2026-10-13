@@ -38,14 +38,14 @@
 #include "ogldev_util.h"
 #include "regress_hook.h"
 
-bool ReadFile(const char* pFileName, string& outFile)
+bool ReadFile(const char* pFileName, std::string& outFile)
 {
-    ifstream f(pFileName);
+    std::ifstream f(pFileName);
 
     bool ret = false;
 
     if (f.is_open()) {
-        string line;
+        std::string line;
         while (getline(f, line)) {
             outFile.append(line);
             outFile.append("\n");
@@ -350,10 +350,10 @@ void glDebugOutput(GLenum source,
 #endif
 #endif
 
-string GetDirFromFilename(const string& Filename)
+std::string GetDirFromFilename(const std::string& Filename)
 {
     // Extract the directory part from the file name
-    string::size_type SlashIndex;
+    std::string::size_type SlashIndex;
 
 #ifdef _WIN64
     SlashIndex = Filename.find_last_of("\\");
@@ -365,9 +365,9 @@ string GetDirFromFilename(const string& Filename)
     SlashIndex = Filename.find_last_of("/");
 #endif
 
-    string Dir;
+    std::string Dir;
 
-    if (SlashIndex == string::npos) {
+    if (SlashIndex == std::string::npos) {
         Dir = ".";
     }
     else if (SlashIndex == 0) {

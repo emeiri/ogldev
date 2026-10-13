@@ -15,7 +15,7 @@ public:
 private:
     
     void InitBuffers();
-    void CalcPositions(vector<Vector4f>& Positions);
+    void CalcPositions(std::vector<Vector4f>& Positions);
     void ExecuteComputeShader(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2);
     void RenderParticles(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2, const Matrix4f& VP);
 

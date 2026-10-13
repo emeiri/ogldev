@@ -300,7 +300,7 @@ private:
 
         float TextureScale = 4.0f;
 
-        std::vector<string> TextureFilenames;
+        std::vector<std::string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
         TextureFilenames.push_back("../Content/textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");

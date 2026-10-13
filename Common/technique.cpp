@@ -65,7 +65,7 @@ bool Technique::Init()
 // Use this method to add shaders to the program. When finished - call finalize()
 bool Technique::AddShader(GLenum ShaderType, const char* pFilename)
 {
-    string s;
+    std::string s;
 
     if (!ReadFile(pFilename, s)) {
         return false;

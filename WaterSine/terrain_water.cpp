@@ -177,7 +177,7 @@ public:
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
 
-        float y = min(-0.4f, cosf(foo));
+        float y = std::min(-0.4f, cosf(foo));
         Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
 
         Vector3f LightDir2(1.0f, -1.0f, 0.0f);
@@ -311,7 +311,7 @@ private:
     {
         float WorldScale = 4.0f;
         float TextureScale = 16.0f;
-        std::vector<string> TextureFilenames;
+        std::vector<std::string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
         TextureFilenames.push_back("../Content/textures/coast_sand_rocks_02_diff_2k.jpg");        
         TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");

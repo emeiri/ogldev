@@ -48,11 +48,11 @@ public:
     // and updates the corresponding matrix in the vector. This must then be updated in the VS
     // to be accumulated for the final local position (see skinning.vs). The animation index
     // is an optional param which selects one of the animations.
-    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms, unsigned int AnimationIndex = 0);
+    void GetBoneTransforms(float AnimationTimeSec, std::vector<Matrix4f>& Transforms, unsigned int AnimationIndex = 0);
 
     // Same as above but this one blends two animations together based on a blending factor
     void GetBoneTransformsBlended(float AnimationTimeSec,
-                                  vector<Matrix4f>& Transforms,
+                                  std::vector<Matrix4f>& Transforms,
                                   unsigned int StartAnimIndex,
                                   unsigned int EndAnimIndex,
                                   float BlendFactor);
@@ -116,8 +116,8 @@ private:
     void PopulateBuffersNonDSA();
     void PopulateBuffersDSA();
 
-    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
-    void LoadSingleBone(uint MeshIndex, const aiBone* pBone, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
+    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh, std::vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
+    void LoadSingleBone(uint MeshIndex, const aiBone* pBone, std::vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
     int GetBoneId(const aiBone* pBone);
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -125,7 +125,7 @@ private:
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation& Animation, const string& NodeName);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation& Animation, const std::string& NodeName);
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation);
     void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
                                   const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);
@@ -141,11 +141,11 @@ private:
 
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
-    vector<SkinnedVertex> m_SkinnedVertices;
+    std::vector<SkinnedVertex> m_SkinnedVertices;
 
     GLuint m_boneBuffer = 0;
 
-    map<string,uint> m_BoneNameToIndexMap;
+    std::map<std::string,uint> m_BoneNameToIndexMap;
 
     struct BoneInfo
     {
@@ -159,7 +159,7 @@ private:
         }
     };
 
-    vector<BoneInfo> m_BoneInfo;
+    std::vector<BoneInfo> m_BoneInfo;
 
     struct NodeInfo {
 
@@ -171,7 +171,7 @@ private:
         bool isRequired = false;
     };
 
-    map<string,NodeInfo> m_requiredNodeMap;
+    std::map<std::string,NodeInfo> m_requiredNodeMap;
 };
 
 

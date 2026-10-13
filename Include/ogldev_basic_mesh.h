@@ -91,7 +91,7 @@ protected:
 
     Matrix4f m_GlobalInverseTransform;
 
-    vector<uint> m_Indices;
+    std::vector<uint> m_Indices;
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,
@@ -117,27 +117,27 @@ private:
     void InitAllMeshes(const aiScene* pScene);
     void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<Vertex>& Vertices);
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index);
 
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadDiffuseTextureFromFile(const std::string& dir, const aiString& Path, int MaterialIndex);
 
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadSpecularTextureFromFile(const std::string& dir, const aiString& Path, int MaterialIndex);
 
-    void LoadAlbedoTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadAlbedoTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadAlbedoTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadAlbedoTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadAlbedoTextureFromFile(const std::string& dir, const aiString& Path, int MaterialIndex);
 
-    void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadMetalnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadMetalnessTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadMetalnessTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadMetalnessTextureFromFile(const std::string& dir, const aiString& Path, int MaterialIndex);
 
-    void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadRoughnessTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadRoughnessTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadRoughnessTextureFromFile(const std::string& dir, const aiString& Path, int MaterialIndex);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
@@ -147,7 +147,7 @@ private:
     std::vector<Material> m_Materials;
     
     // Temporary space for vertex stuff before we load them into the GPU
-    vector<Vertex> m_Vertices;
+    std::vector<Vertex> m_Vertices;
 
     Assimp::Importer m_Importer;
 

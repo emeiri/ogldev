@@ -129,7 +129,7 @@ public:
 
         m_pEffect->Enable();
 
-        vector<Matrix4f> Transforms;
+        std::vector<Matrix4f> Transforms;
 
         float RunningTime = GetRunningTime();
 

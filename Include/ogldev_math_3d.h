@@ -828,13 +828,13 @@ public:
 
     void Add(const Vector3f& v)
     {
-        MinX = min(MinX, v.x);
-        MinY = min(MinY, v.y);
-        MinZ = min(MinZ, v.z);
+        MinX = std::min(MinX, v.x);
+        MinY = std::min(MinY, v.y);
+        MinZ = std::min(MinZ, v.z);
 
-        MaxX = max(MaxX, v.x);
-        MaxY = max(MaxY, v.y);
-        MaxZ = max(MaxZ, v.z);
+        MaxX = std::max(MaxX, v.x);
+        MaxY = std::max(MaxY, v.y);
+        MaxZ = std::max(MaxZ, v.z);
     }
 
     float MinX = FLT_MAX;

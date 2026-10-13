@@ -53,7 +53,7 @@ public:
 
     const Material& GetMaterial();
 
-    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms);
+    void GetBoneTransforms(float AnimationTimeSec, std::vector<Matrix4f>& Transforms);
 
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4
@@ -74,11 +74,11 @@ private:
 
     void PopulateBuffers();
 
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index);
 
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
 
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
@@ -116,7 +116,7 @@ private:
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string& NodeName);
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
@@ -155,13 +155,13 @@ private:
     std::vector<Material> m_Materials;
 
     // Temporary space for vertex stuff before we load them into the GPU
-    vector<Vector3f> m_Positions;
-    vector<Vector3f> m_Normals;
-    vector<Vector2f> m_TexCoords;
-    vector<unsigned int> m_Indices;
-    vector<VertexBoneData> m_Bones;
+    std::vector<Vector3f> m_Positions;
+    std::vector<Vector3f> m_Normals;
+    std::vector<Vector2f> m_TexCoords;
+    std::vector<unsigned int> m_Indices;
+    std::vector<VertexBoneData> m_Bones;
 
-    map<string,uint> m_BoneNameToIndexMap;
+    std::map<std::string,uint> m_BoneNameToIndexMap;
 
     struct BoneInfo
     {
@@ -175,7 +175,7 @@ private:
         }
     };
 
-    vector<BoneInfo> m_BoneInfo;
+    std::vector<BoneInfo> m_BoneInfo;
     Matrix4f m_GlobalInverseTransform;
 };
 

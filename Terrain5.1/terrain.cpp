@@ -44,7 +44,7 @@ void BaseTerrain::Destroy()
 
 
 
-void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness)
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<std::string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness)
 {
     if (!m_terrainTech.Init()) {
         printf("Error initializing tech\n");

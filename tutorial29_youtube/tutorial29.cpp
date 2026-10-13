@@ -200,7 +200,7 @@ void Tutorial29::RenderSceneCB()
     long long CurrentTimeMillis = GetCurrentTimeMillis();
     float AnimationTimeSec = ((float)(CurrentTimeMillis - StartTimeMillis)) / 1000.0f;
 
-    vector<Matrix4f> Transforms;
+    std::vector<Matrix4f> Transforms;
     pMesh1->GetBoneTransforms(AnimationTimeSec, Transforms);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {

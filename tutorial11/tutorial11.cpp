@@ -131,7 +131,7 @@ static void CompileShaders()
         exit(1);
     }
 
-    string vs, fs;
+    std::string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
         exit(1);

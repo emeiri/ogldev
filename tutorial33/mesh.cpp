@@ -58,7 +58,7 @@ void Mesh::Clear()
 }
 
 
-bool Mesh::LoadMesh(const string& Filename)
+bool Mesh::LoadMesh(const std::string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -88,15 +88,15 @@ bool Mesh::LoadMesh(const string& Filename)
     return Ret;
 }
 
-bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)
+bool Mesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {  
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
-    vector<Vector3f> Positions;
-    vector<Vector3f> Normals;
-    vector<Vector2f> TexCoords;
-    vector<unsigned int> Indices;
+    std::vector<Vector3f> Positions;
+    std::vector<Vector3f> Normals;
+    std::vector<Vector2f> TexCoords;
+    std::vector<unsigned int> Indices;
 
     unsigned int NumVertices = 0;
     unsigned int NumIndices = 0;
@@ -167,10 +167,10 @@ bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)
 }
 
 void Mesh::InitMesh(const aiMesh* paiMesh,
-                    vector<Vector3f>& Positions,
-                    vector<Vector3f>& Normals,
-                    vector<Vector2f>& TexCoords,
-                    vector<unsigned int>& Indices)
+                    std::vector<Vector3f>& Positions,
+                    std::vector<Vector3f>& Normals,
+                    std::vector<Vector2f>& TexCoords,
+                    std::vector<unsigned int>& Indices)
 {    
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -195,13 +195,13 @@ void Mesh::InitMesh(const aiMesh* paiMesh,
     }
 }
 
-bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
+bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 {
     // Extract the directory part from the file name
-    string::size_type SlashIndex = Filename.find_last_of("/");
-    string Dir;
+    std::string::size_type SlashIndex = Filename.find_last_of("/");
+    std::string Dir;
 
-    if (SlashIndex == string::npos) {
+    if (SlashIndex == std::string::npos) {
         Dir = ".";
     }
     else if (SlashIndex == 0) {
@@ -223,13 +223,13 @@ bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
             aiString Path;
 
             if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-                string p(Path.data);
+                std::string p(Path.data);
                 
                 if (p.substr(0, 2) == ".\\") {                    
                     p = p.substr(2, p.size() - 2);
                 }
                                
-                string FullPath = Dir + "/" + p;
+                std::string FullPath = Dir + "/" + p;
                     
                 m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 

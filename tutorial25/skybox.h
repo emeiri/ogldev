@@ -31,13 +31,13 @@ public:
 
     ~SkyBox();
 
-    bool Init(const string& Directory,
-              const string& PosXFilename,
-              const string& NegXFilename,
-              const string& PosYFilename,
-              const string& NegYFilename,
-              const string& PosZFilename,
-              const string& NegZFilename);
+    bool Init(const std::string& Directory,
+              const std::string& PosXFilename,
+              const std::string& NegXFilename,
+              const std::string& PosYFilename,
+              const std::string& NegYFilename,
+              const std::string& PosZFilename,
+              const std::string& NegZFilename);
 
     void Render();
 

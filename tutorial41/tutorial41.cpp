@@ -167,7 +167,7 @@ public:
 
         m_pSkinningTech->Enable();
 
-        vector<Matrix4f> Transforms;
+        std::vector<Matrix4f> Transforms;
 
         float RunningTime = GetRunningTime();
 
@@ -239,7 +239,7 @@ private:
     PersProjInfo m_persProjInfo;
     IntermediateBuffer m_intermediateBuffer;
     Pipeline m_pipeline;
-    vector<Matrix4f> m_prevTransforms;
+    std::vector<Matrix4f> m_prevTransforms;
 };
 
 

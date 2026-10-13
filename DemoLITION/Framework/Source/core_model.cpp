@@ -574,7 +574,7 @@ void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTim
 }
 
 
-void CoreModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
+void CoreModel::GetBoneTransforms(float TimeInSeconds, std::vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
 {
     if (AnimationIndex >= m_modelData.m_animations.size()) {
         printf("Invalid animation index %d, max is %d\n", AnimationIndex, (int)(m_modelData.m_animations.size() - 1));

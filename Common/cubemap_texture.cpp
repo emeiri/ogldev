@@ -37,17 +37,17 @@ static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 #define CUBEMAP_NUM_FACES 6
 
 
-CubemapTexture::CubemapTexture(const string& Directory,
-                               const string& PosXFilename,
-                               const string& NegXFilename,
-                               const string& PosYFilename,
-                               const string& NegYFilename,
-                               const string& PosZFilename,
-                               const string& NegZFilename)
+CubemapTexture::CubemapTexture(const std::string& Directory,
+                               const std::string& PosXFilename,
+                               const std::string& NegXFilename,
+                               const std::string& PosYFilename,
+                               const std::string& NegYFilename,
+                               const std::string& PosZFilename,
+                               const std::string& NegZFilename)
 {
-    string::const_iterator it = Directory.end();
+    std::string::const_iterator it = Directory.end();
     it--;
-    string BaseDir = (*it == '/') ? Directory : Directory + "/";
+    std::string BaseDir = (*it == '/') ? Directory : Directory + "/";
 
     m_fileNames[0] = BaseDir + PosXFilename;
     m_fileNames[1] = BaseDir + NegXFilename;

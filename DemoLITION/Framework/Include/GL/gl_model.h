@@ -61,9 +61,9 @@ public:
 
 protected:    
 
-    virtual void PopulateBuffersSkinned(vector<SkinnedVertex>& Vertices);
+    virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices);
 
-    virtual void PopulateBuffers(vector<Vertex>& Vertices);
+    virtual void PopulateBuffers(std::vector<Vertex>& Vertices);
 
     virtual void InitGeometryPost();
 
@@ -72,16 +72,16 @@ private:
     void AllocBuffers();
 
     template<typename VertexType>
-    void PopulateBuffersInternal(vector<VertexType>& Vertices);
+    void PopulateBuffersInternal(std::vector<VertexType>& Vertices);
 
     template<typename VertexType>
-    void PopulateBuffersPVP(vector<VertexType>& Vertices);
+    void PopulateBuffersPVP(std::vector<VertexType>& Vertices);
 
     template<typename VertexType>
-    void PopulateBuffersNonDSA(vector<VertexType>& Vertices);
+    void PopulateBuffersNonDSA(std::vector<VertexType>& Vertices);
 
     template<typename VertexType>
-    void PopulateBuffersDSA(vector<VertexType>& Vertices);
+    void PopulateBuffersDSA(std::vector<VertexType>& Vertices);
 
     void RenderInstance(int InstanceIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 

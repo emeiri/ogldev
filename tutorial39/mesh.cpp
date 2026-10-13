@@ -75,7 +75,7 @@ void Mesh::Clear()
 }
 
 
-bool Mesh::LoadMesh(const string& Filename, bool WithAdjacencies)
+bool Mesh::LoadMesh(const std::string& Filename, bool WithAdjacencies)
 {
     m_withAdjacencies = WithAdjacencies;
     
@@ -111,16 +111,16 @@ bool Mesh::LoadMesh(const string& Filename, bool WithAdjacencies)
 }
 
 
-bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)
+bool Mesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {  
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
-    vector<Vector3f> Positions;
-    vector<Vector3f> Normals;
-    vector<Vector2f> TexCoords;
-    vector<VertexBoneData> Bones;
-    vector<uint> Indices;
+    std::vector<Vector3f> Positions;
+    std::vector<Vector3f> Normals;
+    std::vector<Vector2f> TexCoords;
+    std::vector<VertexBoneData> Bones;
+    std::vector<uint> Indices;
        
     uint NumVertices = 0;
     uint NumIndices = 0;
@@ -201,7 +201,7 @@ static uint GetOppositeIndex(const aiFace& Face, const Edge& e)
 }
 
 
-void Mesh::FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices)
+void Mesh::FindAdjacencies(const aiMesh* paiMesh, std::vector<unsigned int>& Indices)
 {       
     // Step 1 - find the two triangles that share every edge
     for (uint i = 0 ; i < paiMesh->mNumFaces ; i++) {
@@ -260,11 +260,11 @@ void Mesh::FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices)
 
 void Mesh::InitMesh(uint MeshIndex,
                     const aiMesh* paiMesh,
-                    vector<Vector3f>& Positions,
-                    vector<Vector3f>& Normals,
-                    vector<Vector2f>& TexCoords,
-                    vector<VertexBoneData>& Bones,
-                    vector<uint>& Indices)
+                    std::vector<Vector3f>& Positions,
+                    std::vector<Vector3f>& Normals,
+                    std::vector<Vector2f>& TexCoords,
+                    std::vector<VertexBoneData>& Bones,
+                    std::vector<uint>& Indices)
 {    
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
     
@@ -297,11 +297,11 @@ void Mesh::InitMesh(uint MeshIndex,
 }
 
 
-void Mesh::LoadBones(uint MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>& Bones)
+void Mesh::LoadBones(uint MeshIndex, const aiMesh* pMesh, std::vector<VertexBoneData>& Bones)
 {
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {                
         uint BoneIndex = 0;        
-        string BoneName(pMesh->mBones[i]->mName.data);
+        std::string BoneName(pMesh->mBones[i]->mName.data);
         
         if (m_BoneMapping.find(BoneName) == m_BoneMapping.end()) {
             // Allocate an index for a new bone
@@ -325,13 +325,13 @@ void Mesh::LoadBones(uint MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>
 }
 
 
-bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
+bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 {
     // Extract the directory part from the file name
-    string::size_type SlashIndex = Filename.find_last_of("/");
-    string Dir;
+    std::string::size_type SlashIndex = Filename.find_last_of("/");
+    std::string Dir;
 
-    if (SlashIndex == string::npos) {
+    if (SlashIndex == std::string::npos) {
         Dir = ".";
     }
     else if (SlashIndex == 0) {
@@ -353,13 +353,13 @@ bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
             aiString Path;
 
             if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-                string p(Path.data);
+                std::string p(Path.data);
                 
                 if (p.substr(0, 2) == ".\\") {                    
                     p = p.substr(2, p.size() - 2);
                 }
                                
-                string FullPath = Dir + "/" + p;
+                std::string FullPath = Dir + "/" + p;
                     
                 m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -516,7 +516,7 @@ void Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const a
 
 void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
 {    
-    string NodeName(pNode->mName.data);
+    std::string NodeName(pNode->mName.data);
     
     const aiAnimation* pAnimation = m_pScene->mAnimations[0];
         
@@ -559,7 +559,7 @@ void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Mat
 }
 
 
-void Mesh::BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms)
+void Mesh::BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms)
 {
     Matrix4f Identity;
     Identity.InitIdentity();
@@ -578,12 +578,12 @@ void Mesh::BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms)
 }
 
 
-const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const string NodeName)
+const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
 {
     for (uint i = 0 ; i < pAnimation->mNumChannels ; i++) {
         const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
         
-        if (string(pNodeAnim->mNodeName.data) == NodeName) {
+        if (std::string(pNodeAnim->mNodeName.data) == NodeName) {
             return pNodeAnim;
         }
     }

@@ -34,7 +34,7 @@ class SpriteBatch
 
     SpriteBatch(const char* pFilename, uint NumSpritesX, uint NumSpritesY, uint WindowWidth, uint WindowHeight);
 
-    void Render(const vector<SpriteInfo>& sprites);
+    void Render(const std::vector<SpriteInfo>& sprites);
 
     void RenderAll();
 

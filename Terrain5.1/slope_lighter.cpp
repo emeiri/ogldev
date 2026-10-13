@@ -150,7 +150,7 @@ float SlopeLighter::GetLighting(int x, int z) const
         f = 1.0f;
     }
 
-    f = std::min(1.0f, max(f, min_brightness));
+    f = std::min(1.0f, std::max(f, min_brightness));
 
     return f;
 }

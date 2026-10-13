@@ -170,7 +170,7 @@ public:
 
     ~Mesh();
 
-    bool LoadMesh(const string& Filename, bool WithAdjacencies);
+    bool LoadMesh(const std::string& Filename, bool WithAdjacencies);
 
     void Render();
 	
@@ -179,7 +179,7 @@ public:
         return m_NumBones;
     }
     
-    void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
+    void BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms);
     
 private:
     #define NUM_BONES_PER_VERTEX 4
@@ -221,19 +221,19 @@ private:
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
-    bool InitFromScene(const aiScene* pScene, const string& Filename);
-    void FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices);
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+    void FindAdjacencies(const aiMesh* paiMesh, std::vector<unsigned int>& Indices);
     void InitMesh(uint MeshIndex,
                   const aiMesh* paiMesh,
-                  vector<Vector3f>& Positions,
-                  vector<Vector3f>& Normals,
-                  vector<Vector2f>& TexCoords,
-                  vector<VertexBoneData>& Bones,
-                  vector<unsigned int>& Indices);
-    void LoadBones(uint MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
-    bool InitMaterials(const aiScene* pScene, const string& Filename);
+                  std::vector<Vector3f>& Positions,
+                  std::vector<Vector3f>& Normals,
+                  std::vector<Vector2f>& TexCoords,
+                  std::vector<VertexBoneData>& Bones,
+                  std::vector<unsigned int>& Indices);
+    void LoadBones(uint MeshIndex, const aiMesh* paiMesh, std::vector<VertexBoneData>& Bones);
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
     void Clear();
 
 #define INVALID_MATERIAL 0xFFFFFFFF
@@ -265,12 +265,12 @@ enum VB_TYPES {
         unsigned int MaterialIndex;
     };
     
-    vector<MeshEntry> m_Entries;
-    vector<Texture*> m_Textures;
+    std::vector<MeshEntry> m_Entries;
+    std::vector<Texture*> m_Textures;
      
-    map<string,uint> m_BoneMapping; // maps a bone name to its index
+    std::map<std::string,uint> m_BoneMapping; // maps a bone name to its index
     uint m_NumBones;
-    vector<BoneInfo> m_BoneInfo;
+    std::vector<BoneInfo> m_BoneInfo;
     Matrix4f m_GlobalInverseTransform;
 
     std::map<Edge, Neighbors, CompareEdges> m_indexMap;

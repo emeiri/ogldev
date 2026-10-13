@@ -37,7 +37,7 @@ class BaseTerrain
 
     void Destroy();
 
-	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames);
+	void InitTerrain(float WorldScale, float TextureScale, const std::vector<std::string>& TextureFilenames);
 
     void InitTerrain(float WorldScale, float TextureScale);
 

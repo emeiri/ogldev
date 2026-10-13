@@ -68,7 +68,7 @@ ShadowMapOffsetTexture::ShadowMapOffsetTexture(int WindowSize, int FilterSize)
 }
 
 
-void ShadowMapOffsetTexture::CreateTexture(int WindowSize, int FilterSize, const vector<float>& Data)
+void ShadowMapOffsetTexture::CreateTexture(int WindowSize, int FilterSize, const std::vector<float>& Data)
 {
     int NumFilterSamples = FilterSize * FilterSize;
 

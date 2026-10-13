@@ -1094,7 +1094,7 @@ void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject
     if (pSceneObject->GetModel()->IsAnimated()) {
         float AnimationTimeSec = (float)TotalRuntime;
         int AnimationIndex = 0;
-        vector<Matrix4f> Transforms;
+        std::vector<Matrix4f> Transforms;
         pSceneObject->GetModel()->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
 
         for (uint i = 0; i < Transforms.size(); i++) {

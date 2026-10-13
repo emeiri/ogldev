@@ -227,7 +227,7 @@ struct ModelData {
     MeshDims m_dims;
     Matrix4f m_globalInverseTransform;
     u32 m_numAnimations = 0;
-    vector<BoneInfo> m_boneInfo;
+    std::vector<BoneInfo> m_boneInfo;
     std::vector<SkelNode> m_nodes;
     std::unordered_map<std::string, int> m_nodeMap;
     std::map<std::string, uint> m_boneNameToIndexMap;
@@ -294,20 +294,20 @@ private:
 
     // Materials
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, int aiTextureType, int AssimpTexIndex, TEXTURE_TYPE MyType);
+    void LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadMetalnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadEmissiveTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadEmissionColorTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadNormalCameraTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadAmbientOcclusionTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, int aiTextureType, int AssimpTexIndex, TEXTURE_TYPE MyType);
 
     // Colors
     void LoadColors(const aiMaterial* pMaterial, MaterialData& MyMaterial);

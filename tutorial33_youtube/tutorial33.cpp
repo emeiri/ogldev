@@ -85,7 +85,7 @@ public:
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        vector<SpriteBatch::SpriteInfo> Sprites;
+        std::vector<SpriteBatch::SpriteInfo> Sprites;
         Sprites.resize(5);
 
         Sprites[0].PixelX = anim_pixelX;

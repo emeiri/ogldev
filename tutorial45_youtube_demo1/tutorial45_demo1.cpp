@@ -273,7 +273,7 @@ private:
     {
         float WorldScale = 4.0f;
         float TextureScale = 16.0f;
-        std::vector<string> TextureFilenames;
+        std::vector<std::string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/tex_Water.jpg");
         TextureFilenames.push_back("../Content/textures/coast_sand_rocks_02_diff_2k.jpg");        
         TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");

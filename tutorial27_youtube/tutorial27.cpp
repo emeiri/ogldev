@@ -201,7 +201,7 @@ void Tutorial27::RenderSceneCB()
 
     long long CurrentTime = GetCurrentTimeMillis();
 
-    vector<Matrix4f> Transforms;
+    std::vector<Matrix4f> Transforms;
     pMesh1->GetBoneTransforms(Transforms);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {

@@ -35,8 +35,6 @@
 #include "regress_hook.h"
 
 
-using namespace std;
-
 bool ReadFile(const char* fileName, std::string& outFile);
 char* ReadBinaryFile(const char* pFileName, int& size);
 
@@ -128,7 +126,7 @@ void glDebugOutput(GLenum source,
                    const void *userParam);
 #endif
 
-string GetDirFromFilename(const string& Filename);
+std::string GetDirFromFilename(const std::string& Filename);
 bool IsFileExists(const char* filename);
 
 #define MAX_BONES (200)
