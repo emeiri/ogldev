@@ -139,10 +139,23 @@ struct TextureSource {
     bool IsValid() const { return !Path.empty() || !EmbeddedBytes.empty(); }
 };
 
-//struct MaterialData {
- //   CoreMaterial Params;               // colors, factors, type flags (no Texture* inside)
-//    TextureSource Textures[TEX_TYPE_NUM];
-//};
+
+struct MaterialData {
+    std::string m_name;
+    bool m_isPBR = false;
+    int m_materialType = MaterialType_Invalid;
+    Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f SpecularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f BaseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f EmissiveColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f MetallicRoughnessNormalOcclusion = Vector4f(1.0f);
+    Vector4f ClearCoatTransmissionThickness = Vector4f(1.0f);
+    float m_transparencyFactor = 1.0f;
+    float m_alphaTest = 0.0f;
+    float m_ior = 1.5f;
+    TextureSource m_textures[TEX_TYPE_NUM];
+};
 
 
 struct ModelData {
@@ -150,7 +163,7 @@ struct ModelData {
     std::vector<Vertex>        m_vertices;          // used when !IsSkinned()
     std::vector<SkinnedVertex> m_skinnedVertices;   // used when IsSkinned()
     std::vector<u32>           m_indices;
-    //std::vector<MaterialData>  m_materials;
+    std::vector<MaterialData>  m_materials;
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight>       m_pointLights;
     std::vector<SpotLight>        m_spotLights;
@@ -189,6 +202,7 @@ public:
 
 private:
     void InitFromScene();
+    void InitMaterials();
     void InitGeometry();
     void CountVerticesAndIndices(uint& NumVertices, uint& NumIndices);
     void InitMeshes(unsigned int NumVertices, unsigned int NumIndices);
@@ -201,19 +215,45 @@ private:
     template<typename VertexType>
     void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices,
         std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices);
+    
     void InitCameras();
     void InitSingleCamera(int Index);
+    
     void InitializeRequiredNodeMap(const aiNode* pNode);
     void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
     void MarkRequiredNodesForBone(const aiBone* pBone);
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
+
+    // Lights
     void InitLights();
     void InitSingleLight(const aiLight& light);
     void InitDirectionalLight(const aiLight& light);
     void InitPointLight(const aiLight& light);
     void InitSpotLight(const aiLight& light);
+
+    // Materials
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType);
+
+    // Colors
+    void LoadColors(const aiMaterial* pMaterial, MaterialData& MyMaterial);
+    void ProcessClearCoat(const aiMaterial* pMaterial, MaterialData& MyMaterial);
+    void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
 
     // Each of these is a private free function or small helper class in the .cpp:
     //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt

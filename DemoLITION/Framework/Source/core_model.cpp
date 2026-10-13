@@ -17,8 +17,6 @@
 */
 
 #include <algorithm>
-#include <filesystem>
-#include <assimp/GltfMaterial.h>
 
 #include "Int/core_rendering_system.h"
 #include "Int/core_model.h"
@@ -28,9 +26,6 @@
 //#define DEBUG_TEXTURES
 //#define DEBUG_BONES
 #define DEBUG_SCENE_HIERARCHY
-
-// config flags
-static bool MissingTextureDetection = false;
 
 #ifdef OGLDEV_VULKAN
 
@@ -81,73 +76,8 @@ aiProcess_ValidateDataStructure)
                                       aiProcess_CalcTangentSpace)
 #endif
 
-static uint CountValidFaces(const aiMesh& Mesh);
-static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
-
 int traverse(int depth, aiNode* pNode);
     
-static std::string GetFullPath(const std::string& Dir, const aiString& Path) 
-{
-    std::filesystem::path p(Path.C_Str());
-    std::string ret = (std::filesystem::path(Dir) / p).generic_string();
-    // .generic_string() automatically converts windows \ to /
-    return ret;
-}
-
-
-static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMaterial)
-{
-    int ShadingModel = 0;
-
-    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) != AI_SUCCESS) {
-        printf("Cannot get the shading model\n");
-        assert(0);
-    }
-
-    MaterialTypeFlags mt = MaterialType_Invalid;
-
-    switch (ShadingModel) {
-        case aiShadingMode_Unlit:
-#ifdef DEBUG_MATERIALS
-            printf("Shading model: Unlit\n");
-#endif
-            mt = MaterialType_Unlit;
-            break;
-
-        case aiShadingMode_PBR_BRDF:
-        {
-#ifdef DEBUG_MATERIALS
-            printf("Shading model: PBR BRDF\n");
-#endif
-            MyMaterial.m_isPBR = true;            
-            
-            float factor = 0;
-            if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
-                mt = MaterialType_MetallicRoughness;
-            }
-        }
-            break;
-
-        case aiShadingMode_Gouraud:
-#ifdef DEBUG_MATERIALS
-            printf("Shading model: Gouraud\n");
-#endif
-            break;
-
-        case aiShadingMode_Phong:
-#ifdef DEBUG_MATERIALS
-            printf("Shading model: Phong\n");
-#endif
-            break;
-
-        default:
-            assert(0);
-    }
-
-    MyMaterial.m_materialType = mt;
-}
-
-
 bool CoreModel::IsPBR() const
 {
     bool ret = false;
@@ -234,11 +164,9 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
     unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
     unsigned int NumIndices = (unsigned int)m_modelData.m_indices.size();
 
-    if (!InitMaterials(pScene, Filename)) {
-        return false;
-    }
+    InitMaterials();
 
-    InitGPUBuffers(pScene, NumVertices, NumIndices);
+    InitGPUBuffers(NumVertices, NumIndices);
 
     CalculateMeshTransformations(pScene);
 
@@ -252,11 +180,11 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 }
 
 
-void CoreModel::InitGPUBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices)
+void CoreModel::InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices)
 {
-    printf("Num animations %d\n", pScene->mNumAnimations);
+    printf("Num animations %d\n", m_modelData.m_numAnimations);
 
-    if (pScene->mNumAnimations > 0) {
+    if (m_modelData.m_numAnimations > 0) {
         PopulateBuffersSkinned(m_modelData.m_skinnedVertices);
     }
     else {
@@ -341,375 +269,67 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 }
 
 
-bool CoreModel::InitMaterials(const aiScene* pScene, const std::string& Filename)
+void CoreModel::InitMaterials()
 {
-    string Dir = GetDirFromFilename(Filename);
+    for (int MaterialIndex = 0; MaterialIndex < m_modelData.m_materials.size(); MaterialIndex++) {
 
-    bool Ret = true;
+        for (int TexType = 0; TexType < TEX_TYPE_NUM; TexType++) {        
+            TextureSource& TextureSource = m_modelData.m_materials[MaterialIndex].m_textures[TexType];
 
-    printf("Num materials: %d\n", pScene->mNumMaterials);
+            if (!TextureSource.IsValid()) {
+                continue;
+            }
 
-    // Initialize the materials
-    for (unsigned int i = 0 ; i < pScene->mNumMaterials; i++) {
-        const aiMaterial* pMaterial = pScene->mMaterials[i];
-
-#ifdef DEBUG_MATERIALS
-        printf("\nLoading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
-#endif
-        SetMaterialType(pMaterial, m_Materials[i]);
-
-        LoadTextures(Dir, pMaterial, i);
-
-        LoadColors(pMaterial, i);
-    }
-
-    return Ret;
-}
-
-
-const CoreMaterial* CoreModel::GetMaterialForMesh(int MeshIndex) const
-{
-    if (MeshIndex >= m_Meshes.size()) {
-        printf("Invalid mesh index %d, num meshes %d\n", MeshIndex, (int)m_Meshes.size());
-        exit(1);
-    }
-
-    int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
-
-    const CoreMaterial* pMaterial = NULL;
-
-    if ((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size())) {
-        pMaterial = & m_Materials[MaterialIndex];
-    }
-
-    return pMaterial;
-}
-
-
-static int GetTextureCount(const aiMaterial* pMaterial)
-{
-    int TextureCount = 0;
-
-    for (int i = 0; i <= AI_TEXTURE_TYPE_MAX; ++i) { // UNKNOWN is the last texture type in Assimp.
-        aiTextureType ttype = (aiTextureType)(i);
-        int Count = pMaterial->GetTextureCount(ttype);
-        TextureCount += Count;
-
-#ifdef DEBUG_MATERIALS
-        if (Count > 0) {
-#ifdef _WIN64
-            printf("Found texture %s\n", aiTextureTypeToString(ttype));
-#endif
-        }
-#endif
-    }
-
-    return TextureCount;
-}
-
-
-void CoreModel::LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index)
-{
-    int TextureCount = GetTextureCount(pMaterial);
-
-#ifdef DEBUG_MATERIALS
-    printf("Number of textures %d\n", TextureCount);
-#endif
-
-    LoadDiffuseTexture(Dir, pMaterial, index);
-    LoadSpecularTexture(Dir, pMaterial, index);
-    LoadNormalTexture(Dir, pMaterial, index);
-    LoadMetalnessTexture(Dir, pMaterial, index);
-    LoadEmissiveTexture(Dir, pMaterial, index);
-    LoadEmissionColorTexture(Dir, pMaterial, index);
-    LoadNormalCameraTexture(Dir, pMaterial, index);
-    LoadRoughnessTexture(Dir, pMaterial, index);
-    LoadAmbientOcclusionTexture(Dir, pMaterial, index);
-    LoadClearCoatTexture(Dir, pMaterial, index);
-    LoadClearCoatRoughnessTexture(Dir, pMaterial, index);
-    LoadClearCoatNormalTexture(Dir, pMaterial, index);
-}
-
-
-void CoreModel::LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, 0, TEX_TYPE_BASE);
-    } else {
-        printf("Warning! no diffuse texture\n");
-
-        aiString Path;
-
-        if (MissingTextureDetection) {
-            Path = ("no_texture.png");  // Big red texture with the text "no texture" to make it obvious when a texture is missing
-        } else {
-            Path = ("white.png");   // Single pixel texture to minimize the performance impact of missing textures
-        }
-        
-#ifdef OGLDEV_VULKAN
-        std::string DefaultTextureDir("../../Content/textures/");
-#else
-        std::string DefaultTextureDir("../Content/textures/");
-#endif
-
-        LoadTextureFromFile(DefaultTextureDir, Path, MaterialIndex, TEX_TYPE_BASE, false);
-    }
-}
-
-
-void CoreModel::LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_SHININESS, 0, TEX_TYPE_SPECULAR);
-}
-
-
-void CoreModel::LoadNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMALS, 0, TEX_TYPE_NORMAL);
-}
-
-
-void CoreModel::LoadMetalnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_METALNESS, 0, TEX_TYPE_METALNESS);
-}
-
-void CoreModel::LoadEmissiveTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSIVE, 0, TEX_TYPE_EMISSIVE);
-}
-
-void CoreModel::LoadEmissionColorTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSION_COLOR, 0, TEX_TYPE_EMISSION_COLOR);
-}
-
-void CoreModel::LoadNormalCameraTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMAL_CAMERA, 0, TEX_TYPE_NORMAL_CAMERA);
-}
-
-void CoreModel::LoadRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE_ROUGHNESS, 0, TEX_TYPE_ROUGHNESS);
-}
-
-void CoreModel::LoadAmbientOcclusionTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_UNKNOWN, 0, TEX_TYPE_AMBIENT_OCCLUSION);
-}
-
-
-void CoreModel::LoadClearCoatTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 0, TEX_TYPE_CLEARCOAT);
-}
-
-
-void CoreModel::LoadClearCoatRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 1, TEX_TYPE_CLEARCOAT_ROUGHNESS);
-}
-
-
-void CoreModel::LoadClearCoatNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
-{
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 2, TEX_TYPE_CLEARCOAT_NORMAL);
-}
-
-
-void CoreModel::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
-                            aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType) 
-{
-    assert(MyType < TEX_TYPE_NUM);
-
-    m_Materials[MaterialIndex].pTextures[MyType] = NULL;
-
-    if (pMaterial->GetTextureCount(AssimpType) > 0) {
-        aiString Path;
-
-        if (pMaterial->GetTexture(AssimpType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
-
-            bool IsSRGB = (MyType == TEX_TYPE_BASE);
-
-            if (paiTexture) {
-                LoadTextureEmbedded(paiTexture, MaterialIndex, MyType, IsSRGB);
-            } else {
-                LoadTextureFromFile(Dir, Path, MaterialIndex, MyType, IsSRGB);
+            bool IsSRGB = TextureSource.IsSRGB;
+            
+            if (TextureSource.EmbeddedBytes.size() > 0) {            
+                LoadTextureEmbedded(MaterialIndex, (TEXTURE_TYPE)TexType, IsSRGB);
+            } else {               
+                const std::string& Path = TextureSource.Path;
+                LoadTextureFromFile(Path, MaterialIndex, (TEXTURE_TYPE)TexType, IsSRGB);
             }
         }
+
+        m_Materials[MaterialIndex].m_isPBR = m_modelData.m_materials[MaterialIndex].m_isPBR;
+        m_Materials[MaterialIndex].m_name = m_modelData.m_materials[MaterialIndex].m_name;
+        m_Materials[MaterialIndex].m_materialType = m_modelData.m_materials[MaterialIndex].m_materialType;
+        m_Materials[MaterialIndex].AmbientColor = m_modelData.m_materials[MaterialIndex].AmbientColor;
+        m_Materials[MaterialIndex].DiffuseColor = m_modelData.m_materials[MaterialIndex].DiffuseColor;
+        m_Materials[MaterialIndex].SpecularColor = m_modelData.m_materials[MaterialIndex].SpecularColor;
+        m_Materials[MaterialIndex].BaseColor = m_modelData.m_materials[MaterialIndex].BaseColor;
+        m_Materials[MaterialIndex].EmissiveColor = m_modelData.m_materials[MaterialIndex].EmissiveColor;
+        m_Materials[MaterialIndex].MetallicRoughnessNormalOcclusion = m_modelData.m_materials[MaterialIndex].MetallicRoughnessNormalOcclusion;
+        m_Materials[MaterialIndex].ClearCoatTransmissionThickness = m_modelData.m_materials[MaterialIndex].ClearCoatTransmissionThickness;
+        m_Materials[MaterialIndex].m_transparencyFactor = m_modelData.m_materials[MaterialIndex].m_transparencyFactor;
+        m_Materials[MaterialIndex].m_alphaTest = m_modelData.m_materials[MaterialIndex].m_alphaTest;
+        m_Materials[MaterialIndex].m_ior = m_modelData.m_materials[MaterialIndex].m_ior;        
     }
 }
 
 
-void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB) 
+void CoreModel::LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB) 
 {
 #ifdef DEBUG_MATERIALS
     printf("Loaded embedded texture type '%s'\n", paiTexture->achFormatHint);
 #endif
     // Raw assignment compiles successfully again
-    m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
-    assert(paiTexture->mHeight == 0);
-    int buffer_size = paiTexture->mWidth;   
-    m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData, IsSRGB);
+    m_Materials[MaterialIndex].pTextures[TexType] = AllocTexture2D();
+    size_t BufferSize = m_modelData.m_materials[MaterialIndex].m_textures[TexType].EmbeddedBytes.size();
+    void* pData = m_modelData.m_materials[MaterialIndex].m_textures[TexType].EmbeddedBytes.data();
+    m_Materials[MaterialIndex].pTextures[TexType]->Load((u32)BufferSize, pData, IsSRGB);
 }
 
 
-void CoreModel::LoadTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB) 
+void CoreModel::LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB) 
 {
-    std::string FullPath = GetFullPath(Dir, Path);
-
-    m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
-    m_Materials[MaterialIndex].pTextures[MyType]->Load(FullPath.c_str(), IsSRGB);
+    m_Materials[MaterialIndex].pTextures[TexType] = AllocTexture2D();
+    m_Materials[MaterialIndex].pTextures[TexType]->Load(Path.c_str(), IsSRGB);
 
 #ifdef DEBUG_MATERIALS
-    printf("Loaded texture type %d from '%s'\n", MyType, FullPath.c_str());
+    printf("Loaded texture type %d from '%s'\n", TexType, Path.c_str());
 #endif
 }
 
-
-void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
-{
-    CoreMaterial& material = m_Materials[index];
-
-    material.m_name = pMaterial->GetName().C_Str();
-
-    Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
-
-    LoadColor(pMaterial, material.AmbientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
-
-    aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    if (pMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, EmissiveColor) == AI_SUCCESS) {
-#ifdef DEBUG_COLORS
-        printf("Loaded emissive color [%f %f %f]\n", EmissiveColor.r, EmissiveColor.g, EmissiveColor.b);
-#endif
-        material.AmbientColor.r += EmissiveColor.r;
-        material.AmbientColor.g += EmissiveColor.g;
-        material.AmbientColor.b += EmissiveColor.b;
-        material.AmbientColor.a += EmissiveColor.a;
-        material.AmbientColor.a = std::min(material.AmbientColor.a, 1.0f);
-    } else {
-        material.AmbientColor = AllOnes;
-    }
-
-    LoadColor(pMaterial, material.DiffuseColor, AI_MATKEY_COLOR_DIFFUSE, "diffuse color");
-
-    LoadColor(pMaterial, material.SpecularColor, AI_MATKEY_COLOR_SPECULAR, "specular color");
-
-    LoadColor(pMaterial, material.BaseColor, AI_MATKEY_BASE_COLOR, "base color");
-
-    LoadColor(pMaterial, material.EmissiveColor, AI_MATKEY_COLOR_EMISSIVE, "emissive color");
-
-    float EmissiveStrength = 1.0f;
-    if (pMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, EmissiveStrength) == AI_SUCCESS) {
-        material.EmissiveColor = material.EmissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
-    }
-
-    if (material.m_materialType & MaterialType_MetallicRoughness) {
-        float MetallicFactor;
-
-        if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
-            material.MetallicRoughnessNormalOcclusion.x = MetallicFactor;
-        }
-
-        float RoughnessFactor;
-
-        if (pMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, RoughnessFactor) == AI_SUCCESS) {
-            material.MetallicRoughnessNormalOcclusion.y = RoughnessFactor;
-        }
-    }
-
-    float NormalScale;
-    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), NormalScale) == AI_SUCCESS) {
-        material.MetallicRoughnessNormalOcclusion.z = NormalScale;
-    }
-
-    float OcclusionStrength;
-    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), OcclusionStrength) == AI_SUCCESS) {
-        material.MetallicRoughnessNormalOcclusion.w = OcclusionStrength;
-    }
-
-    float AlphaCutoff = 0.0f;
-
-    if (pMaterial->Get(AI_MATKEY_GLTF_ALPHACUTOFF, AlphaCutoff) == AI_SUCCESS) {
-        material.EmissiveColor.a = AlphaCutoff;
-    } else {
-        material.EmissiveColor.a = 0.5f;    // Based on the "3D Rendering Cookbook"
-    }
-
-    float OpaquenessThreshold = 0.05f;
-    float Opacity = 1.0f;
-    if (pMaterial->Get(AI_MATKEY_OPACITY, Opacity) == AI_SUCCESS) {
-        material.m_transparencyFactor = std::clamp(1.0f - Opacity, 0.0f, 1.0f);
-        if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
-            material.m_transparencyFactor = 0.0f;
-        }
-    }
-
-    aiColor4D TransparentColor;
-    if (pMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, TransparentColor) == AI_SUCCESS) {
-        float Opacity = std::max(std::max(TransparentColor.r, TransparentColor.g), TransparentColor.b);
-        material.m_transparencyFactor = std::clamp(Opacity, 0.0f, 1.0f);
-        if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
-            material.m_transparencyFactor = 0.0f;
-        }
-
-        material.m_alphaTest = 0.5f;
-    }
-
-    ProcessClearCoat(index, pMaterial, material);
-
-    if ((material.AmbientColor.r == 0.0f) && (material.AmbientColor.g == 0.0f) && (material.AmbientColor.b == 0.0f)) {
-        // THE MIXAMO FALLBACK: If the DAE file provides a zero ambient vector,
-        // match the diffuse color property so the ambient light works.
-        material.AmbientColor = material.DiffuseColor;
-    }
-}
-
-
-void CoreModel::ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMaterial& material)
-{
-    bool UseClearCoat = m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT] ||
-                        m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT_NORMAL] ||
-                        m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT_ROUGHNESS];
-
-    float ClearCoatFactor = 0.0f;
-    if (pMaterial->Get(AI_MATKEY_CLEARCOAT_FACTOR, ClearCoatFactor) == AI_SUCCESS) {
-        material.ClearCoatTransmissionThickness.x = ClearCoatFactor;
-        UseClearCoat = true;
-    }
-
-    float ClearCoatRoughnessFactor = 0.0f;
-    if (pMaterial->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, ClearCoatRoughnessFactor) == AI_SUCCESS) {
-        material.ClearCoatTransmissionThickness.y = ClearCoatRoughnessFactor;
-        UseClearCoat = true;
-    }
-
-    if (UseClearCoat) {
-        material.m_materialType |= MaterialType_ClearCoat;
-    }
-}
-
-
-void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color, 
-                          const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName)
-{
-    aiColor4D AiColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    if (pMaterial->Get(pAiMatKey, AiMatType, AiMatIdx, AiColor) == AI_SUCCESS) {
-#ifdef DEBUG_COLORS
-        printf("Loaded %s color [%f %f %f]\n", pName, AiColor.r, AiColor.g, AiColor.b);
-#endif
-        Color.r = AiColor.r;
-        Color.g = AiColor.g;
-        Color.b = AiColor.b;
-        Color.a = std::min(AiColor.a, 1.0f);
-    } else {
-        Color = Vector4f(1.0f);
-    }
-}
 
 
 glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)

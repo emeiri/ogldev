@@ -180,40 +180,19 @@ private:
 
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 
+    void InitMaterials();
+    void LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
+    void LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
+
     bool InitGeometry(const aiScene* pScene, const std::string& Filename);
 
-    void InitGPUBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices);
+    void InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices);
 
     template<typename VertexType>
     void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
 
     void CalculateMeshTransformations(const aiScene* pScene);
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
-
-    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
-
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-
-    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType);
-    void LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
-    void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
-
-    void LoadColors(const aiMaterial* pMaterial, int index);
-    void ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMaterial& material);
-    void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
 
     const aiScene* m_pScene = NULL;
     Assimp::Importer m_Importer;
