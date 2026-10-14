@@ -129,15 +129,36 @@ public:
 
     const MeshDims& GetNodeDims(const char* pNodeName) const 
     { 
-        auto it = m_nodeMap.find(pNodeName);
-        if (it == m_nodeMap.end()) {
+        auto it = m_modelData.m_nodeMap.find(pNodeName);
+        if (it == m_modelData.m_nodeMap.end()) {
             printf("Invalid node name '%s'\n", pNodeName);
             assert(0);
         }
 
-        int MeshIndex = it->second;
+        int NodeIndex = it->second;
 
-        return m_Meshes[MeshIndex].Dims; 
+        const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
+
+        if (Node.m_meshes.size() > 1) {
+            printf("Node '%s' has multiple meshes\n", pNodeName);
+            assert(0);
+        }
+
+        int FirstMeshIndex = Node.m_meshes[0];
+
+        return m_Meshes[FirstMeshIndex].Dims; 
+    }
+
+    const glm::vec3& GetNodePos(const char* pNodeName) const
+    {
+        auto it = m_modelData.m_nodeMap.find(pNodeName);
+        if (it == m_modelData.m_nodeMap.end()) {
+            printf("Invalid node name '%s'\n", pNodeName);
+            assert(0);
+        }
+        int NodeIndex = it->second;
+        const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
+        return Node.m_pos;
     }
 
 protected:
@@ -190,7 +211,6 @@ private:
 
     std::vector<Matrix4f> m_transformations;
     std::vector<glm::mat4> m_transformationsGLM;
-    std::map<std::string, int> m_nodeMap;
     float m_textureScale = 1.0f;
     bool m_flipTexCoordV = false;
 

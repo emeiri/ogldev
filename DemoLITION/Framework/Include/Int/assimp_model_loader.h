@@ -154,13 +154,14 @@ struct MaterialData {
 
 struct SkelNode {
     std::string m_name;
+    bool m_isRequired = false;
     int m_parentIndex = -1;
     Matrix4f m_localTransform;
     Matrix4f m_globalTransform;
     std::vector<int> m_meshes;
     int m_firstInstance = -1;
     int m_numInstances = 0;
-    bool m_isRequired = false;
+    glm::vec3 m_pos = glm::vec3(0.0f);
 };
 
 
@@ -224,7 +225,6 @@ struct ModelData {
     std::vector<SpotLight>        m_spotLights;
     std::vector<GLMCameraFirstPerson> m_cameras;
     std::vector<AnimationClip> m_animations;
-    MeshDims m_dims;
     Matrix4f m_globalInverseTransform;
     std::vector<BoneInfo> m_boneInfo;
     std::vector<SkelNode> m_nodes;

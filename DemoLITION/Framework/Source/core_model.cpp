@@ -167,9 +167,6 @@ void CoreModel::CalculateMeshTransformations()
     
     for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
         // The matrix is stored as row major in the file but glm expects column major by default.
-        const glm::mat4& MeshTransformGLM = m_transformationsGLM[SubmeshIndex];
-        glm::vec3 MeshPos = glm::vec3(MeshTransformGLM[3]);
-        m_Meshes[SubmeshIndex].Dims.Pos = MeshPos;
     }
 }
 
@@ -179,28 +176,21 @@ void CoreModel::TraverseNodeHierarchy()
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         SkelNode& Node = m_modelData.m_nodes[NodeIndex];
 
+        glm::mat4 MeshTransform = glm::make_mat4(Node.m_globalTransform.data());
+        // The matrix is stored as row major in the file but glm expects column major by default.
+        glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
+
+        glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
+        glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
+
+        glm::vec3 NodePos = glm::vec3(LeftHandedMatrixGLM[3]);
+        Node.m_pos = NodePos;
+
         for (int j = 0; j < Node.m_meshes.size(); j++) {
             int MeshIndex = Node.m_meshes[j];
-            int CurInstanceID = (int)m_transformations.size();
             m_transformations.push_back(Node.m_globalTransform);
-
-            glm::mat4 MeshTransform = glm::make_mat4(Node.m_globalTransform.data());
-            // The matrix is stored as row major in the file but glm expects column major by default.
-            glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
-
-            glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
-            glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
-
             m_transformationsGLM.push_back(LeftHandedMatrixGLM);
-
-#ifdef DEBUG_SCENE_HIERARCHY
-            printf("%d ", MeshIndex);
-#endif
-            m_nodeMap[Node.m_name] = MeshIndex;
         }
-#ifdef DEBUG_SCENE_HIERARCHY
-        printf("\n");
-#endif
     }
 }
 
@@ -270,14 +260,20 @@ void CoreModel::LoadTextureFromFile(const std::string& Path, int MaterialIndex, 
 
 glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)
 {
-    std::map<std::string, int>::iterator it = m_nodeMap.find(pNodeName);
+    auto it = m_modelData.m_nodeMap.find(pNodeName);
 
-    if (it == m_nodeMap.end()) {
+    if (it == m_modelData.m_nodeMap.end()) {
         OGLDEV_ERROR("Cannot find node %s in the hierarchy\n", pNodeName);
         assert(0);
     }
 
-    return m_transformationsGLM[it->second];
+    int NodeIndex = it->second;
+
+    const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
+
+    int FirstInstance = Node.m_firstInstance;
+
+    return m_transformationsGLM[FirstInstance];
 }
 
 
