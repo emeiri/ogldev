@@ -66,7 +66,7 @@ public:
 
     void LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags);
 
-    const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_modelData.m_cameras; }
+    const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
     uint NumBones() const { return (uint)m_modelData.m_boneNameToIndexMap.size(); }
 
@@ -186,6 +186,7 @@ protected:
     ModelData m_modelData;
     std::vector<BasicMeshEntry>& m_Meshes = m_modelData.m_meshes;
     std::vector<CoreMaterial> m_Materials;
+    std::vector<GLMCameraFirstPerson> m_cameras;
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
@@ -197,6 +198,7 @@ private:
 
     void InitModel();
 
+    void InitCameras();
     void InitMaterials();
     void LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
     void LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);

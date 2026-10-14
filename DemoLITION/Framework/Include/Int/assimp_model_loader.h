@@ -213,6 +213,17 @@ struct AnimationClip {
 };
 
 
+struct CameraData {
+    std::string m_name;
+    glm::vec3 m_pos = glm::vec3(0.0f);
+    glm::vec3 m_target = glm::vec3(0.0f);
+    glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+    float m_zNear = 0.1f;
+    float m_zFar = 1000.0f;
+    float m_hFov = 45.0f;
+};
+
+
 struct ModelData {
     std::vector<BasicMeshEntry>     m_meshes;
     std::vector<Vertex>        m_vertices;          // used when !IsSkinned()
@@ -223,7 +234,7 @@ struct ModelData {
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight>       m_pointLights;
     std::vector<SpotLight>        m_spotLights;
-    std::vector<GLMCameraFirstPerson> m_cameras;
+    std::vector<CameraData> m_cameras;
     std::vector<AnimationClip> m_animations;
     Matrix4f m_globalInverseTransform;
     std::vector<BoneInfo> m_boneInfo;
@@ -254,7 +265,7 @@ class AssimpModelLoader {
 public:
 
     AssimpModelLoader() = default;
-    void Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData, int WindowWidth, int WindowHeight);
+    void Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData);
     const std::string& GetError() const { return m_error; }
 
 private:
@@ -328,7 +339,5 @@ private:
     const aiScene* m_pScene = NULL;
     ModelData* m_pModelData = NULL;
     bool m_flipTexCoordV = false;
-    int m_windowWidth = 0;
-    int m_windowHeight = 0;
 };
 

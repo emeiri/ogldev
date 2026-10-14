@@ -103,15 +103,8 @@ void CoreModel::DestroyModel()
 
 void CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
 {
-    int WindowWidth, WindowHeight;
-#ifdef OGLDEV_VULKAN
-    GetWindowSize(WindowWidth, WindowHeight);
-#else
-    m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
-#endif
-
     AssimpModelLoader Loader;
-    Loader.Load(Filename, Flags, m_modelData, WindowWidth, WindowHeight);
+    Loader.Load(Filename, Flags, m_modelData);
 
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
@@ -135,6 +128,8 @@ void CoreModel::InitModel()
 
     InitGPUBuffers(NumVertices, NumIndices);
 
+    InitCameras();
+
     CalculateMeshTransformations();
 
     InitGeometryPost();
@@ -154,6 +149,38 @@ void CoreModel::InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices
     }
     else {
         PopulateBuffers(m_modelData.m_vertices);
+    }
+}
+
+
+void CoreModel::InitCameras()
+{
+    m_cameras.resize(m_modelData.m_cameras.size());
+
+    int WindowWidth, WindowHeight;
+#ifdef OGLDEV_VULKAN
+    GetWindowSize(WindowWidth, WindowHeight);
+#else
+    m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+#endif
+
+    for (int CameraIndex = 0; CameraIndex < m_modelData.m_cameras.size(); CameraIndex++) {
+        const CameraData& Camera = m_modelData.m_cameras[CameraIndex];
+        PersProjInfo persProjInfo;
+        persProjInfo.Width = (float)WindowWidth;
+        persProjInfo.Height = (float)WindowHeight;
+
+        float AspectRatio = (float)WindowWidth / (float)WindowHeight;
+
+        // 3. Mathematical conversion: Full Horizontal FOV -> Full Vertical FOV
+        float FullVerticalRad = 2.0f * atan(tan(ToRadian(Camera.m_hFov) / 2.0f) / AspectRatio);
+        float FullVerticalDeg = ToDegree(FullVerticalRad);
+
+        persProjInfo.FOV = FullVerticalDeg;
+        persProjInfo.zNear = Camera.m_zNear;
+        persProjInfo.zFar = Camera.m_zFar;
+
+        m_cameras[CameraIndex].Init(Camera.m_pos, Camera.m_target, Camera.m_up, persProjInfo);
     }
 }
 

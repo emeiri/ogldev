@@ -205,12 +205,10 @@ static std::string GetFullPath(const std::string& Dir, const aiString& Path)
 }
 
 
-void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData, int WindowWidth, int WindowHeight)
+void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& Flags, ModelData& OutModelData)
 {
     m_filename = Filename;
     m_pModelData = &OutModelData;
-    m_windowWidth = WindowWidth;
-    m_windowHeight = WindowHeight;
 
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
@@ -579,25 +577,17 @@ void AssimpModelLoader::InitSingleCamera(int Index)
     Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, Up4D.z).Normalize();
 
     // 6. Setup Perspective Projection
-    PersProjInfo persProjInfo;
-    persProjInfo.zNear = pCamera->mClipPlaneNear;
-    persProjInfo.zFar = pCamera->mClipPlaneFar;
-    persProjInfo.Width = (float)m_windowWidth;
-    persProjInfo.Height = (float)m_windowHeight;
+    m_pModelData->m_cameras[Index].m_zNear = pCamera->mClipPlaneNear;
+    m_pModelData->m_cameras[Index].m_zFar = pCamera->mClipPlaneFar;
 
     float FullHorizontalDeg = ToDegree(pCamera->mHorizontalFOV);
-
-    float AspectRatio = persProjInfo.Width / persProjInfo.Height;
-
-    // 3. Mathematical conversion: Full Horizontal FOV -> Full Vertical FOV
-    float FullVerticalRad = 2.0f * atan(tan(ToRadian(FullHorizontalDeg) / 2.0f) / AspectRatio);
-    float FullVerticalDeg = ToDegree(FullVerticalRad);
+    m_pModelData->m_cameras[Index].m_hFov = FullHorizontalDeg;
 
     // 4. Assign the FULL vertical degree angle straight to your projection settings
     // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
-    persProjInfo.FOV = FullVerticalDeg;
-
-    m_pModelData->m_cameras[Index].Init(FinalPos.ToGLM(), FinalTargetDir.ToGLM(), FinalUp.ToGLM(), persProjInfo);
+    m_pModelData->m_cameras[Index].m_pos = glm::vec3(FinalPos.x, FinalPos.y, FinalPos.z);
+    m_pModelData->m_cameras[Index].m_target = glm::vec3(FinalTargetDir.x, FinalTargetDir.y, FinalTargetDir.z);
+    m_pModelData->m_cameras[Index].m_up = glm::vec3(FinalUp.x, FinalUp.y, FinalUp.z);
 
     printf("Final Pos: "); FinalPos.Print();
     printf("Final Dir: "); FinalTargetDir.Print();
