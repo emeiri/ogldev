@@ -148,16 +148,9 @@ public:
         return m_modelData.m_meshes[FirstMeshIndex].Dims; 
     }
 
-    const glm::vec3& GetNodePos(const char* pNodeName) const
+    const glm::vec3 GetNodePos(const char* pNodeName) const
     {
-        auto it = m_modelData.m_nodeMap.find(pNodeName);
-        if (it == m_modelData.m_nodeMap.end()) {
-            printf("Invalid node name '%s'\n", pNodeName);
-            assert(0);
-        }
-        int NodeIndex = it->second;
-        const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
-        return Node.m_pos;
+        return m_modelData.GetNodePos(pNodeName);
     }
 
 protected:

@@ -152,9 +152,6 @@ void CoreModel::CalculateMeshTransformations()
         glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
         glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
 
-        glm::vec3 NodePos = glm::vec3(LeftHandedMatrixGLM[3]);
-        Node.m_pos = NodePos;
-
         for (int j = 0; j < Node.m_meshes.size(); j++) {
             int MeshIndex = Node.m_meshes[j];
             m_transformations.push_back(Node.m_bindPoseGlobalTransform);

@@ -162,7 +162,6 @@ struct SkelNode {
     std::vector<int> m_meshes;
     int m_firstInstance = -1;
     int m_numInstances = 0;
-    glm::vec3 m_pos = glm::vec3(0.0f);
 };
 
 
@@ -267,6 +266,19 @@ struct ModelData {
         }
         Out = m_nodes[it->second].m_bindPoseGlobalTransform;
         return true;
+    }
+
+    const glm::vec3 GetNodePos(const char* pNodeName) const
+    {
+        auto it = m_nodeMap.find(pNodeName);
+        if (it == m_nodeMap.end()) {
+            printf("Invalid node name '%s'\n", pNodeName);
+            assert(0);
+        }
+        int NodeIndex = it->second;
+        const SkelNode& Node = m_nodes[NodeIndex];
+        glm::vec3 pos = glm::vec3(Node.m_bindPoseGlobalTransform[3]);
+        return pos;
     }
 };
 
