@@ -242,21 +242,17 @@ struct ModelData {
     std::vector<SkelNode> m_nodes;
     std::unordered_map<std::string, int> m_nodeMap;
     std::map<std::string, uint> m_boneNameToIndexMap;
-    
-
-    // bool IsSkinned() const { return Skel != nullptr; }   // keyed on bones, not animation count
-    bool IsPBR() const;
 
     size_t NumVertices() const {
-        size_t NumVertices = 0;
+        size_t ret = 0;
 
         if (m_skinnedVertices.size() > 0) {
-            NumVertices = m_skinnedVertices.size();
+            ret = m_skinnedVertices.size();
         } else {
-            NumVertices = m_vertices.size();
+            ret = m_vertices.size();
         }
 
-        return NumVertices;
+        return ret;
     }
 
     bool GetNodeWorldTransform(const char* Name, Matrix4f& Out) const
@@ -306,7 +302,6 @@ private:
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
     void MarkRequiredNodesForBone(int NodeIndex);
-    void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
 
     // Lights
     void InitLights();
@@ -316,7 +311,6 @@ private:
     void InitSpotLight(const aiLight& light);
 
     // Materials
-    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
     void LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
     void LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int index);
@@ -342,11 +336,6 @@ private:
 
     void InitSingleNodeAnimation(AnimationClip& MyAnim, int ChannelIndex, AnimChannel& MyChannel, const aiNodeAnim* pNodeAnim);
 
-    // Each of these is a private free function or small helper class in the .cpp:
-    //   MeshBuilder      - ExtractVertex<VertexType>(), indices, bounds, optional meshopt
-    //   MaterialBuilder  - table-driven texture slots + LoadColors + ProcessClearCoat
-    //   SceneExtractor   - node transforms, lights, cameras
-    //   SkeletonBuilder  - bones, node tree, animation channels -> Skeleton
     std::string m_error;
     std::string m_filename;
     const aiScene* m_pScene = NULL;
