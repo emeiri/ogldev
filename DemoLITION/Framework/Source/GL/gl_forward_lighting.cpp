@@ -70,6 +70,7 @@ bool ForwardLightingTechnique::InitUniforms()
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
     materialLoc.SpecularColor = GetUniformLocation("gMaterial.SpecularColor");
+    materialLoc.EmissiveColor = GetUniformLocation("gMaterial.EmissiveColor");
     ColorModLocation = GetUniformLocation("gColorMod");
     ColorAddLocation = GetUniformLocation("gColorAdd");
     EnableRimLightLoc = GetUniformLocation("gRimLightEnabled");
@@ -114,6 +115,7 @@ bool ForwardLightingTechnique::InitUniforms()
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.SpecularColor == INVALID_UNIFORM_LOCATION ||
+        materialLoc.EmissiveColor == INVALID_UNIFORM_LOCATION ||
         EnableRimLightLoc == INVALID_UNIFORM_LOCATION ||
         EnableCellShadingLoc == INVALID_UNIFORM_LOCATION ||
         EnableSpecularExponent == INVALID_UNIFORM_LOCATION ||
@@ -232,6 +234,7 @@ void ForwardLightingTechnique::SetMaterial(const CoreMaterial& material)
     glUniform4f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b, material.AmbientColor.a);
     glUniform4f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b, material.DiffuseColor.a);
     glUniform4f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b, material.SpecularColor.a);
+    glUniform4f(materialLoc.EmissiveColor, material.EmissiveColor.r, material.EmissiveColor.g, material.EmissiveColor.b, material.EmissiveColor.a);
 
     bool HasDiffuseTexture = (material.pTextures[TEX_TYPE_BASE] != NULL);
     ControlDiffuseTexture(HasDiffuseTexture);

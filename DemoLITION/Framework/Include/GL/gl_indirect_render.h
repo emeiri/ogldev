@@ -59,6 +59,7 @@ private:
         Vector4f AmbientColor;
         Vector4f DiffuseColor;
         Vector4f SpecularColor;
+        Vector4f EmissiveColor;
     };
 
     struct MaterialIndirect {

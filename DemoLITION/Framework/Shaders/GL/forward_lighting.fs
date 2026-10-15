@@ -71,6 +71,7 @@ struct MaterialColor
     vec4 AmbientColor;
     vec4 DiffuseColor;
     vec4 SpecularColor;
+    vec4 EmissiveColor;
 };
 
 
@@ -150,6 +151,16 @@ vec4 GetMaterialAmbientColor()
         return materials[MaterialIndex].Color.AmbientColor;
     } else {
         return gMaterial.AmbientColor;
+    }
+}
+
+
+vec4 GetMaterialEmissiveColor()
+{
+    if (gIsIndirectRender) {
+        return materials[MaterialIndex].Color.EmissiveColor;
+    } else {
+        return gMaterial.EmissiveColor;
     }
 }
 
@@ -729,6 +740,9 @@ vec4 CalcPhongLighting(vec3 Normal)
     TexColor = TexColor * gColorMod + gColorAdd;
 
     vec4 FinalColor = TexColor * TotalLight;
+
+    // Emissive light doesn't depend on the light sources (alpha holds the alpha cutoff)
+    FinalColor.rgb += GetMaterialEmissiveColor().rgb;
 
     if (gRefRefractEnabled) {
         FinalColor = ApplyRefRefract(FinalColor, Normal);

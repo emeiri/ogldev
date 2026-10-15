@@ -121,6 +121,7 @@ private:
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;
         GLuint DiffuseColor = INVALID_UNIFORM_LOCATION;
         GLuint SpecularColor = INVALID_UNIFORM_LOCATION;
+        GLuint EmissiveColor = INVALID_UNIFORM_LOCATION;
     } materialLoc;
 };
 

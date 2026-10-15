@@ -988,24 +988,7 @@ void AssimpModelLoader::LoadTexture(const std::string& Dir, const aiMaterial* pM
 
 void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& MyMaterial)
 {
-    Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
-
     LoadColor(pMaterial, MyMaterial.m_ambientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
-
-    aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    if (pMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, EmissiveColor) == AI_SUCCESS) {
-#ifdef DEBUG_COLORS
-        printf("Loaded emissive color [%f %f %f]\n", EmissiveColor.r, EmissiveColor.g, EmissiveColor.b);
-#endif
-        MyMaterial.m_ambientColor.r += EmissiveColor.r;
-        MyMaterial.m_ambientColor.g += EmissiveColor.g;
-        MyMaterial.m_ambientColor.b += EmissiveColor.b;
-        MyMaterial.m_ambientColor.a += EmissiveColor.a;
-        MyMaterial.m_ambientColor.a = std::min(MyMaterial.m_ambientColor.a, 1.0f);
-    } else {
-        MyMaterial.m_ambientColor = AllOnes;
-    }
 
     LoadColor(pMaterial, MyMaterial.m_diffuseColor, AI_MATKEY_COLOR_DIFFUSE, "diffuse color");
 
@@ -1013,7 +996,17 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
 
     LoadColor(pMaterial, MyMaterial.m_baseColor, AI_MATKEY_BASE_COLOR, "base color");
 
-    LoadColor(pMaterial, MyMaterial.m_emissiveColor, AI_MATKEY_COLOR_EMISSIVE, "emissive color");
+    // Emissive light is added once by the shaders, independent of the lights.
+    // Unlike the other colors (see LoadColor) a missing emissive color means no emission.
+    aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    if (pMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, EmissiveColor) == AI_SUCCESS) {
+#ifdef DEBUG_COLORS
+        printf("Loaded emissive color [%f %f %f]\n", EmissiveColor.r, EmissiveColor.g, EmissiveColor.b);
+#endif
+    }
+
+    MyMaterial.m_emissiveColor = Vector4f(EmissiveColor.r, EmissiveColor.g, EmissiveColor.b, 0.0f);
 
     float EmissiveStrength = 1.0f;
     if (pMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, EmissiveStrength) == AI_SUCCESS) {
