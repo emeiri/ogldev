@@ -226,7 +226,7 @@ private:
     uint FindRotation(float AnimationTime, const AnimChannel& NodeAnim);
     uint FindPosition(float AnimationTime, const AnimChannel& NodeAnim);
     void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation);
-    void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, 
+    void ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, 
                                   const AnimationClip &StartAnimation, const AnimationClip& EndAnimation, float BlendFactor);
     float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
 
