@@ -794,93 +794,6 @@ void AssimpModelLoader::InitSpotLight(const aiLight& light)
 }
 
 
-void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
-{
-    if (pMesh->mNumBones > MAX_BONES) {
-        printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
-        printf("Make sure to increase the macro MAX_BONES in the C++ header as well as in the shader to the same value\n");
-        assert(0);
-    }
-
-    // printf("Loading mesh bones %d\n", MeshIndex);
-    for (uint i = 0; i < pMesh->mNumBones; i++) {
-        // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
-        LoadSingleBone(SkinnedVertices, MeshIndex, pMesh->mBones[i]);
-    }
-}
-
-
-void AssimpModelLoader::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone)
-{
-    int BoneId = GetBoneId(pBone);
-
-    if (BoneId == m_pModelData->m_boneInfo.size()) {
-        BoneInfo bi(pBone->mOffsetMatrix);
-        // bi.OffsetMatrix.Print();
-        m_pModelData->m_boneInfo.push_back(bi);
-    }
-
-    for (uint i = 0; i < pBone->mNumWeights; i++) {
-        const aiVertexWeight& vw = pBone->mWeights[i];
-
-        // Fix: Use the isolated mesh layout offset safely.
-        // If optimizing with meshopt, ensure this logic runs BEFORE meshopt_remapVertexBuffer maps the array!
-        uint GlobalVertexID = m_pModelData->m_meshes[MeshIndex].BaseVertex + vw.mVertexId;
-
-        if (GlobalVertexID < SkinnedVertices.size()) {
-            SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
-        }
-    }
-
-    MarkRequiredNodesForBone(pBone);
-}
-
-
-void AssimpModelLoader::MarkRequiredNodesForBone(const aiBone* pBone)
-{
-    std::string NodeName(pBone->mName.C_Str());
-
-    auto NodeIter = m_pModelData->m_nodeMap.find(NodeName);
-
-    if (NodeIter == m_pModelData->m_nodeMap.end()) {
-        printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
-        assert(0);
-    }
-
-    int NodeIndex = NodeIter->second;
-
-    do {
-        SkelNode& Node = m_pModelData->m_nodes[NodeIndex];
-        Node.m_isRequired = true;
-
-        int ParentIndex = Node.m_parentIndex;
-
-        if (ParentIndex == -1) {
-            break;            
-        } else {
-            NodeIndex = ParentIndex;
-        }
-    } while (true);
-}
-
-
-int AssimpModelLoader::GetBoneId(const aiBone* pBone)
-{
-    int BoneIndex = 0;
-    std::string BoneName(pBone->mName.C_Str());
-
-    if (m_pModelData->m_boneNameToIndexMap.find(BoneName) == m_pModelData->m_boneNameToIndexMap.end()) {
-        // Allocate an index for a new bone
-        BoneIndex = (int)m_pModelData->m_boneNameToIndexMap.size();
-        m_pModelData->m_boneNameToIndexMap[BoneName] = BoneIndex;
-    } else {
-        BoneIndex = m_pModelData->m_boneNameToIndexMap[BoneName];
-    }
-
-    return BoneIndex;
-}
-
-
 void AssimpModelLoader::InitMaterials()
 {
     std::string Dir = GetDirFromFilename(m_filename);
@@ -1190,6 +1103,106 @@ void AssimpModelLoader::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
         Color = Vector4f(1.0f);
     }
 }
+
+
+void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
+{
+    if (pMesh->mNumBones > MAX_BONES) {
+        printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
+        printf("Make sure to increase the macro MAX_BONES in the C++ header as well as in the shader to the same value\n");
+        assert(0);
+    }
+
+    // printf("Loading mesh bones %d\n", MeshIndex);
+    for (uint i = 0; i < pMesh->mNumBones; i++) {
+        // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
+        LoadSingleBone(SkinnedVertices, MeshIndex, pMesh->mBones[i]);
+    }
+}
+
+
+static int GetNodeByBone(const aiBone* pBone, const ModelData* pModelData)
+{
+    std::string NodeName(pBone->mName.C_Str());
+
+    auto NodeIter = pModelData->m_nodeMap.find(NodeName);
+
+    if (NodeIter == pModelData->m_nodeMap.end()) {
+        printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
+        assert(0);
+    }
+
+    int NodeIndex = NodeIter->second;
+
+    return NodeIndex;
+}
+
+
+
+void AssimpModelLoader::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone)
+{
+    int BoneId = GetBoneId(pBone);
+
+    if (BoneId == m_pModelData->m_boneInfo.size()) {
+        BoneInfo bi(pBone->mOffsetMatrix);
+        // bi.OffsetMatrix.Print();
+        m_pModelData->m_boneInfo.push_back(bi);
+    }
+
+    int NodeIndex = GetNodeByBone(pBone, m_pModelData);
+
+    SkelNode& Node = m_pModelData->m_nodes[NodeIndex];
+    Node.m_boneIndex = BoneId;
+
+    for (uint i = 0; i < pBone->mNumWeights; i++) {
+        const aiVertexWeight& vw = pBone->mWeights[i];
+
+        // Fix: Use the isolated mesh layout offset safely.
+        // If optimizing with meshopt, ensure this logic runs BEFORE meshopt_remapVertexBuffer maps the array!
+        uint GlobalVertexID = m_pModelData->m_meshes[MeshIndex].BaseVertex + vw.mVertexId;
+
+        if (GlobalVertexID < SkinnedVertices.size()) {
+            SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
+        }
+    }
+
+    MarkRequiredNodesForBone(NodeIndex);
+}
+
+
+void AssimpModelLoader::MarkRequiredNodesForBone(int NodeIndex)
+{
+    do {
+        SkelNode& Node = m_pModelData->m_nodes[NodeIndex];
+        Node.m_isRequired = true;
+
+        int ParentIndex = Node.m_parentIndex;
+
+        if (ParentIndex == -1) {
+            break;
+        } else {
+            NodeIndex = ParentIndex;
+        }
+    } while (true);
+}
+
+
+int AssimpModelLoader::GetBoneId(const aiBone* pBone)
+{
+    int BoneIndex = 0;
+    std::string BoneName(pBone->mName.C_Str());
+
+    if (m_pModelData->m_boneNameToIndexMap.find(BoneName) == m_pModelData->m_boneNameToIndexMap.end()) {
+        // Allocate an index for a new bone
+        BoneIndex = (int)m_pModelData->m_boneNameToIndexMap.size();
+        m_pModelData->m_boneNameToIndexMap[BoneName] = BoneIndex;
+    } else {
+        BoneIndex = m_pModelData->m_boneNameToIndexMap[BoneName];
+    }
+
+    return BoneIndex;
+}
+
 
 
 static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex, 

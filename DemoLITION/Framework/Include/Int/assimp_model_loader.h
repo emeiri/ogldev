@@ -158,6 +158,7 @@ struct SkelNode {
     int m_parentIndex = -1;
     Matrix4f m_localTransform;
     Matrix4f m_globalTransform;
+    int m_boneIndex = -1;  // -1 = not a bone
     std::vector<int> m_meshes;
     int m_firstInstance = -1;
     int m_numInstances = 0;
@@ -304,7 +305,7 @@ private:
     void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
-    void MarkRequiredNodesForBone(const aiBone* pBone);
+    void MarkRequiredNodesForBone(int NodeIndex);
     void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
 
     // Lights
