@@ -27,6 +27,12 @@
 #include "Int/assimp_model_loader.h"
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 
+//#define DEBUG_COLORS
+//#define DEBUG_MATERIALS
+//#define DEBUG_TEXTURES
+//#define DEBUG_BONES
+
+
 // config flags
 static bool UseMeshOptimizer = false;
 static bool MissingTextureDetection = false;

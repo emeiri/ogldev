@@ -21,10 +21,8 @@
 #include "Int/core_rendering_system.h"
 #include "Int/core_model.h"
 
-//#define DEBUG_COLORS
-//#define DEBUG_MATERIALS
 //#define DEBUG_TEXTURES
-//#define DEBUG_BONES
+
 #define DEBUG_SCENE_HIERARCHY
 
 bool CoreModel::IsPBR() const
