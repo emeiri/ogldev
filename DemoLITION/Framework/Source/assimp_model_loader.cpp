@@ -944,14 +944,14 @@ void AssimpModelLoader::LoadClearCoatNormalTexture(const std::string& Dir, const
 
 
 void AssimpModelLoader::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
-                                    int AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType)
+                                    int AssimpTextureType, int AssimpTexIndex, TEXTURE_TYPE MyType)
 {
     assert(MyType < TEX_TYPE_NUM);
 
-    if (pMaterial->GetTextureCount((aiTextureType)AssimpType) > 0) {
+    if (pMaterial->GetTextureCount((aiTextureType)AssimpTextureType) > 0) {
         aiString Path;
 
-        if (pMaterial->GetTexture((aiTextureType)AssimpType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+        if (pMaterial->GetTexture((aiTextureType)AssimpTextureType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
             bool IsSRGB = (MyType == TEX_TYPE_BASE);

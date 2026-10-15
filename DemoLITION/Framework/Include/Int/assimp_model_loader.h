@@ -326,7 +326,7 @@ private:
     void LoadClearCoatTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadClearCoatRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadClearCoatNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
-    void LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, int aiTextureType, int AssimpTexIndex, TEXTURE_TYPE MyType);
+    void LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, int AssimpTextureType, int AssimpTexIndex, TEXTURE_TYPE MyType);
 
     // Colors
     void LoadColors(const aiMaterial* pMaterial, MaterialData& MyMaterial);
