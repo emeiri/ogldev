@@ -142,16 +142,6 @@ void CoreModel::CalculateMeshTransformations()
     printf("----------------------------------------\n");
     printf("Calculating mesh transformations\n");
 
-    TraverseNodeHierarchy();
-    
-    for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-        // The matrix is stored as row major in the file but glm expects column major by default.
-    }
-}
-
-
-void CoreModel::TraverseNodeHierarchy()
-{
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         SkelNode& Node = m_modelData.m_nodes[NodeIndex];
 

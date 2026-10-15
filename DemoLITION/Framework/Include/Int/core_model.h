@@ -208,7 +208,6 @@ private:
     void InitAllMeshes(const std::string& Filename, std::vector<VertexType>& Vertices);
 
     void CalculateMeshTransformations();
-    void TraverseNodeHierarchy();
 
     std::vector<Matrix4f> m_transformations;
     std::vector<glm::mat4> m_transformationsGLM;
