@@ -100,7 +100,7 @@ void VkModel::UpdateAlignedMeshesArray()
 {
 	VkDeviceSize Alignment = m_pVulkanCore->GetPhysicalDeviceLimits().minStorageBufferOffsetAlignment;
 
-	size_t NumSubmeshes = m_Meshes.size();
+	size_t NumSubmeshes = m_modelData.m_meshes.size();
 
 	m_alignedMeshes.resize(NumSubmeshes);
 
@@ -109,13 +109,13 @@ void VkModel::UpdateAlignedMeshesArray()
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		m_alignedMeshes[SubmeshIndex].VertexBufferOffset = BaseVertexOffset;
-		m_alignedMeshes[SubmeshIndex].VertexBufferRange = m_Meshes[SubmeshIndex].NumVertices * m_vertexSize;
+		m_alignedMeshes[SubmeshIndex].VertexBufferRange = m_modelData.m_meshes[SubmeshIndex].NumVertices * m_vertexSize;
 
 		BaseVertexOffset += m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 		BaseVertexOffset = AlignUpToMultiple(BaseVertexOffset, Alignment);
 
 		m_alignedMeshes[SubmeshIndex].IndexBufferOffset = BaseIndexOffset;
-		m_alignedMeshes[SubmeshIndex].IndexBufferRange = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
+		m_alignedMeshes[SubmeshIndex].IndexBufferRange = m_modelData.m_meshes[SubmeshIndex].NumIndices * sizeof(u32);
 
 		BaseIndexOffset += m_alignedMeshes[SubmeshIndex].IndexBufferRange;
 		BaseIndexOffset = AlignUpToMultiple(BaseIndexOffset, Alignment);
@@ -151,13 +151,13 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	// Copy the segments from the non aligned offsets to the aligned offsets
 	// in the temporary buffer.
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		size_t SrcOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
+		size_t SrcOffset = m_modelData.m_meshes[SubmeshIndex].BaseVertex * m_vertexSize;
 		char* pSrc = pSrcVertices + SrcOffset;
 		char* pDst = m_alignedVertices.pMem + m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 		size_t Size = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 		memcpy(pDst, pSrc, Size);
 
-		SrcOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
+		SrcOffset = m_modelData.m_meshes[SubmeshIndex].BaseIndex * sizeof(u32);
 		pSrc = pSrcIndices + SrcOffset;
 		pDst = m_alignedIndices.pMem + m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
 		Size = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
@@ -169,7 +169,7 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_alignedIndices.pMem, IndexBufferSize);
 
 	if (m_useInternalUniformBuffers) {
-		m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
+		m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_modelData.m_meshes.size());
 	}
 
 	if (m_isDescriptorIndexing) {
@@ -186,10 +186,10 @@ void VkModel::CreateMetaData()
 	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-        int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
+        int MaterialIndex = m_modelData.m_meshes[SubmeshIndex].MaterialIndex;
 		MetaData[SubmeshIndex].MaterialIndex = MaterialIndex;
 		MetaData[SubmeshIndex].BaseIndex = (u32)m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
-		MetaData[SubmeshIndex].NumIndices = m_Meshes[SubmeshIndex].NumIndices;
+		MetaData[SubmeshIndex].NumIndices = m_modelData.m_meshes[SubmeshIndex].NumIndices;
 		MetaData[SubmeshIndex].BaseVertex = (u32)m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 
 		CoreMaterial* pMaterial = &m_Materials[MaterialIndex];
@@ -202,11 +202,11 @@ void VkModel::CreateMetaData()
 
 void VkModel::CreateIndirectBuffer()
 {
-	std::vector<VkDrawIndirectCommand> DrawCommands(m_Meshes.size());
+	std::vector<VkDrawIndirectCommand> DrawCommands(m_modelData.m_meshes.size());
 
-	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_modelData.m_meshes.size(); SubmeshIndex++) {
 		VkDrawIndirectCommand cmd = {
-			.vertexCount = m_Meshes[SubmeshIndex].NumIndices,
+			.vertexCount = m_modelData.m_meshes[SubmeshIndex].NumIndices,
 			.instanceCount = 1,
 			.firstVertex = 0,
 			.firstInstance = SubmeshIndex
@@ -223,7 +223,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
 	assert(!m_isDescriptorIndexing);
 
-	int NumSubmeshes = (int)m_Meshes.size();
+	int NumSubmeshes = (int)m_modelData.m_meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
 
 	ModelDesc md;
@@ -238,7 +238,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 {
 	assert(m_isDescriptorIndexing);
 
-	int NumSubmeshes = (int)m_Meshes.size();
+	int NumSubmeshes = (int)m_modelData.m_meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets, m_texturesDescriptorSet);
 
 	ModelDesc md;
@@ -292,16 +292,16 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 			}
 		}
 	} else {
-		md.m_materials.resize(m_Meshes.size());
+		md.m_materials.resize(m_modelData.m_meshes.size());
 	}
 
-	md.m_ranges.resize(m_Meshes.size());
+	md.m_ranges.resize(m_modelData.m_meshes.size());
 
-	int NumSubmeshes = (int)m_Meshes.size();
+	int NumSubmeshes = (int)m_modelData.m_meshes.size();
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		if (!m_isDescriptorIndexing) {
-			int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
+			int MaterialIndex = m_modelData.m_meshes[SubmeshIndex].MaterialIndex;
 
 			if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE])) {
 				Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
@@ -337,7 +337,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pi
 	u32 FirstInstance = 0;
 	u32 BaseVertex = 0;
 
-	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_modelData.m_meshes.size(); SubmeshIndex++) {
 		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, 
 								Pipeline.GetPipelineLayout(),
 								0,  // firstSet
@@ -346,7 +346,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pi
 								0,	// dynamicOffsetCount
 								NULL);	// pDynamicOffsets
 
-		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, 
+		vkCmdDraw(CmdBuf, m_modelData.m_meshes[SubmeshIndex].NumIndices, 
 			      InstanceCount, BaseVertex, FirstInstance);
 	}
 }
@@ -366,7 +366,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 							NULL);	// pDynamicOffsets
 
 
-	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_modelData.m_meshes.size(); SubmeshIndex++) {
 		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
 								Pipeline.GetPipelineLayout(),
 								0,      // firstSet
@@ -375,7 +375,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 								0,	    // dynamicOffsetCount
 								NULL);	// pDynamicOffsets
 
-		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices,
+		vkCmdDraw(CmdBuf, m_modelData.m_meshes[SubmeshIndex].NumIndices,
 			      InstanceCount, BaseVertex, SubmeshIndex);
 	}
 }
@@ -400,7 +400,7 @@ void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf)
 	vkCmdDrawIndirect(CmdBuf,
 					  m_indirectBuffer.m_buffer,
 					  0,  // offset inside the indirect buffer            
-					  (u32)m_Meshes.size(), // number of VkDrawIndirectCommand elements
+					  (u32)m_modelData.m_meshes.size(), // number of VkDrawIndirectCommand elements
 					  sizeof(VkDrawIndirectCommand)); // stride between VkDrawIndirectCommand elements
 }
 
@@ -412,7 +412,7 @@ void VkModel::Update(int ImageIndex, const glm::mat4& Transformation)
         assert(0);
     }
 
-	std::vector<glm::mat4> Transformations(m_Meshes.size());
+	std::vector<glm::mat4> Transformations(m_modelData.m_meshes.size());
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < Transformations.size(); SubmeshIndex++) {
 		Transformations[SubmeshIndex] = Transformation * GetTransformations()[SubmeshIndex];

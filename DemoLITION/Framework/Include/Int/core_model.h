@@ -116,7 +116,7 @@ public:
 
     virtual void SetAmbientOcclusionMap(int TextureHandle) { assert(0); }
 
-    virtual size_t GetNumMeshes() const { return m_Meshes.size(); }
+    virtual size_t GetNumMeshes() const { return m_modelData.m_meshes.size(); }
 
     glm::mat4& GetNodeTransformationGLM(const char* pNodeName);
 
@@ -145,7 +145,7 @@ public:
 
         int FirstMeshIndex = Node.m_meshes[0];
 
-        return m_Meshes[FirstMeshIndex].Dims; 
+        return m_modelData.m_meshes[FirstMeshIndex].Dims; 
     }
 
     const glm::vec3& GetNodePos(const char* pNodeName) const
@@ -183,7 +183,6 @@ protected:
     virtual void InitGeometryPost() {}
 
     ModelData m_modelData;
-    std::vector<BasicMeshEntry>& m_Meshes = m_modelData.m_meshes;
     std::vector<CoreMaterial> m_Materials;
     std::vector<GLMCameraFirstPerson> m_cameras;
 

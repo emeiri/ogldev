@@ -124,7 +124,7 @@ void GLModel::ConvertToMesh(const char* pFilename)
     mesh.m_totalIndices = (int)m_modelData.m_indices.size();
     mesh.m_vertexSize = (int)sizeof(Vertex);
 
-    size_t NumMeshes = m_Meshes.size();
+    size_t NumMeshes = m_modelData.m_meshes.size();
     mesh.m_meshes.resize(NumMeshes);
     mesh.m_boxes.resize(NumMeshes);
 
@@ -139,12 +139,12 @@ void GLModel::ConvertToMesh(const char* pFilename)
         Mesh m;
 
         // TODO: lod
-        m.m_baseIndex = m_Meshes[i].BaseIndex;
-        m.m_baseVertex = m_Meshes[i].BaseVertex;
-        m.m_numIndices = m_Meshes[i].NumIndices;
-        m.m_numVertices = m_Meshes[i].NumVertices;
+        m.m_baseIndex = m_modelData.m_meshes[i].BaseIndex;
+        m.m_baseVertex = m_modelData.m_meshes[i].BaseVertex;
+        m.m_numIndices = m_modelData.m_meshes[i].NumIndices;
+        m.m_numVertices = m_modelData.m_meshes[i].NumVertices;
         m.m_lodOffsets[0] = 0;
-        m.m_lodOffsets[1] = m_Meshes[i].NumIndices;
+        m.m_lodOffsets[1] = m_modelData.m_meshes[i].NumIndices;
         
         mesh.m_meshes[i] = m;
     }
@@ -166,15 +166,15 @@ bool GLModel::LoadMesh(const std::string& Filename)
 
     AllocBuffers();
 
-    m_Meshes.resize(mesh.m_meshes.size());
+    m_modelData.m_meshes.resize(mesh.m_meshes.size());
 
-    for (int i = 0 ; i < m_Meshes.size() ; i++) {
-        m_Meshes[i].NumIndices = mesh.m_meshes[i].m_numIndices;
-        m_Meshes[i].NumVertices = mesh.m_meshes[i].m_numVertices;
-        m_Meshes[i].BaseVertex = mesh.m_meshes[i].m_baseVertex;
-        m_Meshes[i].BaseIndex = mesh.m_meshes[i].m_baseIndex;
-        //m_Meshes[i].ValidFaces =
-        m_Meshes[i].MaterialIndex = 0;
+    for (int i = 0 ; i < m_modelData.m_meshes.size() ; i++) {
+        m_modelData.m_meshes[i].NumIndices = mesh.m_meshes[i].m_numIndices;
+        m_modelData.m_meshes[i].NumVertices = mesh.m_meshes[i].m_numVertices;
+        m_modelData.m_meshes[i].BaseVertex = mesh.m_meshes[i].m_baseVertex;
+        m_modelData.m_meshes[i].BaseIndex = mesh.m_meshes[i].m_baseIndex;
+        //m_modelData.m_meshes[i].ValidFaces =
+        m_modelData.m_meshes[i].MaterialIndex = 0;
     }
 
     m_modelData.m_indices.resize(mesh.m_totalIndices);
@@ -223,7 +223,7 @@ void GLModel::PopulateBuffers(std::vector<Vertex>& Vertices)
 void GLModel::InitGeometryPost()
 {
     if (UseIndirectRender) {
-        m_indirectRender.Init(m_modelData.m_instances, m_Meshes, m_Materials);
+        m_indirectRender.Init(m_modelData.m_instances, m_modelData.m_meshes, m_Materials);
     }
 }
 
@@ -421,7 +421,7 @@ void GLModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 void GLModel::RenderInstance(int InstanceIndex, DemolitionRenderCallbacks* pRenderCallbacks)
 {
     const MeshInstance& Inst = m_modelData.m_instances[InstanceIndex];
-    const BasicMeshEntry& Mesh = m_Meshes[Inst.m_meshIndex];
+    const BasicMeshEntry& Mesh = m_modelData.m_meshes[Inst.m_meshIndex];
 
     int MaterialIndex = Mesh.MaterialIndex;
     assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
@@ -499,7 +499,7 @@ void GLModel::Render(unsigned int DrawIndex, unsigned int PrimID)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
-    int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
+    int MaterialIndex = m_modelData.m_meshes[DrawIndex].MaterialIndex;
     assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
@@ -513,8 +513,8 @@ void GLModel::Render(unsigned int DrawIndex, unsigned int PrimID)
     glDrawElementsBaseVertex(GL_TRIANGLES,
         3,
         GL_UNSIGNED_INT,
-        (void*)(sizeof(unsigned int) * (m_Meshes[DrawIndex].BaseIndex + PrimID * 3)),
-        m_Meshes[DrawIndex].BaseVertex);
+        (void*)(sizeof(unsigned int) * (m_modelData.m_meshes[DrawIndex].BaseIndex + PrimID * 3)),
+        m_modelData.m_meshes[DrawIndex].BaseVertex);
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
@@ -537,8 +537,8 @@ void GLModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const M
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
-    for (unsigned int i = 0; i < m_Meshes.size(); i++) {
-        int MaterialIndex = m_Meshes[i].MaterialIndex;
+    for (unsigned int i = 0; i < m_modelData.m_meshes.size(); i++) {
+        int MaterialIndex = m_modelData.m_meshes[i].MaterialIndex;
 
         assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
@@ -551,11 +551,11 @@ void GLModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const M
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,
-            m_Meshes[i].NumIndices,
+            m_modelData.m_meshes[i].NumIndices,
             GL_UNSIGNED_INT,
-            (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
+            (void*)(sizeof(unsigned int) * m_modelData.m_meshes[i].BaseIndex),
             NumInstances,
-            m_Meshes[i].BaseVertex);
+            m_modelData.m_meshes[i].BaseVertex);
     }
 
     // Make sure the VAO is not changed from the outside
