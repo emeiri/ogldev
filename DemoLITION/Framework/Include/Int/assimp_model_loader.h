@@ -243,6 +243,8 @@ struct ModelData {
     std::unordered_map<std::string, int> m_nodeMap;
     std::map<std::string, uint> m_boneNameToIndexMap;
 
+    bool IsSkinned() const { return !m_skinnedVertices.empty(); }
+    
     size_t NumVertices() const {
         size_t ret = 0;
 

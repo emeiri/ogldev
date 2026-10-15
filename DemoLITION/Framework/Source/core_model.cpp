@@ -93,7 +93,7 @@ void CoreModel::InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices
 {
     printf("Num skinned vertices %d\n", (int)m_modelData.m_skinnedVertices.size());
 
-    if (m_modelData.m_skinnedVertices.size() > 0) {
+    if (m_modelData.IsSkinned()) {
         PopulateBuffersSkinned(m_modelData.m_skinnedVertices);
     }
     else {
@@ -623,7 +623,7 @@ float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Animat
 
 bool CoreModel::IsAnimated() const
 {
-    bool ret = m_modelData.m_skinnedVertices.size() > 0;
+    bool ret = m_modelData.IsSkinned();
 
     if (ret && (NumBones() == 0)) {
         printf("Animations without bones? need to check this\n");
