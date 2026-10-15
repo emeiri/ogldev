@@ -299,7 +299,8 @@ private:
     
     void InitCameras();
     void InitSingleCamera(int Index);
-        
+    Vector3f LocalToLeftHandedWorld(const Matrix4f& NodeWorld, const aiVector3D& v, float w) const;
+
     void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
     void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
@@ -343,5 +344,6 @@ private:
     const aiScene* m_pScene = NULL;
     ModelData* m_pModelData = NULL;
     bool m_flipTexCoordV = false;
+    bool m_convertToLeftHanded = false;
 };
 

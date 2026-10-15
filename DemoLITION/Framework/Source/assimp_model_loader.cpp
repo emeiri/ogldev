@@ -255,6 +255,8 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
 
     uint LoadFlags = DEMOLITION_ASSIMP_LOAD_FLAGS;
 
+    m_convertToLeftHanded = Flags.ConvertToLeftHanded;
+
     if (Flags.ConvertToLeftHanded) {
         LoadFlags |= aiProcess_ConvertToLeftHanded;
     }
@@ -579,6 +581,22 @@ void AssimpModelLoader::InitCameras()
 }
 
 
+// Transforms a point (w = 1) or a direction (w = 0) that is local to a camera/light node
+// into the left handed world space of the engine (the right handed scene mirrored in Z).
+// aiProcess_ConvertToLeftHanded mirrors the node transformations but not the local
+// vectors of cameras and lights, so in that case the local vector is mirrored instead.
+Vector3f AssimpModelLoader::LocalToLeftHandedWorld(const Matrix4f& NodeWorld, const aiVector3D& v, float w) const
+{
+    if (m_convertToLeftHanded) {
+        Vector4f World = NodeWorld * Vector4f(v.x, v.y, -v.z, w);
+        return Vector3f(World.x, World.y, World.z);
+    } else {
+        Vector4f World = NodeWorld * Vector4f(v.x, v.y, v.z, w);
+        return Vector3f(World.x, World.y, -World.z);
+    }
+}
+
+
 void AssimpModelLoader::InitSingleCamera(int Index)
 {
     const aiCamera* pCamera = m_pScene->mCameras[Index];
@@ -599,12 +617,13 @@ void AssimpModelLoader::InitSingleCamera(int Index)
     // mPosition is relative to the camera node, but the glTF importer copies
     // the node's own translation into it. In that case it is already part of
     // the node transformation and must not be applied again.
+    // (with aiProcess_ConvertToLeftHanded the node translation is mirrored but mPosition isn't)
     aiVector3D LocalPos = pCamera->mPosition;
     const aiNode* pNode = m_pScene->mRootNode->FindNode(pCamera->mName);
 
     if (pNode) {
         const aiMatrix4x4& m = pNode->mTransformation;
-        aiVector3D NodeTranslation(m.a4, m.b4, m.c4);
+        aiVector3D NodeTranslation(m.a4, m.b4, m_convertToLeftHanded ? -m.c4 : m.c4);
 
         if ((LocalPos - NodeTranslation).Length() < 0.0001f) {
             LocalPos = aiVector3D(0.0f, 0.0f, 0.0f);
@@ -612,21 +631,13 @@ void AssimpModelLoader::InitSingleCamera(int Index)
     }
 
     // Extract World Position
-    Vector4f Pos4D(LocalPos.x, LocalPos.y, LocalPos.z, 1.0f);
-    Pos4D = FinalWorld * Pos4D;
-    Vector3f FinalPos(Pos4D.x, Pos4D.y, -Pos4D.z);
+    Vector3f FinalPos = LocalToLeftHandedWorld(FinalWorld, LocalPos, 1.0f);
 
     // Extract World Direction (mLookAt is relative to the camera node)
-    Vector4f Target4D(pCamera->mLookAt.x, pCamera->mLookAt.y, pCamera->mLookAt.z, 0.0f);
-    Target4D = FinalWorld * Target4D;
-    Vector3f FinalTargetDir(Target4D.x, Target4D.y, -Target4D.z);
-
-    FinalTargetDir = FinalTargetDir.Normalize();
+    Vector3f FinalTargetDir = LocalToLeftHandedWorld(FinalWorld, pCamera->mLookAt, 0.0f).Normalize();
 
     // Extract World Up (mUp is relative to the camera node)
-    Vector4f Up4D(pCamera->mUp.x, pCamera->mUp.y, pCamera->mUp.z, 0.0f);
-    Up4D = FinalWorld * Up4D;
-    Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, -Up4D.z).Normalize();
+    Vector3f FinalUp = LocalToLeftHandedWorld(FinalWorld, pCamera->mUp, 0.0f).Normalize();
 
     // Setup Perspective Projection
     m_pModelData->m_cameras[Index].m_zNear = pCamera->mClipPlaneNear;
@@ -701,31 +712,18 @@ void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
 
-    /* Vector3f Direction = VectorFromAssimpVector(light.mDirection);
-     printf("Original direction: "); Direction.Print();
-     Vector4f Dir4D(Direction, 0.0f);
-     Dir4D = Transformation * Dir4D;
-     l.WorldDirection = Dir4D;
-     printf("Transformed direction: "); l.WorldDirection.Print();*/
-
-     // Extract the components directly from your row-major matrix layout
-     // to bypass Blender's embedded glTF offset rotation
-    Vector3f TrueDirection;
-    TrueDirection.x = Transformation.m[0][2];
-    TrueDirection.y = Transformation.m[1][2];
-    TrueDirection.z = Transformation.m[2][2];
+    // mDirection is relative to the light node (glTF lights point down the local -Z)
+    printf("Original direction: (%f, %f, %f)\n", light.mDirection.x, light.mDirection.y, light.mDirection.z);
 
     // Normalize to preserve clean calculations for your lighting equations
-    l.WorldDirection = TrueDirection.Normalize();
+    l.WorldDirection = LocalToLeftHandedWorld(Transformation, light.mDirection, 0.0f).Normalize();
 
     printf("Adjusted World Direction: "); l.WorldDirection.Print();
 
     Vector3f Up = VectorFromAssimpVector(light.mUp);
     printf("Original up: "); Up.Print();
-    Vector4f Up4D(Up, 0.0f);
-    Up4D = Transformation * Up4D;
 
-    l.Up = Vector3f(Up4D);
+    l.Up = LocalToLeftHandedWorld(Transformation, light.mUp, 0.0f);
     printf("Final up: "); l.Up.Print();
 
     m_pModelData->m_dirLights.push_back(l);
@@ -773,20 +771,12 @@ void AssimpModelLoader::InitSpotLight(const aiLight& light)
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
 
-    /*    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
-        printf("Original direction: "); Direction.Print();
-        Vector4f Dir4D(Direction, 0.0f);
-        Dir4D = Transformation * Dir4D;
-        l.WorldDirection = Dir4D;
-        printf("Final direction: "); l.WorldDirection.Print();*/
-
-    Vector3f TrueDirection;
-    TrueDirection.x = Transformation.m[0][2];
-    TrueDirection.y = Transformation.m[1][2];
-    TrueDirection.z = Transformation.m[2][2];
+    // mDirection is relative to the light node (glTF lights point down the local -Z)
+    printf("Original direction: (%f, %f, %f)\n", light.mDirection.x, light.mDirection.y, light.mDirection.z);
 
     // Normalize to preserve clean calculations for your lighting equations
-    l.WorldDirection = TrueDirection.Normalize();
+    l.WorldDirection = LocalToLeftHandedWorld(Transformation, light.mDirection, 0.0f).Normalize();
+    printf("Final direction: "); l.WorldDirection.Print();
 
     Vector3f Up = VectorFromAssimpVector(light.mUp);
     printf("Original up: "); Up.Print();
@@ -798,19 +788,15 @@ void AssimpModelLoader::InitSpotLight(const aiLight& light)
             l.Up = Vector3f(0.0f, 1.0f, 0.0f);
         }
     } else {
-        Vector4f Up4D(Up, 0.0f);
-        Up4D = Transformation * Up4D;
-        l.Up = Vector3f(Up4D);
+        l.Up = LocalToLeftHandedWorld(Transformation, light.mUp, 0.0f);
     }
 
     printf("Final up: "); l.Up.Print();
 
     Vector3f Position = VectorFromAssimpVector(light.mPosition);
     printf("Original Position: "); Position.Print();
-    Vector4f Pos4D(Position, 1.0f);
-    Pos4D = Transformation * Pos4D;
 
-    l.WorldPosition = Vector3f(Pos4D);
+    l.WorldPosition = LocalToLeftHandedWorld(Transformation, light.mPosition, 1.0f);
     printf("Final Position: "); l.WorldPosition.Print();
 
     l.Attenuation.Constant = light.mAttenuationConstant;
