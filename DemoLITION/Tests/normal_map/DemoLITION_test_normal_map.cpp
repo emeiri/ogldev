@@ -71,14 +71,14 @@ void test_normal_map()
 
     Scene* pScene = pRenderingSystem->CreateEmptyScene();
 
-    Model* pModel = pRenderingSystem->LoadModel("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/bs_ears.obj");    
+    Model* pModel = pRenderingSystem->LoadModel("../Content/bs_ears.obj");    
     SceneObject* pSceneObject = pScene->CreateSceneObject(pModel);
     pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
     //pSceneObject->SetRotation(Vector3f(30.0f, 60.0f, 90.0f));
    // pSceneObject->SetScale(Vector3f(2.0f, 2.0f, 2.0f));
     pScene->AddToRenderList(pSceneObject);
 
-    int NormalMap = pRenderingSystem->LoadTexture2D("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/texture/ogre_normalmap.png");
+    int NormalMap = pRenderingSystem->LoadTexture2D("../Content/textures/ogre_normalmap.png");
     pModel->SetNormalMap(NormalMap);            
 
     pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
