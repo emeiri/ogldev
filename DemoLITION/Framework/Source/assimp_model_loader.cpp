@@ -976,7 +976,7 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
 {
     Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
 
-    LoadColor(pMaterial, MyMaterial.AmbientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
+    LoadColor(pMaterial, MyMaterial.m_ambientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
 
     aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -984,58 +984,58 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
 #ifdef DEBUG_COLORS
         printf("Loaded emissive color [%f %f %f]\n", EmissiveColor.r, EmissiveColor.g, EmissiveColor.b);
 #endif
-        MyMaterial.AmbientColor.r += EmissiveColor.r;
-        MyMaterial.AmbientColor.g += EmissiveColor.g;
-        MyMaterial.AmbientColor.b += EmissiveColor.b;
-        MyMaterial.AmbientColor.a += EmissiveColor.a;
-        MyMaterial.AmbientColor.a = std::min(MyMaterial.AmbientColor.a, 1.0f);
+        MyMaterial.m_ambientColor.r += EmissiveColor.r;
+        MyMaterial.m_ambientColor.g += EmissiveColor.g;
+        MyMaterial.m_ambientColor.b += EmissiveColor.b;
+        MyMaterial.m_ambientColor.a += EmissiveColor.a;
+        MyMaterial.m_ambientColor.a = std::min(MyMaterial.m_ambientColor.a, 1.0f);
     } else {
-        MyMaterial.AmbientColor = AllOnes;
+        MyMaterial.m_ambientColor = AllOnes;
     }
 
-    LoadColor(pMaterial, MyMaterial.DiffuseColor, AI_MATKEY_COLOR_DIFFUSE, "diffuse color");
+    LoadColor(pMaterial, MyMaterial.m_diffuseColor, AI_MATKEY_COLOR_DIFFUSE, "diffuse color");
 
-    LoadColor(pMaterial, MyMaterial.SpecularColor, AI_MATKEY_COLOR_SPECULAR, "specular color");
+    LoadColor(pMaterial, MyMaterial.m_specularColor, AI_MATKEY_COLOR_SPECULAR, "specular color");
 
-    LoadColor(pMaterial, MyMaterial.BaseColor, AI_MATKEY_BASE_COLOR, "base color");
+    LoadColor(pMaterial, MyMaterial.m_baseColor, AI_MATKEY_BASE_COLOR, "base color");
 
-    LoadColor(pMaterial, MyMaterial.EmissiveColor, AI_MATKEY_COLOR_EMISSIVE, "emissive color");
+    LoadColor(pMaterial, MyMaterial.m_emissiveColor, AI_MATKEY_COLOR_EMISSIVE, "emissive color");
 
     float EmissiveStrength = 1.0f;
     if (pMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, EmissiveStrength) == AI_SUCCESS) {
-        MyMaterial.EmissiveColor = MyMaterial.EmissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
+        MyMaterial.m_emissiveColor = MyMaterial.m_emissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
     }
 
     if (MyMaterial.m_materialType & MaterialType_MetallicRoughness) {
         float MetallicFactor;
 
         if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
-            MyMaterial.MetallicRoughnessNormalOcclusion.x = MetallicFactor;
+            MyMaterial.m_metallicRoughnessNormalOcclusion.x = MetallicFactor;
         }
 
         float RoughnessFactor;
 
         if (pMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, RoughnessFactor) == AI_SUCCESS) {
-            MyMaterial.MetallicRoughnessNormalOcclusion.y = RoughnessFactor;
+            MyMaterial.m_metallicRoughnessNormalOcclusion.y = RoughnessFactor;
         }
     }
 
     float NormalScale;
     if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), NormalScale) == AI_SUCCESS) {
-        MyMaterial.MetallicRoughnessNormalOcclusion.z = NormalScale;
+        MyMaterial.m_metallicRoughnessNormalOcclusion.z = NormalScale;
     }
 
     float OcclusionStrength;
     if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), OcclusionStrength) == AI_SUCCESS) {
-        MyMaterial.MetallicRoughnessNormalOcclusion.w = OcclusionStrength;
+        MyMaterial.m_metallicRoughnessNormalOcclusion.w = OcclusionStrength;
     }
 
     float AlphaCutoff = 0.0f;
 
     if (pMaterial->Get(AI_MATKEY_GLTF_ALPHACUTOFF, AlphaCutoff) == AI_SUCCESS) {
-        MyMaterial.EmissiveColor.a = AlphaCutoff;
+        MyMaterial.m_emissiveColor.a = AlphaCutoff;
     } else {
-        MyMaterial.EmissiveColor.a = 0.5f;    // Based on the "3D Rendering Cookbook"
+        MyMaterial.m_emissiveColor.a = 0.5f;    // Based on the "3D Rendering Cookbook"
     }
 
     float OpaquenessThreshold = 0.05f;
@@ -1059,11 +1059,11 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
     }
 
     ProcessClearCoat(pMaterial, MyMaterial);
-
-    if ((MyMaterial.AmbientColor.r == 0.0f) && (MyMaterial.AmbientColor.g == 0.0f) && (MyMaterial.AmbientColor.b == 0.0f)) {
+        
+    if ((MyMaterial.m_ambientColor.r == 0.0f) && (MyMaterial.m_ambientColor.g == 0.0f) && (MyMaterial.m_ambientColor.b == 0.0f)) {
         // THE MIXAMO FALLBACK: If the DAE file provides a zero ambient vector,
         // match the diffuse color property so the ambient light works.
-        MyMaterial.AmbientColor = MyMaterial.DiffuseColor;
+        MyMaterial.m_ambientColor = MyMaterial.m_diffuseColor;
     }
 }
 
@@ -1076,13 +1076,13 @@ void AssimpModelLoader::ProcessClearCoat(const aiMaterial* pMaterial, MaterialDa
 
     float ClearCoatFactor = 0.0f;
     if (pMaterial->Get(AI_MATKEY_CLEARCOAT_FACTOR, ClearCoatFactor) == AI_SUCCESS) {
-        MyMaterial.ClearCoatTransmissionThickness.x = ClearCoatFactor;
+        MyMaterial.m_clearCoatTransmissionThickness.x = ClearCoatFactor;
         UseClearCoat = true;
     }
 
     float ClearCoatRoughnessFactor = 0.0f;
     if (pMaterial->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, ClearCoatRoughnessFactor) == AI_SUCCESS) {
-        MyMaterial.ClearCoatTransmissionThickness.y = ClearCoatRoughnessFactor;
+        MyMaterial.m_clearCoatTransmissionThickness.y = ClearCoatRoughnessFactor;
         UseClearCoat = true;
     }
 
