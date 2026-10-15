@@ -1199,6 +1199,11 @@ void AssimpModelLoader::MarkRequiredNodesForBone(int NodeIndex)
 {
     do {
         SkelNode& Node = m_pModelData->m_nodes[NodeIndex];
+
+        if (Node.m_isRequired) {
+            break;  // early exit - no need to traverse up the hierarchy if this node is already marked as required
+        }
+
         Node.m_isRequired = true;
 
         int ParentIndex = Node.m_parentIndex;
