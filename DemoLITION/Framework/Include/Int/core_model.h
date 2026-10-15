@@ -148,9 +148,28 @@ public:
         return m_modelData.m_meshes[FirstMeshIndex].Dims; 
     }
 
+    // Returns the current position of the node, including any changes the application
+    // made to its transformation (e.g. SetNodePositionXZ). Left handed, like m_transformationsGLM.
     const glm::vec3 GetNodePos(const char* pNodeName) const
     {
-        return m_modelData.GetNodePos(pNodeName);
+        auto it = m_modelData.m_nodeMap.find(pNodeName);
+        if (it == m_modelData.m_nodeMap.end()) {
+            printf("Invalid node name '%s'\n", pNodeName);
+            assert(0);
+        }
+
+        int NodeIndex = it->second;
+
+        const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
+
+        if (Node.m_numInstances == 0) {
+            printf("Node '%s' has no meshes\n", pNodeName);
+            assert(0);
+        }
+
+        const glm::mat4& Transformation = m_transformationsGLM[Node.m_firstInstance];
+
+        return glm::vec3(Transformation[3]);
     }
 
 protected:
