@@ -1223,7 +1223,7 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
     node.m_name = pNode->mName.C_Str();
     node.m_parentIndex = ParenIndex;
     node.m_localTransform = Matrix4f(pNode->mTransformation);
-    node.m_globalTransform = ParentTransform * node.m_localTransform;
+    node.m_bindPoseGlobalTransform = ParentTransform * node.m_localTransform;
     node.m_meshes.resize(pNode->mNumMeshes);
     node.m_firstInstance = (int)Instances.size();
     for (unsigned int i = 0; i < pNode->mNumMeshes; i++) {
@@ -1232,7 +1232,7 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
         MeshInstance mi;
         mi.m_meshIndex = MeshIndex;
         mi.m_nodeIndex = NodeIndex;
-        mi.m_worldTransform = node.m_globalTransform;
+        mi.m_worldTransform = node.m_bindPoseGlobalTransform;
         Instances.push_back(mi);
     }
     node.m_numInstances = pNode->mNumMeshes;
@@ -1249,7 +1249,7 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
     printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), NodeIndex, ParenIndex);
 
     for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-        FlattenNodeHierarchy(pNode->mChildren[i], NodeIndex, node.m_globalTransform, Out, NodeNameToIndexMap, Instances);
+        FlattenNodeHierarchy(pNode->mChildren[i], NodeIndex, node.m_bindPoseGlobalTransform, Out, NodeNameToIndexMap, Instances);
     }
 }
 

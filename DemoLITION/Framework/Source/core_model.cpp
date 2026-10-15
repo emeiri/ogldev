@@ -152,7 +152,7 @@ void CoreModel::TraverseNodeHierarchy()
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         SkelNode& Node = m_modelData.m_nodes[NodeIndex];
 
-        glm::mat4 MeshTransform = glm::make_mat4(Node.m_globalTransform.data());
+        glm::mat4 MeshTransform = glm::make_mat4(Node.m_bindPoseGlobalTransform.data());
         // The matrix is stored as row major in the file but glm expects column major by default.
         glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
 
@@ -164,7 +164,7 @@ void CoreModel::TraverseNodeHierarchy()
 
         for (int j = 0; j < Node.m_meshes.size(); j++) {
             int MeshIndex = Node.m_meshes[j];
-            m_transformations.push_back(Node.m_globalTransform);
+            m_transformations.push_back(Node.m_bindPoseGlobalTransform);
             m_transformationsGLM.push_back(LeftHandedMatrixGLM);
         }
     }

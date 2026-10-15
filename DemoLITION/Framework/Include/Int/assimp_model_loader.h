@@ -157,7 +157,7 @@ struct SkelNode {
     bool m_isRequired = false;
     int m_parentIndex = -1;
     Matrix4f m_localTransform;
-    Matrix4f m_globalTransform;
+    Matrix4f m_bindPoseGlobalTransform; // calculated once
     int m_boneIndex = -1;  // -1 = not a bone
     std::vector<int> m_meshes;
     int m_firstInstance = -1;
@@ -267,7 +267,7 @@ struct ModelData {
             Out.InitIdentity();
             return false;
         }
-        Out = m_nodes[it->second].m_globalTransform;
+        Out = m_nodes[it->second].m_bindPoseGlobalTransform;
         return true;
     }
 };
