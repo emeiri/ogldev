@@ -605,9 +605,6 @@ void AssimpModelLoader::InitSingleCamera(int Index)
 
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(pCamera->mName.C_Str(), Transformation);
-
-    Matrix4f FinalWorld = Transformation;
-
     printf("Camera transformation:\n");
     Transformation.Print();
 
@@ -631,13 +628,13 @@ void AssimpModelLoader::InitSingleCamera(int Index)
     }
 
     // Extract World Position
-    Vector3f FinalPos = LocalToLeftHandedWorld(FinalWorld, LocalPos, 1.0f);
+    Vector3f FinalPos = LocalToLeftHandedWorld(Transformation, LocalPos, 1.0f);
 
     // Extract World Direction (mLookAt is relative to the camera node)
-    Vector3f FinalTargetDir = LocalToLeftHandedWorld(FinalWorld, pCamera->mLookAt, 0.0f).Normalize();
+    Vector3f FinalTargetDir = LocalToLeftHandedWorld(Transformation, pCamera->mLookAt, 0.0f).Normalize();
 
     // Extract World Up (mUp is relative to the camera node)
-    Vector3f FinalUp = LocalToLeftHandedWorld(FinalWorld, pCamera->mUp, 0.0f).Normalize();
+    Vector3f FinalUp = LocalToLeftHandedWorld(Transformation, pCamera->mUp, 0.0f).Normalize();
 
     // Setup Perspective Projection
     m_pModelData->m_cameras[Index].m_zNear = pCamera->mClipPlaneNear;
