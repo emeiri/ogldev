@@ -135,27 +135,6 @@ static uint CountValidFaces(const aiMesh& Mesh)
 }
 
 
-bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation)
-{
-    Transformation.InitIdentity();
-
-    const aiNode* pNode = pRootNode->FindNode(pName);
-
-    if (!pNode) {
-        printf("Warning! Cannot find a node for '%s'\n", pName);
-        return false;
-    }
-
-    while (pNode) {
-        Matrix4f CurTransformation(pNode->mTransformation);
-        Transformation = CurTransformation * Transformation;
-        pNode = pNode->mParent;
-    }
-
-    return true;
-}
-
-
 static void SetMaterialType(const aiMaterial* pMaterial, MaterialData& MyMaterial)
 {
     int ShadingModel = 0;
@@ -580,7 +559,7 @@ void AssimpModelLoader::InitSingleCamera(int Index)
 
     // 1. Get the hierarchy matrix (Order: Parent * Child)
     Matrix4f Transformation;
-    GetFullTransformation(m_pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
+    m_pModelData->GetNodeWorldTransform(pCamera->mName.C_Str(), Transformation);
 
     aiMatrix4x4 aiCameraMatrix;
     pCamera->GetCameraMatrix(aiCameraMatrix);
@@ -682,7 +661,7 @@ void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
     l.DiffuseIntensity = 1.0f; // TODO
 
     Matrix4f Transformation;
-    GetFullTransformation(m_pScene->mRootNode, light.mName.C_Str(), Transformation);
+    m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
 
     /* Vector3f Direction = VectorFromAssimpVector(light.mDirection);
      printf("Original direction: "); Direction.Print();
@@ -728,7 +707,7 @@ void AssimpModelLoader::InitPointLight(const aiLight& light)
 
     Matrix4f Transformation;
 
-    GetFullTransformation(m_pScene->mRootNode, light.mName.C_Str(), Transformation);
+    m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
 
     Vector4f Pos4D(Position, 1.0f);
     Pos4D = Transformation * Pos4D;
@@ -754,7 +733,7 @@ void AssimpModelLoader::InitSpotLight(const aiLight& light)
     l.DiffuseIntensity = 1.0f; // TODO
 
     Matrix4f Transformation;
-    GetFullTransformation(m_pScene->mRootNode, light.mName.C_Str(), Transformation);
+    m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
 
     /*    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
         printf("Original direction: "); Direction.Print();

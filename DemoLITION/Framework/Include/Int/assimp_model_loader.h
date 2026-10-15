@@ -257,6 +257,18 @@ struct ModelData {
 
         return NumVertices;
     }
+
+    bool GetNodeWorldTransform(const char* Name, Matrix4f& Out) const
+    {
+        auto it = m_nodeMap.find(Name);
+        if (it == m_nodeMap.end()) {
+            printf("Warning! Cannot find a node for '%s'\n", Name);
+            Out.InitIdentity();
+            return false;
+        }
+        Out = m_nodes[it->second].m_globalTransform;
+        return true;
+    }
 };
 
 
