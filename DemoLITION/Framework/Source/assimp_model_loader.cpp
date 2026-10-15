@@ -847,10 +847,7 @@ void AssimpModelLoader::InitMaterials()
 void AssimpModelLoader::LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index)
 {
     int TextureCount = GetTextureCount(pMaterial);
-
-#ifdef DEBUG_MATERIALS
     printf("Number of textures %d\n", TextureCount);
-#endif
 
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
@@ -872,7 +869,7 @@ void AssimpModelLoader::LoadDiffuseTexture(const std::string& Dir, const aiMater
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, 0, TEX_TYPE_BASE);
     } else {
-        printf("Warning! no diffuse texture\n");
+       // printf("Warning! no diffuse texture\n");
 
         aiString Path;
 
