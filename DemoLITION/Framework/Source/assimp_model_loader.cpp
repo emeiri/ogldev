@@ -471,9 +471,9 @@ void AssimpModelLoader::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, 
             continue;
         }
 
-        m_pModelData->m_indices.push_back(Face.mIndices[0]);
-        m_pModelData->m_indices.push_back(Face.mIndices[1]);
-        m_pModelData->m_indices.push_back(Face.mIndices[2]);
+        Indices.push_back(Face.mIndices[0]);
+        Indices.push_back(Face.mIndices[1]);
+        Indices.push_back(Face.mIndices[2]);
     }
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
