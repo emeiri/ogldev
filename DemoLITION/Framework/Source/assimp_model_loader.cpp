@@ -1235,7 +1235,7 @@ int AssimpModelLoader::GetBoneId(const aiBone* pBone)
 
 
 
-static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex, 
+static void FlattenNodeHierarchy(const aiNode* pNode, int ParentIndex, 
                                  const Matrix4f& ParentTransform,
                                  std::vector<SkelNode>& Out, 
                                  std::unordered_map<std::string, int>& NodeNameToIndexMap,
@@ -1245,7 +1245,7 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
 
     SkelNode node;
     node.m_name = pNode->mName.C_Str();
-    node.m_parentIndex = ParenIndex;
+    node.m_parentIndex = ParentIndex;
     node.m_localTransform = Matrix4f(pNode->mTransformation);
     node.m_bindPoseGlobalTransform = ParentTransform * node.m_localTransform;
     node.m_meshes.resize(pNode->mNumMeshes);
@@ -1270,7 +1270,7 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParenIndex,
 
     NodeNameToIndexMap[node.m_name] = NodeIndex;
 
-    printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), NodeIndex, ParenIndex);
+   // printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), NodeIndex, ParentIndex);
 
     for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
         FlattenNodeHierarchy(pNode->mChildren[i], NodeIndex, node.m_bindPoseGlobalTransform, Out, NodeNameToIndexMap, Instances);
