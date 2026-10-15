@@ -290,7 +290,7 @@ void AssimpModelLoader::CountVerticesAndIndices(uint& NumVertices, uint& NumIndi
         m_pModelData->m_meshes[i].ValidFaces = CountValidFaces(*m_pScene->mMeshes[i]);
 
         NumVertices += m_pScene->mMeshes[i]->mNumVertices;
-        NumIndices += m_pModelData->m_meshes[i].NumIndices;
+        NumIndices += m_pModelData->m_meshes[i].ValidFaces * 3;
     }
 }
 
