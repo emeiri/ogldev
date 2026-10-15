@@ -755,7 +755,7 @@ void AssimpModelLoader::InitSpotLight(const aiLight& light)
     printf("Original up: "); Up.Print();
     if (Up.Length() == 0) {
         // Use clean 3D vector literal dimensions for structural comparisons
-        if ((l.WorldDirection == Vector3f(0.0f, 1.0f, 0.0f)) || (l.WorldDirection == Vector3f(0.0f, -1.0f, 0.0f))) {
+        if (fabsf(l.WorldDirection.Dot(Vector3f(0.0f, 1.0f, 0.0f))) > 0.999f) {
             l.Up = Vector3f(1.0f, 0.0f, 0.0f);
         } else {
             l.Up = Vector3f(0.0f, 1.0f, 0.0f);
