@@ -27,55 +27,6 @@
 //#define DEBUG_BONES
 #define DEBUG_SCENE_HIERARCHY
 
-#ifdef OGLDEV_VULKAN
-
-#if 0
-#define DEMOLITION_ASSIMP_LOAD_FLAGS (\
-aiProcess_Triangulate |         \
-aiProcess_GenSmoothNormals |     \
-aiProcess_CalcTangentSpace |      \
-aiProcess_JoinIdenticalVertices |  \
-aiProcess_RemoveRedundantMaterials | \
-aiProcess_SortByPType |              \
-aiProcess_GenUVCoords |              \
-aiProcess_TransformUVCoords |        \
-aiProcess_FlipUVs |                  \
-aiProcess_ValidateDataStructure |    \
-aiProcess_OptimizeMeshes |           \
-aiProcess_FlipWindingOrder | \
-aiProcess_OptimizeGraph)            
-#endif
-
-#define DEMOLITION_ASSIMP_LOAD_FLAGS (\
-aiProcess_CalcTangentSpace |    \
-aiProcess_FindDegenerates | \
-aiProcess_FindInvalidData | \
-aiProcess_GenBoundingBoxes | \
-aiProcess_GenSmoothNormals |    \
-aiProcess_GenUVCoords | \
-aiProcess_ImproveCacheLocality | \
-aiProcess_JoinIdenticalVertices |   \
-aiProcess_LimitBoneWeights | \
-aiProcess_RemoveRedundantMaterials | \
-aiProcess_SortByPType | \
-aiProcess_Triangulate | \
-aiProcess_ValidateDataStructure)
-#else
-
-#define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices | \
-                                      aiProcess_Triangulate | \
-                                      aiProcess_GenBoundingBoxes | \
-                                      aiProcess_GenSmoothNormals | \
-                                      aiProcess_LimitBoneWeights | \
-                                      aiProcess_SplitLargeMeshes | \
-                                      aiProcess_ImproveCacheLocality | \
-                                      aiProcess_RemoveRedundantMaterials | \
-                                      aiProcess_FindDegenerates | \
-                                      aiProcess_FindInvalidData | \
-                                      aiProcess_GenUVCoords | \
-                                      aiProcess_CalcTangentSpace)
-#endif
-   
 bool CoreModel::IsPBR() const
 {
     bool ret = false;
