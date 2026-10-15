@@ -649,7 +649,7 @@ void AssimpModelLoader::InitSingleCamera(int Index)
     // Assign the FULL vertical degree angle straight to your projection settings
     // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
     m_pModelData->m_cameras[Index].m_pos = glm::vec3(FinalPos.x, FinalPos.y, FinalPos.z);
-    m_pModelData->m_cameras[Index].m_target = glm::vec3(FinalTargetDir.x, FinalTargetDir.y, FinalTargetDir.z);
+    m_pModelData->m_cameras[Index].m_dir = glm::vec3(FinalTargetDir.x, FinalTargetDir.y, FinalTargetDir.z);
     m_pModelData->m_cameras[Index].m_up = glm::vec3(FinalUp.x, FinalUp.y, FinalUp.z);
 
     printf("Final Pos: "); FinalPos.Print();
