@@ -21,6 +21,15 @@
 #include "Int/core_model.h"
 #include "GL/gl_indirect_render.h"
 
+enum BUFFER_TYPE {
+    INDEX_BUFFER = 0,
+    VERTEX_BUFFER = 1,
+    WVP_MAT_BUFFER = 2,  // required only for instancing
+    WORLD_MAT_BUFFER = 3,  // required only for instancing
+    NUM_BUFFERS = 4
+};
+
+
 class GLModel : public CoreModel
 {
 public:

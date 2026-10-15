@@ -172,14 +172,6 @@ protected:
 
     virtual void DestroyTexture(Texture* pTexture) = 0;
 
-    enum BUFFER_TYPE {
-        INDEX_BUFFER = 0,
-        VERTEX_BUFFER = 1,
-        WVP_MAT_BUFFER = 2,  // required only for instancing
-        WORLD_MAT_BUFFER = 3,  // required only for instancing
-        NUM_BUFFERS = 4
-    };
-
     virtual void InitGeometryPost() {}
 
     ModelData m_modelData;
