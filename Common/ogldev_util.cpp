@@ -17,6 +17,9 @@
 
 */
 
+#include <algorithm>
+#include <cctype>
+#include <string>
 #include <iostream>
 #include <fstream>
 #ifdef _WIN32
@@ -400,4 +403,12 @@ bool IsFileExists(const char* filename)
     bool exists = (STAT_FUNC(filename, &buffer) == 0);
     
     return exists;
+}
+
+
+std::string ToLower(std::string s)
+{
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    return s;
 }

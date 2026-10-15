@@ -142,3 +142,5 @@ static inline size_t AlignUpToMultiple(size_t Size, size_t Alignment)
 
     return ret;
 }
+
+std::string ToLower(std::string s);
