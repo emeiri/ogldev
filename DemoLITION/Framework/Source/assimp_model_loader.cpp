@@ -967,7 +967,8 @@ void AssimpModelLoader::LoadTexture(const std::string& Dir, const aiMaterial* pM
         if (pMaterial->GetTexture((aiTextureType)AssimpTextureType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
-            bool IsSRGB = (MyType == TEX_TYPE_BASE);
+            bool IsSRGB = (MyType == TEX_TYPE_BASE) || (MyType == TEX_TYPE_EMISSIVE) || (MyType == TEX_TYPE_EMISSION_COLOR);
+
             m_pModelData->m_materials[MaterialIndex].m_textures[MyType].IsSRGB = IsSRGB;
 
             if (paiTexture) {
