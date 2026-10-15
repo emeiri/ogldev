@@ -1,0 +1,1166 @@
+﻿/*
+
+        Copyright 2024 Etay Meiri
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    DemoLITION - Carbonara
+*/
+
+#include <stdio.h>
+#include <math.h>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imGuIZMOquat.h"
+
+#include "demolition.h"
+#include "demolition_base_gl_app.h"
+#include "ogldev_physics.h"
+#include "ogldev_accelorobject.h"
+
+
+#define WINDOW_WIDTH  2560
+#define WINDOW_HEIGHT 1440
+
+#define NUM_PSOs 1000
+
+// TODO: code duplication with ogldev_imgui.cpp in vulkan and gl_rendering_system. need to share.
+static bool IsMouseControlledByImGUI()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    bool ret = io.WantCaptureMouse;
+
+    return ret;
+}
+
+
+struct PhysicsSceneObject {
+    SceneObject* pSceneObject = NULL;
+    OgldevPhysics::Particle* pParticle = NULL;
+
+    void InitPosition(const Vector3f& Pos)
+    {
+        if (!pSceneObject) {
+            printf("pSceneObject is not initialized\n");
+            exit(1);
+        }
+
+        pSceneObject->SetPosition(Pos);
+
+        if (pParticle) {
+            pParticle->SetPosition(Pos);
+        }
+    }
+};
+
+
+class Carbonara : public BaseGLApp {
+public:
+    Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Carbonara")
+    {
+      //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        m_dirLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_dirLight[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight[0].DiffuseIntensity = 0.8f;
+        m_dirLight[0].AmbientIntensity = 0.2f;
+
+        m_dirLight[1].Color = Vector3f(1.0f, 0.0f, 0.0f);
+        m_dirLight[1].WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
+        m_dirLight[1].DiffuseIntensity = 1.0f;
+        m_dirLight[1].AmbientIntensity = 0.0f;
+
+        m_pointLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLight[0].WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
+        m_pointLight[0].DiffuseIntensity = 1.0f;
+        m_pointLight[0].AmbientIntensity = 0.0f;
+        m_pointLight[0].Attenuation.Constant = 0.25f;
+
+        m_pointLight[1].Color = Vector3f(0.0f, 0.0f, 1.0f);
+        m_pointLight[1].WorldPosition = Vector3f(10.0f, 10.0f, 0.0f);
+        m_pointLight[1].DiffuseIntensity = 0.2f;
+        m_pointLight[1].AmbientIntensity = 0.0f;
+        m_pointLight[1].Attenuation.Constant = 0.25f;
+
+        m_spotLight.WorldPosition = Vector3f(0.0f, 10.0f, 0.0f);
+        m_spotLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+        m_spotLight.Up = Vector3f(0.0f, 0.0f, -1.0f);
+        m_spotLight.Cutoff = 30.0f;
+        m_spotLight.DiffuseIntensity = 0.2f;
+        m_spotLight.AmbientIntensity = 0.1f;
+    }
+
+    ~Carbonara() {}
+
+    virtual void InitChild()
+    {
+        printf("-------------------------------------------\n");
+        printf("Warning! Child didn't implement InitChild()\n");
+        printf("-------------------------------------------\n");
+        exit(0);
+    }
+
+    void Start()
+    {
+        m_pScene = m_pRenderingSystem->CreateEmptyScene();
+        
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        
+        m_pScene->SetCameraAcceleration(50.0f);
+
+      //  m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetDirLights().push_back(m_dirLight[0]);
+        //m_pScene->GetPointLights().push_back(m_pointLight[0]);
+        //m_pScene->GetPointLights().push_back(m_pointLight[1]);
+        //m_pScene->GetSpotLights().push_back(m_spotLight);
+
+        m_pRenderingSystem->SetScene(m_pScene);
+
+        InitChild();
+
+        m_pRenderingSystem->Execute();
+    }
+
+
+    void InitSpringDemo()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        PhysicsSceneObject Box1;
+        Box1.pSceneObject = m_pScene->CreateSceneObject(pModel);
+        Box1.pSceneObject->SetScale(0.1f);
+        Box1.pParticle = m_physicsSystem.AllocParticle();
+        m_sceneObjects.push_back(Box1);
+        m_pScene->AddToRenderList(Box1.pSceneObject);
+        Box1.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
+        Box1.pParticle->SetMass(2.0f);
+
+        PhysicsSceneObject Box2;
+        Box2.pSceneObject = m_pScene->CreateSceneObject(pModel);
+        Box2.pSceneObject->SetScale(0.1f);
+        Box2.pParticle = m_physicsSystem.AllocParticle();
+        m_sceneObjects.push_back(Box2);
+        m_pScene->AddToRenderList(Box2.pSceneObject);
+        Box2.pParticle->SetPosition(Vector3f(1.0f, 0.0f, 0.0f));
+        Box2.pParticle->SetMass(2.0f);
+
+    //    Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
+        m_springForceGenerator.Init(Box1.pParticle, 1.0f, 0.99f);
+
+        m_physicsSystem.GetRegistry().Add(Box1.pParticle, &m_springForceGenerator);
+
+//        m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
+  //      m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
+
+    }
+
+
+    void InitBuoyancyDemo()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 10.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
+        PhysicsSceneObject Water = LoadAndAddModel("../Content/ground.obj", true);
+        Water.pParticle->SetPosition(0.0f, 10.0f, 0.0f);
+        PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", true, 0.1f);
+        Box.pParticle->SetMass(0.0001f);
+        Box.pParticle->SetPosition(0.0f, 9.5f, 0.0f);
+
+        m_buoyancyForceGenerator.Init(5.0f, 1.0f, 10.0f, 0.1f);
+        m_fakeSpringForceGenerator.Init(&Water.pParticle->GetPosition(), 0.000001f, 0.01f);
+        m_physicsSystem.GetRegistry().Add(Box.pParticle, &m_fakeSpringForceGenerator);
+    }
+
+
+    void OnFrame(double DeltaTime)
+    {
+        OnFrameChild(DeltaTime);
+
+        if (m_pScene->GetPointLights().size() > 0) {
+            m_pScene->GetPointLights()[0].WorldPosition = Vector3f(sinf(m_count) * 10.0f, 1.0f, cosf(m_count) * 10.0f);
+
+            if (m_pScene->GetPointLights().size() > 1) {
+                m_pScene->GetPointLights()[1].WorldPosition = Vector3f(-sinf(m_count) * 10.0f, 1.0f, -cosf(m_count) * 10.0f);
+            }
+        }
+
+        m_count += 0.01f;
+
+        if (m_pScene->GetPickedSceneObject()) {
+            m_pickedObject = m_pScene->GetPickedSceneObject();
+            m_pickedObject->SetColorMod(2.0f, 1.0f, 1.0f);
+        } else {
+            if (m_pickedObject) {
+                m_pickedObject->SetColorMod(1.0f, 1.0f, 1.0f);
+                m_pickedObject = NULL;
+            }
+        }
+
+        m_physicsSystem.Update(DeltaTime);
+
+        UpdateParticlePositions();
+        
+    //    m_pSceneObject->ResetRotations();
+     //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
+        //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
+
+     //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
+      //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
+    }
+
+
+    void OnFrameEnd()
+    {
+        if (m_showGui) {
+            OnFrameGUI();
+        }
+    }
+
+
+    void UpdateParticlePositions()
+    {
+        for (std::list<PhysicsSceneObject>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
+            if (it->pParticle) {
+                const Vector3f& NewPos = it->pParticle->GetPosition();
+                it->pSceneObject->SetPosition(NewPos);
+            }
+        }
+    }
+
+
+    PhysicsSceneObject LoadAndAddModel(const char* pFilename, bool AllocParticle, float Scale = 1.0f)
+    {
+        Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
+        PhysicsSceneObject CObject = AddPhysicsSceneObject(pModel, AllocParticle, Scale);
+  //      m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
+   //     m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
+        return CObject;
+    }
+
+
+    PhysicsSceneObject AddPhysicsSceneObject(Model* pModel, bool AllocParticle, float Scale = 1.0f)
+    {
+        PhysicsSceneObject PSObject;
+        PSObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
+        PSObject.pSceneObject->SetScale(Scale);
+        if (AllocParticle) {
+            PSObject.pParticle = m_physicsSystem.AllocParticle();
+        }        
+        m_sceneObjects.push_back(PSObject);
+        m_pScene->AddToRenderList(PSObject.pSceneObject);
+        return PSObject;
+    }
+
+
+    void OnFrameGUI()
+    {
+        Scene* pScene = m_pRenderingSystem->GetScene();    
+
+        pScene->StartSceneGUI("Scene Config");
+        ChildGui();
+        pScene->EndSceneGUI();
+    }
+
+
+    virtual void ChildGui() {}
+
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = false;
+
+        switch (key) {
+        case GLFW_KEY_SPACE:
+            if (action == GLFW_PRESS) {
+                m_showGui = !m_showGui;
+            }
+            HandledByMe = true;
+            break;
+
+        default:
+            HandledByMe = BaseGLApp::OnKeyboard(key, action);
+        }
+
+        return HandledByMe;
+    }
+
+
+    bool OnMouseMove(int x, int y)
+    {
+        bool ret = false;
+
+        if (!IsMouseControlledByImGUI()) {
+            ret = !m_leftMousePressed;
+        }
+
+        return ret;
+    }
+
+
+    bool OnMouseButton(int Button, int Action, int Mode, int x, int y)
+    {
+        switch (Button) {
+        case GLFW_MOUSE_BUTTON_LEFT:
+            m_leftMousePressed = (Action == GLFW_PRESS);
+            break;
+
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            m_midMousePressed = (Action == GLFW_PRESS);
+            m_pScene->GetConfig()->ControlPicking(m_midMousePressed);
+            break;
+        }
+
+        return false;
+    }
+
+protected:
+
+    virtual void OnFrameChild(double DeltaTime) {}
+
+    Scene* m_pScene = NULL;
+    std::list<PhysicsSceneObject> m_sceneObjects;
+    OgldevPhysics::PhysicsSystem m_physicsSystem;
+
+private:
+
+    float m_count = 0.0f;
+
+    DirectionalLight m_dirLight[2];
+    PointLight m_pointLight[2];
+    SpotLight m_spotLight;
+    bool m_leftMousePressed = false;
+    bool m_midMousePressed = false;
+    SceneObject* m_pickedObject = NULL;
+    bool m_showGui = false;
+    int m_enableShadowMapping = 1;
+
+    OgldevPhysics::GravityForceGenerator m_gravityForceGenerator;
+    OgldevPhysics::DragForceGenerator m_dragForceGenerator;
+    OgldevPhysics::SpringForceGenerator m_springForceGenerator;
+    OgldevPhysics::BuoyancyForceGenerator m_buoyancyForceGenerator;
+    OgldevPhysics::FakeSpringForceGenerator m_fakeSpringForceGenerator;
+};
+
+
+
+class BallisticsDemo : public Carbonara {
+
+public:
+
+    BallisticsDemo()
+    {
+        m_physicsSystem.Init(NUM_PSOs, 1, 1);
+    }
+
+    void InitChild()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
+        PhysicsSceneObject Ground = LoadAndAddModel("../Content/ground.obj", true);
+        PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", true, 0.1f);
+
+        Box.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
+        Box.pParticle->SetMass(2.0f);
+        Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
+        //   Box.pParticle->SetDamping(0.99f);
+    }
+};
+
+
+class FireworksDemo : public Carbonara {
+
+public:
+
+    FireworksDemo()  
+    {
+        m_physicsSystem.Init(NUM_PSOs, 1, 1);
+    }
+
+    void InitChild()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -50.0f), Vector3f(0.0, 0.1f, 1.0f));
+
+        int NumFireworks = 50;
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        for (int i = 0; i < NumFireworks; i++) {
+            PhysicsSceneObject CObject;
+            CObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
+            CObject.pSceneObject->SetScale(0.1f);
+            CObject.pParticle = m_physicsSystem.AllocFirework();
+            m_sceneObjects.push_back(CObject);
+            m_pScene->AddToRenderList(CObject.pSceneObject);
+        }
+    }
+};
+
+
+
+class AnimationDemo : public Carbonara {
+
+public:
+
+    AnimationDemo() : m_accelorObject(6.0f, 4.0f, 5.0f) {}
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+
+        m_pScene->SetCamera(Vector3f(0.0f, 4.0f, 0.0f), Vector3f(0.0, -0.4f, 1.0f));
+       // PhysicsSceneObject CObject = LoadAndAddModel("../Content/iclone-7-raptoid-mascot/scene.gltf", false, 0.01f);
+      //  CObject.pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
+		
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/Mixamo/Running/Running.dae");
+      // m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+      //  m_pSceneObject->SetScale(0.1f);
+     //   m_pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
+        m_pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+
+        m_pScene->AddToRenderList(m_pSceneObject);
+    }
+
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = Carbonara::OnKeyboard(key, action);
+
+        return HandledByMe;
+    }
+
+protected:
+
+    virtual void OnFrameChild(double dt)
+    {
+       // printf("%f\n", dt);
+
+        const InputState& is = m_pScene->GetInputState();
+
+        bool isMovingForward = (is.Keys[KEY_UP].Pressed > is.Keys[KEY_UP].Released);
+
+        float Speed = m_accelorObject.Update((float)dt, isMovingForward, false);
+
+        // Move the character using the calculated current speed
+        if (Speed > 0.0f) {
+            Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+            m_pSceneObject->TranslateBy(ForwardDir * Speed);
+        }
+
+
+      /*  if (is.Keys[KEY_UP].Pressed > is.Keys[KEY_UP].Released) {
+            Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+            m_pSceneObject->TranslateBy(ForwardDir * m_speed * (float)dt);
+           // printf("move forward\n");
+            //m_oldUpPressed = m_pScene->GetInputState().Keys[KEY_UP].Pressed;
+        } //else printf("stop\n");*/
+               
+        if (is.Keys[KEY_DOWN].Pressed > is.Keys[KEY_DOWN].Released) {
+            Vector3f BackwardDir = m_pSceneObject->GetForwardDir() * -1.0f;
+         //   m_pSceneObject->TranslateBy(BackwardDir * m_speed * (float)dt);
+            //  m_oldDownPressed = m_pScene->GetInputState().Keys[KEY_DOWN].Pressed;
+        }
+
+        if (is.Keys[KEY_LEFT].Pressed > is.Keys[KEY_LEFT].Released) {
+          //  Speed = std::min(Speed, 1.0f);
+            m_pSceneObject->RotateBy(0.0f, 2.0f * Speed, 0.0f);
+        }
+
+        if (is.Keys[KEY_RIGHT].Pressed > is.Keys[KEY_RIGHT].Released) {
+        //    Speed = std::min(Speed, 1.0f);
+            m_pSceneObject->RotateBy(0.0f, -2.0f * Speed, 0.0f);
+        }
+
+        GLMCameraFirstPerson* pCamera = m_pScene->GetCurrentCamera();
+        pCamera->SetCenter(m_pSceneObject->GetGLMPos());
+        Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+        Vector3f ModelPos = m_pSceneObject->GetPosition();
+        Vector3f CameraPosCenter = ModelPos - ForwardDir * 10.0f;
+        CameraPosCenter.y = ModelPos.y + 5.0f;
+        pCamera->SetPos(CameraPosCenter);
+#if 0
+        static float x = 0.0f;
+        if (isMovingForward) {
+            m_curCameraPos = CameraPosCenter;
+        } else {
+            if (m_curCameraPos.IsZero()) {
+                m_curCameraPos = m_endCameraPos = CameraPosCenter;
+            } else {
+                float CurDistance = m_endCameraPos.Distance(m_curCameraPos);
+                printf("CurDistance %f\n", CurDistance);
+                if (CurDistance >= 10.0f) {
+                    m_curCameraPos = CameraPosCenter;
+                } else if (CurDistance < 0.001f) {
+                    float x = RandomFloatRange(-1.0f, 1.0f);
+                    float y = RandomFloatRange(-1.0f, 1.0f);
+                    float z = RandomFloatRange(-1.0f, 1.0f);
+                    Vector3f v(x, y, z);
+                    float SwayRange = RandomFloatRange(0.0f, 1.0f) * m_maxAmbientSwayRange;
+                    m_endCameraPos = CameraPosCenter + v.Normalize() * SwayRange;
+                    m_cameraTargetDistance = m_endCameraPos.Distance(m_curCameraPos);
+                } else {
+                    Vector3f Dir = (m_endCameraPos - m_curCameraPos).Normalize();
+                    m_curCameraPos += Dir * m_ambientSwaySpeed;
+                }
+            }
+        }
+
+//        m_curCameraPos.Print();
+        pCamera->SetPos(m_curCameraPos);
+#endif
+    }
+
+private:
+
+    Model* m_pModel = NULL;
+    SceneObject* m_pSceneObject = NULL;
+    AccelorObject m_accelorObject;
+    u64 m_oldUpPressed = 0;
+    u64 m_oldDownPressed = 0;
+    Vector3f m_curCameraPos = Vector3f(0.0f);
+    Vector3f m_endCameraPos = Vector3f(0.0f);
+    float m_cameraTargetDistance = 0.0f;
+    float m_maxAmbientSwayRange = 1.0f;
+    float m_ambientSwaySpeed = 0.004f;
+};
+
+
+static void DirToRotation(const Vector3f& Dir, SceneObject& o)
+{
+    Vector3f DirN = Dir;
+    DirN.Normalize();
+
+    glm::vec3 Start(1.0f, 0.0f, 0.0f);
+    glm::vec3 Dest(Dir.x, Dir.y, Dir.z);
+
+    glm::quat q = RotationBetweenVectors(Start, Dest);
+    o.SetQuaternion(q);
+}
+
+
+class BridgeDemo : public Carbonara {
+
+public:
+
+#define NUM_SPHERES 12
+#define NUM_CABLES (NUM_SPHERES-2)
+#define NUM_PLANKS (NUM_SPHERES / 2)
+
+#define PLANK_LENGTH 2.0f
+
+#define BASE_MASS 1
+#define EXTRA_MASS 10
+
+    BridgeDemo() 
+    {
+        m_physicsSystem.Init(NUM_PSOs, NUM_SPHERES * 10, 0);
+    }
+
+    void InitChild()
+    {
+       // glDisable(GL_CULL_FACE);
+        m_pScene->SetCamera(Vector3f(0.0f, 4.5f, -14.0f), Vector3f(0.0, -0.25f, 1.0f));
+
+        m_pRod = m_pRenderingSystem->LoadModel("../Content/demolition/rod.obj");
+        int SphereTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/brickwall.jpg");
+        m_pRod->SetColorTexture(SphereTexture);
+
+        m_pSphere = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
+        m_pSphere->SetColorTexture(SphereTexture);
+
+        m_PSOs.resize(NUM_SPHERES);
+        m_particles.resize(NUM_SPHERES);
+        m_supports.resize(NUM_SPHERES);
+        m_vLinks.resize(NUM_SPHERES);
+        m_hLinks.resize(NUM_CABLES);
+        m_cables.resize(NUM_CABLES);
+        m_planks.resize(NUM_PLANKS);
+        m_rods.resize(NUM_PLANKS);
+
+        InitPlankEnds();
+
+        InitPlanks();
+        
+        InitVLinks();
+
+        InitHLinks();
+
+        InitBall();
+
+        m_groundContactGenerator.Init(&m_particles);
+
+        m_physicsSystem.AddContactGenerator(&m_groundContactGenerator);
+    }
+
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = false;
+
+        switch (key) {
+        case GLFW_KEY_U:
+            m_ballBasePos.z += 0.1f;
+            HandledByMe = true;
+            break;
+
+        case GLFW_KEY_M:
+            m_ballBasePos.z -= 0.1f;
+            HandledByMe = true;
+            break;
+
+        case GLFW_KEY_H:
+            m_ballBasePos.x -= 0.1f;
+            HandledByMe = true;
+            break;
+
+        case GLFW_KEY_K:
+            m_ballBasePos.x += 0.1f;
+            HandledByMe = true;
+            break;
+
+        default:
+            HandledByMe = Carbonara::OnKeyboard(key, action);
+        }
+
+        m_ballBasePos.x = std::clamp(m_ballBasePos.x, 0.0f, 5.0f);
+        m_ballBasePos.z = std::clamp(m_ballBasePos.z, -1.0f, 1.0f);
+        return HandledByMe;
+    }
+
+
+protected:
+
+    virtual void OnFrameChild(double DeltaTime)
+    {
+        // Links from above
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            Vector3f Dir = m_supports[i].m_anchor - m_PSOs[i].pSceneObject->GetPosition();
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_vLinks[i]->SetPosition(Pos);
+            m_vLinks[i]->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *m_vLinks[i]);
+        }
+
+        for (int i = 0; i < NUM_CABLES; i++) {
+            Vector3f Dir = (m_PSOs[i + 2].pSceneObject->GetPosition() - m_PSOs[i].pSceneObject->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_hLinks[i]->SetPosition(Pos);
+            m_hLinks[i]->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *m_hLinks[i]);
+        }
+
+        for (int i = 0; i < NUM_PLANKS; i++) {
+            int BaseIndex = i * 2;
+            Vector3f Dir = (m_PSOs[BaseIndex + 1].pSceneObject->GetPosition() - m_PSOs[BaseIndex].pSceneObject->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[BaseIndex].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_planks[i]->SetPosition(Pos);
+            m_planks[i]->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *m_planks[i]);
+        }
+
+        UpdateBallPosition();
+    }
+
+    
+    void UpdateBallPosition()
+    {
+        int x = int(m_ballBasePos.x);
+
+        float xp = fmod(m_ballBasePos.x, 1.0f);
+
+        if (x < 0) {
+            x = 0;
+            xp = 0;
+        } 
+        
+        if (x >= 5) {
+            x = 5;
+            xp = 0;
+        }
+
+        int z = int(m_ballBasePos.z);
+        float zp = fmod(m_ballBasePos.z, 1.0f);
+
+        if (z < 0) {
+            z = 0;
+            zp = 0.0f;
+        }
+
+        if (z >= 1) {
+            z = 1;
+            zp = 0;
+        }
+
+
+        // Calculate where to draw the mass
+        m_ballDisplayPos.SetZero();
+
+        // Add the proportion to the correct masses
+        m_particles[x * 2 + z]->SetMass(BASE_MASS + EXTRA_MASS * (1 - xp) * (1 - zp));
+
+        m_ballDisplayPos += (m_particles[x * 2 + z]->GetPosition() * (1 - xp) * (1 - zp));
+
+        if (xp > 0) {
+            m_particles[x * 2 + z + 2]->SetMass(BASE_MASS + EXTRA_MASS * xp * (1 - zp));
+            m_ballDisplayPos += (m_particles[x * 2 + z + 2]->GetPosition() * xp * (1 - zp));
+
+            if (zp > 0) {
+                m_particles[x * 2 + z + 3]->SetMass(BASE_MASS + EXTRA_MASS * xp * zp);
+                m_ballDisplayPos += (m_particles[x * 2 + z + 3]->GetPosition() * xp * zp);
+            }
+        }
+
+        if (zp > 0) {
+            m_particles[x * 2 + z + 1]->SetMass(BASE_MASS + EXTRA_MASS * (1 - xp) * zp);
+            m_ballDisplayPos += (m_particles[x * 2 + z + 1]->GetPosition() * (1 - xp) * zp);
+        }
+
+        m_ballDisplayPos.y += 0.5f;
+
+        m_ballPSObject.InitPosition(m_ballDisplayPos);
+    }
+
+private:
+
+    void InitPlankEnds()
+    {
+        // Base spheres
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pSphere, true, 0.05f);
+            Vector3f Pos((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f);
+            PSObject.InitPosition(Pos);
+            PSObject.pParticle->SetMass(1.0f);
+            PSObject.pParticle->SetDamping(0.9f);
+            PSObject.pParticle->SetAcceleration(OgldevPhysics::GRAVITY);
+            m_PSOs[i] = PSObject;
+            m_particles[i] = PSObject.pParticle;
+        }
+    }
+
+    void InitPlanks()
+    {
+        // Rods that connect each opposing spheres
+        for (int i = 0; i < NUM_PLANKS; i++) {
+            int BaseIndex = i * 2;
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
+            Vector3f Dir = (m_PSOs[BaseIndex + 1].pSceneObject->GetPosition() - m_PSOs[BaseIndex].pSceneObject->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[BaseIndex].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_planks[i] = PSObject.pSceneObject;
+            PSObject.pSceneObject->SetPosition(Pos);
+            PSObject.pSceneObject->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *PSObject.pSceneObject);
+            m_rods[i].m_pParticles[0] = m_PSOs[BaseIndex].pParticle;
+            m_rods[i].m_pParticles[1] = m_PSOs[BaseIndex + 1].pParticle;
+            m_rods[i].m_len = PLANK_LENGTH;
+            m_physicsSystem.AddContactGenerator(&m_rods[i]);
+        }
+    }
+
+    void InitVLinks()
+    {
+        // Links from above
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
+            Vector3f AnchorPos((i / 2.0f) * 2.2f - 5.5f, 6, (i % 2) * 1.6f - 0.8f);
+            Vector3f Dir = AnchorPos - m_PSOs[i].pSceneObject->GetPosition();
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            PSObject.pSceneObject->SetPosition(Pos);
+            PSObject.pSceneObject->SetScale(RodLen / 2.0f);
+            m_vLinks[i] = PSObject.pSceneObject;
+            DirToRotation(Dir, *PSObject.pSceneObject);
+            m_supports[i].m_pParticle = m_PSOs[i].pParticle;
+            m_supports[i].m_anchor = AnchorPos;
+            float MaxLength = 0.0f;
+            
+            if (i < 6) {
+                MaxLength = (i / 2.0f) * 0.5f + 3.0f;
+            } else {
+                MaxLength = 5.5f - (i / 2.0f) * 0.5f;
+            }
+
+            m_supports[i].m_maxLength = MaxLength;
+            m_supports[i].m_restitution = 0.5f;
+            m_physicsSystem.AddContactGenerator(&m_supports[i]);
+        }
+    }
+
+    void InitHLinks()
+    {
+        // Links between consecutive spheres
+        for (int i = 0; i < NUM_CABLES ; i++) {
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
+            m_cables[i].m_pParticles[0] = m_PSOs[i].pParticle;
+            m_cables[i].m_pParticles[1] = m_PSOs[i+2].pParticle;
+            m_cables[i].m_maxLength = 1.9f;
+            m_cables[i].m_restituion = 0.3f;
+            m_physicsSystem.AddContactGenerator(&m_cables[i]);
+            Vector3f Dir = (m_PSOs[i + 2].pSceneObject->GetPosition() - m_PSOs[i].pSceneObject->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_hLinks[i] = PSObject.pSceneObject;
+            PSObject.pSceneObject->SetPosition(Pos);
+            PSObject.pSceneObject->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *PSObject.pSceneObject);
+        }
+    }
+
+    void InitBall()
+    {
+        int BallTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/gutsy.png");
+        m_pBall = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
+        m_pBall->SetColorTexture(BallTexture);
+        m_ballPSObject = AddPhysicsSceneObject(m_pBall, true, 0.5f);
+    }
+
+    std::vector<PhysicsSceneObject> m_PSOs;
+    std::vector<SceneObject*> m_vLinks;
+    std::vector<SceneObject*> m_hLinks;
+    std::vector<SceneObject*> m_planks;
+    std::vector<OgldevPhysics::Particle*> m_particles;
+    std::vector<OgldevPhysics::ParticleCable> m_cables;
+    std::vector<OgldevPhysics::ParticleCableConstraint> m_supports;
+    std::vector<OgldevPhysics::ParticleRod> m_rods;
+    OgldevPhysics::GroundContacts m_groundContactGenerator;
+    Model* m_pSphere = NULL;
+    Model* m_pBall = NULL;
+    Model* m_pRod = NULL;
+    PhysicsSceneObject m_ballPSObject;
+    Vector3f m_ballBasePos;
+    Vector3f m_ballDisplayPos;
+};
+
+
+class AmazonBistroDemo : public Carbonara {
+
+public:
+
+    AmazonBistroDemo()
+    {
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        DirectionalLight DirLight;
+        DirLight.Color = Vector3f(1.0f);
+        DirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        DirLight.DiffuseIntensity = 0.8f;
+        DirLight.AmbientIntensity = 0.2f;
+        m_pScene->GetDirLights().clear();
+        m_pScene->GetPointLights().clear();
+        m_pScene->GetSpotLights().clear();
+        m_pScene->GetDirLights().push_back(DirLight);
+
+        //Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
+         Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
+       
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        pSceneObject->SetScale(0.01f);
+        m_pScene->AddToRenderList(pSceneObject);
+
+        m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));        
+    }
+};
+
+
+class GLTFPBRDemo : public Carbonara {
+
+public:
+
+    GLTFPBRDemo()
+    {
+    }
+
+    void InitChild()
+    {
+        SceneConfig* pConfig = m_pScene->GetConfig();
+
+        pConfig->GetInfiniteGrid().Enabled = false;
+        pConfig->ControlShadowMapping(false);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
+        
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/Mixamo/StandingIdle02/StandingIdle02.dae");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
+     //   m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        m_pTexAO->Load();
+        //m_pModel->GetPBRMaterial().pAO = m_pTexAO;
+
+        m_pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
+        m_pBRDF_LUT->Load();
+        pConfig->pBRDF_LUT = m_pBRDF_LUT;
+
+        int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
+        pConfig->SetIrradianceMap(IrrdianceMap);
+
+        int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
+        pConfig->SetEnvMap(EnvMap);
+
+        int t = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_diffuse.png");
+        m_pModel->SetColorTexture(t);
+
+        int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
+        m_pModel->SetNormalMap(n);
+
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pSceneObject->RotateBy(0.0f, 100.0f, 0.0f);
+        m_pScene->AddToRenderList(m_pSceneObject);
+
+        m_pScene->SetCamera(Vector3f(0.0f, 2.0f, -2.5f), Vector3f(0.0f, -0.5f, 1.0f));
+    }
+
+    void OnFrameChild(double DeltaTime)
+    {
+        m_pSceneObject->RotateBy(0.0f, (float)DeltaTime / 25.0f, 0.0f);
+    }
+
+private:
+
+    Model* m_pModel = NULL;
+    SceneObject* m_pSceneObject = NULL;
+
+    Texture* m_pTexAO = NULL;
+    Texture* m_pBRDF_LUT = NULL;
+};
+
+
+
+class SkyboxDemo : public Carbonara {
+
+public:
+
+    SkyboxDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->ControlSkybox(true);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //   m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
+
+        m_pScene->AddToRenderList(pSceneObject);
+    }
+};
+
+
+class MeshConvertDemo : public Carbonara {
+
+public:
+
+    MeshConvertDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //   m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+         //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
+         //   Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        pModel->ConvertToMesh("DamagedHelmet.mesh");
+
+        Model* pMesh = m_pRenderingSystem->LoadMesh("DamagedHelmet.mesh");
+        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pMesh);
+        //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        m_pScene->AddToRenderList(pSceneObject);
+    }
+};
+
+
+class HeliGame : public Carbonara {
+
+public:
+
+    HeliGame()
+    {
+    }
+
+    void InitChild()
+    {
+        delete m_pScene;
+
+        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
+
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+
+        m_pRenderingSystem->SetScene(m_pScene);
+
+       // SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+       // pSceneObject->SetScale(0.01f);
+      //  m_pScene->AddToRenderList(pSceneObject);
+
+        // Hack: the camera should be set up in the glTF file, but for some reason it is not working, so we set it up here
+        m_pScene->SetCamera(Vector3f(0.0f, 10.0f, -30.0f), Vector3f(0.0f, -0.3f, 1.0f));
+    }
+};
+
+
+class SSGIDemo : public Carbonara {
+
+public:
+
+    SSGIDemo()
+    {
+    }
+
+    void InitChild()
+    {
+        SceneConfig* pConfig = m_pScene->GetConfig();
+
+        pConfig->GetInfiniteGrid().Enabled = false;
+        pConfig->ControlShadowMapping(false);
+        pConfig->ControlSSGI(true);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
+       // m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        m_pTexAO->Load();
+        //m_pModel->GetPBRMaterial().pAO = m_pTexAO;
+
+        m_pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
+        m_pBRDF_LUT->Load();
+        pConfig->pBRDF_LUT = m_pBRDF_LUT;
+
+        int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
+        pConfig->SetIrradianceMap(IrrdianceMap);
+
+        int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
+        pConfig->SetEnvMap(EnvMap);
+
+        int t = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_diffuse.png");
+        m_pModel->SetColorTexture(t);
+
+        int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
+        m_pModel->SetNormalMap(n);
+
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pScene->AddToRenderList(m_pSceneObject);
+        m_pSceneObject->SetScale(0.1f);
+
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+    }
+
+    void OnFrameChild(double DeltaTime)
+    {
+        //m_pSceneObject->RotateBy(0.0f, DeltaTime / 25.0f, 0.0f);
+    }
+
+private:
+
+    Model* m_pModel = NULL;
+    SceneObject* m_pSceneObject = NULL;
+
+    Texture* m_pTexAO = NULL;
+    Texture* m_pBRDF_LUT = NULL;
+};
+
+
+class CubeMappingDemo : public Carbonara {
+
+public:
+
+    CubeMappingDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->ControlSkybox(true);
+        m_pScene->GetConfig()->ForcePBRDisabled(true);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Pixabay/arunangshubanerjee-pool-ball-3-2026.glb");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        pSceneObject->SetScale(20.0f);
+        pSceneObject->SetCubeMapping(true);
+        m_pScene->AddToRenderList(pSceneObject);
+        //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+
+        m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
+    }
+};
+
+
+void carbonara()
+{
+  //  BallisticsDemo demo;
+  //  FireworksDemo demo;
+//    AnimationDemo demo;
+ //   BridgeDemo demo;
+  // AmazonBistroDemo demo;
+  //  SkyboxDemo demo;
+  //  GLTFPBRDemo demo;
+    //MeshConvertDemo demo;
+    //HeliGame demo;
+    //SSGIDemo demo;
+    CubeMappingDemo demo;
+
+    demo.Start();
+}
+
+
+int main(int argc, char* arg[])
+{
+    carbonara();
+}

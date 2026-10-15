@@ -51,7 +51,17 @@ Terrain4,gl,Windows/ogldev_vs_2026/Terrain4/Terrain4.vcxproj,Windows/ogldev_vs_2
 Terrain5,gl,Windows/ogldev_vs_2026/Terrain5/Terrain5.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Terrain5.exe,Terrain5,,10,,,,2,ok,own GLFW loop; random: RandomFloat; imgui
 Terrain5.1,gl,Windows/ogldev_vs_2026/Terrain5.1/Terrain5.1.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Terrain5.1.exe,Terrain5.1,,10,,,,2,ok,own GLFW loop; random: RandomFloat; imgui
 Terrain6,gl,Windows/ogldev_vs_2026/Terrain6/Terrain6.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Terrain6.exe,Terrain6,,10,,,,2,ok,own GLFW loop; random: RandomFloat; imgui
-DemoLITION Test,gl,Windows/ogldev_vs_2026/DemoLITION Test/DemoLITION Test.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION Test.exe,DemoLITION,,10,,,,1,ok,DemoLITION RenderingSystemGL::Execute; random: RandomFloat; imgui
+DemoLITION_test_minimal,,Windows/ogldev_vs_2026/DemoLITION Tests/minimal/DemoLITION_test_minimal.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_minimal.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_clear,,Windows/ogldev_vs_2026/DemoLITION Tests/clear/DemoLITION_test_clear.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_clear.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_object,,Windows/ogldev_vs_2026/DemoLITION Tests/object/DemoLITION_test_object.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_object.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_move_object,,Windows/ogldev_vs_2026/DemoLITION Tests/move_object/DemoLITION_test_move_object.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_move_object.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_blender_scene,,Windows/ogldev_vs_2026/DemoLITION Tests/blender_scene/DemoLITION_test_blender_scene.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_blender_scene.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_default_scene,,Windows/ogldev_vs_2026/DemoLITION Tests/default_scene/DemoLITION_test_default_scene.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_default_scene.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_lighting,,Windows/ogldev_vs_2026/DemoLITION Tests/lighting/DemoLITION_test_lighting.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_lighting.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_normal_map,,Windows/ogldev_vs_2026/DemoLITION Tests/normal_map/DemoLITION_test_normal_map.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_normal_map.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_parallax_map,,Windows/ogldev_vs_2026/DemoLITION Tests/parallax_map/DemoLITION_test_parallax_map.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_parallax_map.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_grid,,Windows/ogldev_vs_2026/DemoLITION Tests/grid/DemoLITION_test_grid.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_grid.exe,DemoLITION,,10,,,,,todo,
+DemoLITION_test_carbonara,gl,Windows/ogldev_vs_2026/DemoLITION Tests/carbonara/DemoLITION_test_carbonara.vcxproj,Windows/ogldev_vs_2026/x64/Debug/DemoLITION_test_carbonara.exe,DemoLITION,,10,,,,1,ok,DemoLITION RenderingSystemGL::Execute; random: RandomFloat; imgui
 Terrain7,gl,Windows/ogldev_vs_2026/Terrain7/Terrain7.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Terrain7.exe,Terrain7,,10,,,,2,ok,own GLFW loop; random: RandomFloat; imgui
 Terrain8,,Windows/ogldev_vs_2026/Terrain8/Terrain8.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Terrain8.exe,Windows/ogldev_vs_2026/Terrain8,,10,,,,4,skip,not built by the solution (no sources in the project)
 FrustumCullingTest,,Windows/ogldev_vs_2026/Sandbox/FrustumCullingTest/FrustumCullingTest.vcxproj,Windows/ogldev_vs_2026/x64/Debug/FrustumCullingTest.exe,Windows/ogldev_vs_2026/Sandbox/FrustumCullingTest,,10,,,,4,skip,"console program, no window (candidate for a stdout golden, 3.7)"
