@@ -439,7 +439,8 @@ void AssimpModelLoader::InitSingleMesh(std::vector<VertexType>& Vertices, uint M
     m_pModelData->m_meshes[MeshIndex].NumIndices = AddedIndices;
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
-        LoadMeshBones(Vertices, MeshIndex, paiMesh);
+        // Vertices holds the vertices of all the meshes so far
+        LoadMeshBones(Vertices, MeshIndex, paiMesh, m_pModelData->m_meshes[MeshIndex].BaseVertex);
     }
 }
 
@@ -508,7 +509,9 @@ void AssimpModelLoader::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, 
     }
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
-        LoadMeshBones(Vertices, MeshIndex, paiMesh);
+        // Vertices holds only the vertices of this mesh (before they are optimized
+        // and appended to AllVertices) so the weights are indexed from zero
+        LoadMeshBones(Vertices, MeshIndex, paiMesh, 0);
     }
 
     OptimizeMesh(MeshIndex, Indices, Vertices, AllVertices);
@@ -1118,12 +1121,14 @@ void AssimpModelLoader::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
 }
 
 
-void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
+void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh, uint VertexOffset)
 {
     // printf("Loading mesh bones %d\n", MeshIndex);
     for (uint i = 0; i < pMesh->mNumBones; i++) {
         // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
-        LoadSingleBone(SkinnedVertices, MeshIndex, pMesh->mBones[i]);
+        LoadSingleBone(SkinnedVertices, pMesh->mBones[i], VertexOffset);
+    }
+
     int NumBones = (int)m_pModelData->m_boneInfo.size();
     if (NumBones > MAX_BONES) {
         printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", NumBones, MAX_BONES);
@@ -1151,7 +1156,7 @@ static int GetNodeByBone(const aiBone* pBone, const ModelData* pModelData)
 
 
 
-void AssimpModelLoader::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone)
+void AssimpModelLoader::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, const aiBone* pBone, uint VertexOffset)
 {
     int BoneId = GetBoneId(pBone);
 
@@ -1166,16 +1171,24 @@ void AssimpModelLoader::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertic
     SkelNode& Node = m_pModelData->m_nodes[NodeIndex];
     Node.m_boneIndex = BoneId;
 
+    uint NumOutOfRange = 0;
+
     for (uint i = 0; i < pBone->mNumWeights; i++) {
         const aiVertexWeight& vw = pBone->mWeights[i];
 
-        // Fix: Use the isolated mesh layout offset safely.
-        // If optimizing with meshopt, ensure this logic runs BEFORE meshopt_remapVertexBuffer maps the array!
-        uint GlobalVertexID = m_pModelData->m_meshes[MeshIndex].BaseVertex + vw.mVertexId;
+        // mVertexId is relative to the mesh. VertexOffset is where the mesh starts in SkinnedVertices.
+        uint VertexID = VertexOffset + vw.mVertexId;
 
-        if (GlobalVertexID < SkinnedVertices.size()) {
-            SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
+        if (VertexID < SkinnedVertices.size()) {
+            SkinnedVertices[VertexID].Bones.AddBoneData(BoneId, vw.mWeight);
+        } else {
+            NumOutOfRange++;
         }
+    }
+
+    if (NumOutOfRange > 0) {
+        printf("Warning! bone '%s': %d of %d vertex weights are out of range and were ignored\n",
+               pBone->mName.C_Str(), NumOutOfRange, pBone->mNumWeights);
     }
 
     MarkRequiredNodesForBone(NodeIndex);

@@ -301,8 +301,8 @@ private:
     void InitSingleCamera(int Index);
     Vector3f LocalToLeftHandedWorld(const Matrix4f& NodeWorld, const aiVector3D& v, float w) const;
 
-    void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh);
-    void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
+    void LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh, uint VertexOffset);
+    void LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, const aiBone* pBone, uint VertexOffset);
     int GetBoneId(const aiBone* pBone);
     void MarkRequiredNodesForBone(int NodeIndex);
 
