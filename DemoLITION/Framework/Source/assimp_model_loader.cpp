@@ -555,6 +555,7 @@ void AssimpModelLoader::InitCameras()
 void AssimpModelLoader::InitSingleCamera(int Index)
 {
     const aiCamera* pCamera = m_pScene->mCameras[Index];
+    m_pModelData->m_cameras[Index].m_name = pCamera->mName.C_Str();
     printf("Loading Camera: '%s'\n", pCamera->mName.C_Str());
 
     // 1. Get the hierarchy matrix (Order: Parent * Child)
