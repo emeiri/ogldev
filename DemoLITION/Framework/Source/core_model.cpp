@@ -129,7 +129,10 @@ void CoreModel::InitCameras()
         persProjInfo.zNear = Camera.m_zNear;
         persProjInfo.zFar = Camera.m_zFar;
 
-        m_cameras[CameraIndex].Init(Camera.m_pos, Camera.m_target, Camera.m_up, persProjInfo);
+        // GLMCameraFirstPerson is a yaw/pitch camera (no roll) and its Up parameter
+        // is the world up axis, not the camera's own up vector (Camera.m_up)
+        glm::vec3 WorldUp(0.0f, 1.0f, 0.0f);
+        m_cameras[CameraIndex].Init(Camera.m_pos, Camera.m_target, WorldUp, persProjInfo);
     }
 }
 

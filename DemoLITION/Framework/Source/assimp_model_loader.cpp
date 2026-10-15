@@ -585,47 +585,57 @@ void AssimpModelLoader::InitSingleCamera(int Index)
     m_pModelData->m_cameras[Index].m_name = pCamera->mName.C_Str();
     printf("Loading Camera: '%s'\n", pCamera->mName.C_Str());
 
-    // 1. Get the hierarchy matrix (Order: Parent * Child)
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(pCamera->mName.C_Str(), Transformation);
 
-    aiMatrix4x4 aiCameraMatrix;
-    pCamera->GetCameraMatrix(aiCameraMatrix);
-    Matrix4f CameraMatrix(aiCameraMatrix);
-    printf("Camera internal transformation:\n");
-    CameraMatrix.Print();
-
     Matrix4f FinalWorld = Transformation;
 
-    printf("Final camera transformation:\n");
-    FinalWorld.Print();
+    printf("Camera transformation:\n");
+    Transformation.Print();
 
-    // 3. Extract World Position
-    Vector4f Pos4D(0.0f, 0.0f, 0.0f, 1.0f);
+    printf("Camera local position: (%f, %f, %f)\n", pCamera->mPosition.x, pCamera->mPosition.y, pCamera->mPosition.z);
+    printf("Camera local look at: (%f, %f, %f)\n", pCamera->mLookAt.x, pCamera->mLookAt.y, pCamera->mLookAt.z);
+
+    // mPosition is relative to the camera node, but the glTF importer copies
+    // the node's own translation into it. In that case it is already part of
+    // the node transformation and must not be applied again.
+    aiVector3D LocalPos = pCamera->mPosition;
+    const aiNode* pNode = m_pScene->mRootNode->FindNode(pCamera->mName);
+
+    if (pNode) {
+        const aiMatrix4x4& m = pNode->mTransformation;
+        aiVector3D NodeTranslation(m.a4, m.b4, m.c4);
+
+        if ((LocalPos - NodeTranslation).Length() < 0.0001f) {
+            LocalPos = aiVector3D(0.0f, 0.0f, 0.0f);
+        }
+    }
+
+    // Extract World Position
+    Vector4f Pos4D(LocalPos.x, LocalPos.y, LocalPos.z, 1.0f);
     Pos4D = FinalWorld * Pos4D;
-    Vector3f FinalPos(pCamera->mPosition.x, pCamera->mPosition.y, -pCamera->mPosition.z);
+    Vector3f FinalPos(Pos4D.x, Pos4D.y, -Pos4D.z);
 
-    // 4. Extract World Direction (Blender Camera Forward is -Z)
-    Vector4f Target4D(0.0f, 0.0f, -1.0f, 0.0f);
+    // Extract World Direction (mLookAt is relative to the camera node)
+    Vector4f Target4D(pCamera->mLookAt.x, pCamera->mLookAt.y, pCamera->mLookAt.z, 0.0f);
     Target4D = FinalWorld * Target4D;
-    //Vector3f FinalTargetDir = Vector3f(pCamera->mLookAt.x, pCamera->mLookAt.y, -pCamera->mLookAt.z).Normalize();
-    Vector3f FinalTargetDir(Transformation.m[0][2], -Transformation.m[1][2], Transformation.m[2][2]);
+    Vector3f FinalTargetDir(Target4D.x, Target4D.y, -Target4D.z);
 
     FinalTargetDir = FinalTargetDir.Normalize();
 
-    // 5. Extract World Up (Blender Camera Up is +Y)
-    Vector4f Up4D(0.0f, 1.0f, 0.0f, 0.0f);
+    // Extract World Up (mUp is relative to the camera node)
+    Vector4f Up4D(pCamera->mUp.x, pCamera->mUp.y, pCamera->mUp.z, 0.0f);
     Up4D = FinalWorld * Up4D;
-    Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, Up4D.z).Normalize();
+    Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, -Up4D.z).Normalize();
 
-    // 6. Setup Perspective Projection
+    // Setup Perspective Projection
     m_pModelData->m_cameras[Index].m_zNear = pCamera->mClipPlaneNear;
     m_pModelData->m_cameras[Index].m_zFar = pCamera->mClipPlaneFar;
 
     float FullHorizontalDeg = ToDegree(pCamera->mHorizontalFOV);
     m_pModelData->m_cameras[Index].m_hFov = FullHorizontalDeg;
 
-    // 4. Assign the FULL vertical degree angle straight to your projection settings
+    // Assign the FULL vertical degree angle straight to your projection settings
     // (Do NOT divide by 2! glm::perspective handles halving internally via its cotangent math)
     m_pModelData->m_cameras[Index].m_pos = glm::vec3(FinalPos.x, FinalPos.y, FinalPos.z);
     m_pModelData->m_cameras[Index].m_target = glm::vec3(FinalTargetDir.x, FinalTargetDir.y, FinalTargetDir.z);
