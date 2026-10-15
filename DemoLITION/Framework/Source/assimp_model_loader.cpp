@@ -80,7 +80,7 @@ aiProcess_ValidateDataStructure)
                                       aiProcess_CalcTangentSpace)
 #endif
 
-int traverse(int depth, aiNode* pNode)
+static int traverse(int depth, const aiNode* pNode)
 {
     if (!pNode) {
         return 0;
@@ -109,7 +109,7 @@ int traverse(int depth, aiNode* pNode)
 }
 
 
-Vector3f VectorFromAssimpVector(const aiVector3D& v)
+static Vector3f VectorFromAssimpVector(const aiVector3D& v)
 {
     Vector3f ret;
 
@@ -121,7 +121,7 @@ Vector3f VectorFromAssimpVector(const aiVector3D& v)
 }
 
 
-uint CountValidFaces(const aiMesh& Mesh)
+static uint CountValidFaces(const aiMesh& Mesh)
 {
     uint NumValidFaces = 0;
 
