@@ -86,6 +86,18 @@ aiProcess_ValidateDataStructure)
                                       aiProcess_CalcTangentSpace)
 #endif
 
+
+static bool SceneHasBones(const aiScene* pScene)
+{
+    for (unsigned i = 0; i < pScene->mNumMeshes; i++) {
+        if (pScene->mMeshes[i]->mNumBones > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static int traverse(int depth, const aiNode* pNode)
 {
     if (!pNode) {
@@ -311,7 +323,7 @@ void AssimpModelLoader::InitMeshes(unsigned int NumVertices, unsigned int NumInd
 {
     m_pModelData->m_indices.reserve(NumIndices);
 
-    if (m_pScene->mNumAnimations > 0) {
+    if (SceneHasBones(m_pScene)) {
         m_pModelData->m_skinnedVertices.reserve(NumVertices);
         InitAllMeshes(m_pModelData->m_skinnedVertices);
     } else {
