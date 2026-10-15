@@ -230,6 +230,8 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
     m_filename = Filename;
     m_pModelData = &OutModelData;
 
+    assert(OutModelData.m_meshes.empty());
+
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
     m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");
