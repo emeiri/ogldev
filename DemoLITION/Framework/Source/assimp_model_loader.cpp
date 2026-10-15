@@ -1120,16 +1120,15 @@ void AssimpModelLoader::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
 
 void AssimpModelLoader::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
 {
-    if (pMesh->mNumBones > MAX_BONES) {
-        printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
-        printf("Make sure to increase the macro MAX_BONES in the C++ header as well as in the shader to the same value\n");
-        assert(0);
-    }
-
     // printf("Loading mesh bones %d\n", MeshIndex);
     for (uint i = 0; i < pMesh->mNumBones; i++) {
         // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
         LoadSingleBone(SkinnedVertices, MeshIndex, pMesh->mBones[i]);
+    int NumBones = (int)m_pModelData->m_boneInfo.size();
+    if (NumBones > MAX_BONES) {
+        printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", NumBones, MAX_BONES);
+        printf("Make sure to increase the macro MAX_BONES in the C++ header as well as in the shader to the same value\n");
+        assert(0);
     }
 }
 
