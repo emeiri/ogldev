@@ -360,8 +360,8 @@ void AssimpModelLoader::InitAllMeshes(std::vector<VertexType>& Vertices)
 template<typename VertexType>
 void AssimpModelLoader::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh)
 {
-    printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
-    printf("Size: %f, %f, %f\n", m_pModelData->m_meshes[MeshIndex].Dims.Size.x, m_pModelData->m_meshes[MeshIndex].Dims.Size.y, m_pModelData->m_meshes[MeshIndex].Dims.Size.z);
+   // printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
+   // printf("Size: %f, %f, %f\n", m_pModelData->m_meshes[MeshIndex].Dims.Size.x, m_pModelData->m_meshes[MeshIndex].Dims.Size.y, m_pModelData->m_meshes[MeshIndex].Dims.Size.z);
 
     // Update exact data tracking directly from current dynamic array size to prevent offset corruption
     m_pModelData->m_meshes[MeshIndex].BaseVertex = (uint)(Vertices.size());
