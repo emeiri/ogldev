@@ -111,7 +111,7 @@ void CoreModel::InitCameras()
 
     m_cameras.resize(m_modelData.m_cameras.size());
 
-    int WindowWidth, WindowHeight;
+    int WindowWidth = 0, WindowHeight = 0;
 #ifdef OGLDEV_VULKAN
     GetWindowSize(WindowWidth, WindowHeight);
 #else
@@ -170,7 +170,10 @@ void CoreModel::InitMaterials()
 {
     for (int MaterialIndex = 0; MaterialIndex < m_modelData.m_materials.size(); MaterialIndex++) {
 
-        for (int TexType = 0; TexType < TEX_TYPE_NUM; TexType++) {        
+        for (int TexType = 0; TexType < TEX_TYPE_NUM; TexType++) {
+            
+            m_Materials[MaterialIndex].pTextures[TexType] = NULL;
+
             TextureSource& TextureSource = m_modelData.m_materials[MaterialIndex].m_textures[TexType];
 
             if (!TextureSource.IsValid()) {
