@@ -320,8 +320,10 @@ static void DecomposeTransform(const Matrix4f& m, glm::vec3& Scaling, glm::quat&
 }
 
 
-void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip& Animation)
+void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip& Animation, std::vector<Matrix4f>& Transforms)
 {
+    Transforms.resize(m_modelData.m_boneInfo.size());
+
     // The nodes are stored parent-first so the parent's global transform is always ready
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
@@ -359,17 +361,24 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
         int BoneIndex = Node.m_boneIndex;
 
         if (BoneIndex >= 0) {
-            m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
-                                                                    m_tempGlobalTransforms[NodeIndex] *
-                                                                    m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
+            Transforms[BoneIndex] = m_modelData.m_globalInverseTransform *
+                                    m_tempGlobalTransforms[NodeIndex] *
+                                    m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }
 }
 
 
-void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks,
-                                         const AnimationClip& StartAnimation, const AnimationClip& EndAnimation, float BlendFactor) 
+void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, 
+                                         float EndAnimationTimeTicks,
+                                         const AnimationClip& StartAnimation, 
+                                         const AnimationClip& EndAnimation, 
+                                         float BlendFactor,
+                                         std::vector<Matrix4f>& BlendedTransforms)
+                        
 {
+    BlendedTransforms.resize(m_modelData.m_boneInfo.size());
+
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
         std::string NodeName(Node.m_name);
@@ -440,9 +449,9 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
         int BoneIndex = Node.m_boneIndex;
 
         if (BoneIndex >= 0) {
-            m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
-                                                                    m_tempGlobalTransforms[NodeIndex] *
-                                                                    m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
+            BlendedTransforms[BoneIndex] = m_modelData.m_globalInverseTransform *
+                                           m_tempGlobalTransforms[NodeIndex] *
+                                           m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }
 }
@@ -472,20 +481,15 @@ void CoreModel::GetBoneTransforms(float TimeInSeconds, std::vector<Matrix4f>& Tr
     float AnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, AnimationIndex);
     const AnimationClip& Animation = m_modelData.m_animations[AnimationIndex];
 
-    ReadNodeHierarchy(AnimationTimeTicks, Animation);
-    Transforms.resize(m_modelData.m_boneInfo.size());
-
-    for (uint i = 0 ; i < m_modelData.m_boneInfo.size() ; i++) {
-        Transforms[i] = m_modelData.m_boneInfo[i].FinalTransformation;
-    }
+    ReadNodeHierarchy(AnimationTimeTicks, Animation, Transforms);
 }
 
 
 void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
-                                           std::vector<Matrix4f>& BlendedTransforms,
-                                           unsigned int StartAnimIndex,
-                                           unsigned int EndAnimIndex,
-                                           float BlendFactor)
+                                         std::vector<Matrix4f>& BlendedTransforms,
+                                         unsigned int StartAnimIndex,
+                                         unsigned int EndAnimIndex,
+                                         float BlendFactor)
 {
     if (StartAnimIndex >= m_modelData.m_animations.size()) {
         printf("Invalid start animation index %d, max is %d\n", StartAnimIndex, (int)(m_modelData.m_animations.size() - 1));
@@ -508,13 +512,12 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
     const AnimationClip& StartAnimation = m_modelData.m_animations[StartAnimIndex];
     const AnimationClip& EndAnimation = m_modelData.m_animations[EndAnimIndex];
 
-    ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, StartAnimation, EndAnimation, BlendFactor);
-
-    BlendedTransforms.resize(m_modelData.m_boneInfo.size());
-
-    for (uint i = 0 ; i < m_modelData.m_boneInfo.size() ; i++) {
-        BlendedTransforms[i] = m_modelData.m_boneInfo[i].FinalTransformation;
-    }
+    ReadNodeHierarchyBlended(StartAnimationTimeTicks, 
+                             EndAnimationTimeTicks, 
+                             StartAnimation, 
+                             EndAnimation, 
+                             BlendFactor,
+                             BlendedTransforms);
 }
 
 

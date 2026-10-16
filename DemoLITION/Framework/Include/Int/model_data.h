@@ -69,12 +69,10 @@ struct Vertex {
 struct BoneInfo
 {
     Matrix4f OffsetMatrix;
-    Matrix4f FinalTransformation;
 
     BoneInfo(const Matrix4f& Offset)
     {
         OffsetMatrix = Offset;
-        FinalTransformation.SetZero();
     }
 };
 

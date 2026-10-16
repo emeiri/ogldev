@@ -213,9 +213,13 @@ private:
 	// Skeletal animation stuff
     /////////////////////////////////////
 
-    void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation);
-    void ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, 
-                                  const AnimationClip &StartAnimation, const AnimationClip& EndAnimation, float BlendFactor);
+    void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation, std::vector<Matrix4f>& Transforms);
+    void ReadNodeHierarchyBlended(float StartAnimationTimeTicks, 
+                                  float EndAnimationTimeTicks, 
+                                  const AnimationClip &StartAnimation, 
+                                  const AnimationClip& EndAnimation, 
+                                  float BlendFactor,
+                                  std::vector<Matrix4f>& BlendedTransforms);
     float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
 
     struct LocalTransform {
