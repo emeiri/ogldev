@@ -252,145 +252,71 @@ void CoreModel::SetNodePositionXZ(const char* pNodeName, float x, float z)
 
 
 
-uint CoreModel::FindPosition(float AnimationTimeTicks, const AnimChannel& NodeAnim)
+static glm::vec3 Interpolate(const glm::vec3& Start, const glm::vec3& End, float Factor)
 {
-    for (uint i = 0 ; i < NodeAnim.m_positions.size() - 1 ; i++) {
-        float t = (float)NodeAnim.m_positions[i + 1].m_time;
-        if (AnimationTimeTicks < t) {
-            return i;
+    return Start + Factor * (End - Start);
+}
+
+
+static glm::quat Interpolate(const glm::quat& Start, const glm::quat& End, float Factor)
+{
+    return glm::normalize(glm::slerp(Start, End, Factor));
+}
+
+
+// Samples a key track at the given time. An empty track returns the fallback
+// (the bind-pose value), times outside the track are clamped to the end keys.
+template<typename KeyT, typename T>
+static T Sample(const std::vector<KeyT>& Keys, float Time, const T& Fallback)
+{
+    if (Keys.empty()) {
+        return Fallback;
+    }
+
+    if ((Keys.size() == 1) || (Time <= Keys.front().m_time)) {
+        return Keys.front().m_value;
+    }
+
+    if (Time >= Keys.back().m_time) {
+        return Keys.back().m_value;
+    }
+
+    // Binary search for the last key with m_time <= Time. The checks above
+    // guarantee Keys[Lo].m_time <= Time < Keys[Hi].m_time throughout.
+    size_t Lo = 0;
+    size_t Hi = Keys.size() - 1;
+
+    while (Hi - Lo > 1) {
+        size_t Mid = (Lo + Hi) / 2;
+
+        if (Keys[Mid].m_time <= Time) {
+            Lo = Mid;
+        } else {
+            Hi = Mid;
         }
     }
 
-    return 0;
+    float DeltaTime = Keys[Hi].m_time - Keys[Lo].m_time;
+    float Factor = (DeltaTime > 0.0f) ? (Time - Keys[Lo].m_time) / DeltaTime : 0.0f;
+
+    return Interpolate(Keys[Lo].m_value, Keys[Hi].m_value, Factor);
 }
 
 
-void CoreModel::CalcInterpolatedPosition(glm::vec3& Out, float AnimationTimeTicks, const AnimChannel& NodeAnim)
+// Splits a TRS matrix (no shear) into scaling, rotation and translation
+static void DecomposeTransform(const Matrix4f& m, glm::vec3& Scaling, glm::quat& Rotation, glm::vec3& Translation)
 {
-    // we need at least two values to interpolate...
-    if (NodeAnim.m_positions.size() == 1) {
-        Out = NodeAnim.m_positions[0].m_value;
-        return;
+    // Matrix4f is row major, the translation is in the last column
+    Translation = glm::vec3(m.m[0][3], m.m[1][3], m.m[2][3]);
+
+    glm::mat3 R;
+    for (int c = 0; c < 3; c++) {
+        glm::vec3 Axis(m.m[0][c], m.m[1][c], m.m[2][c]);
+        Scaling[c] = glm::length(Axis);
+        R[c] = (Scaling[c] > 0.0f) ? Axis / Scaling[c] : Axis;
     }
 
-    float MaxTime = (float)NodeAnim.m_positions[NodeAnim.m_positions.size() - 1].m_time;
-    if (AnimationTimeTicks >= MaxTime) {
-        Out = NodeAnim.m_positions[NodeAnim.m_positions.size() - 1].m_value;
-        return;
-    }
-
-    uint PositionIndex = FindPosition(AnimationTimeTicks, NodeAnim);
-    uint NextPositionIndex = PositionIndex + 1;
-    assert(NextPositionIndex < NodeAnim.m_positions.size());
-
-    float t1 = (float)NodeAnim.m_positions[PositionIndex].m_time;
-    float t2 = (float)NodeAnim.m_positions[NextPositionIndex].m_time;
-
-    // Fix: Stripped redundant unreachable 'if (t1 > AnimationTimeTicks)' check and safe-guarded division
-    float DeltaTime = t2 - t1;
-    float Factor = 0.0f;
-    if (DeltaTime > 0.0f) {
-        Factor = (AnimationTimeTicks - t1) / DeltaTime;
-    }
-
-    Factor = std::clamp(Factor, 0.0f, 1.0f);
-
-    const glm::vec3& Start = NodeAnim.m_positions[PositionIndex].m_value;
-    const glm::vec3& End = NodeAnim.m_positions[NextPositionIndex].m_value;
-    Out = Start + Factor * (End - Start);
-}
-
-
-uint CoreModel::FindRotation(float AnimationTimeTicks, const AnimChannel& NodeAnim)
-{
-    assert(NodeAnim.m_rotations.size() > 0);
-
-    for (uint i = 0 ; i < NodeAnim.m_rotations.size() - 1 ; i++) {
-        float t = (float)NodeAnim.m_rotations[i + 1].m_time;
-        if (AnimationTimeTicks < t) {
-            return i;
-        }
-    }
-
-    return 0;
-}
-
-
-void CoreModel::CalcInterpolatedRotation(glm::quat& Out, float AnimationTimeTicks, const AnimChannel& NodeAnim) 
-{
-    // we need at least two values to interpolate...
-    if (NodeAnim.m_rotations.size() == 1) {
-        Out = NodeAnim.m_rotations[0].m_value;
-        return;
-    }
-
-    float MaxTime = (float)NodeAnim.m_rotations[NodeAnim.m_rotations.size() - 1].m_time;
-    if (AnimationTimeTicks >= MaxTime) {
-        Out = NodeAnim.m_rotations[NodeAnim.m_rotations.size() - 1].m_value;
-        return;
-    }
-
-    uint RotationIndex = FindRotation(AnimationTimeTicks, NodeAnim);
-    uint NextRotationIndex = RotationIndex + 1;
-    assert(NextRotationIndex < NodeAnim.m_rotations.size());
-
-    float t1 = (float)NodeAnim.m_rotations[RotationIndex].m_time;
-    float t2 = (float)NodeAnim.m_rotations[NextRotationIndex].m_time;
-
-    float DeltaTime = t2 - t1;
-    float Factor = 0.0f;
-    if (DeltaTime > 0.0f) {
-        Factor = (AnimationTimeTicks - t1) / DeltaTime;
-    }
-    
-    Factor = std::clamp(Factor, 0.0f, 1.0f);
-
-    const glm::quat& StartRotationQ = NodeAnim.m_rotations[RotationIndex].m_value;
-    const glm::quat& EndRotationQ = NodeAnim.m_rotations[NextRotationIndex].m_value;
-    Out = glm::slerp(StartRotationQ, EndRotationQ, Factor);
-    Out = glm::normalize(Out);
-}
-
-
-uint CoreModel::FindScaling(float AnimationTimeTicks, const AnimChannel& NodeAnim)
-{
-    assert(NodeAnim.m_scalings.size() > 0);
-
-    for (uint i = 0 ; i < NodeAnim.m_scalings.size() - 1 ; i++) {
-        float t = (float)NodeAnim.m_scalings[i + 1].m_time;
-        if (AnimationTimeTicks < t) {
-            return i;
-        }
-    }
-
-    return 0;
-}
-
-
-void CoreModel::CalcInterpolatedScaling(glm::vec3& Out, float AnimationTimeTicks, const AnimChannel& NodeAnim)
-{
-    // we need at least two values to interpolate...
-    if (NodeAnim.m_scalings.size() == 1) {
-        Out = NodeAnim.m_scalings[0].m_value;
-        return;
-    }
-
-    uint ScalingIndex = FindScaling(AnimationTimeTicks, NodeAnim);
-    uint NextScalingIndex = ScalingIndex + 1;
-    assert(NextScalingIndex < NodeAnim.m_scalings.size());
-    float t1 = (float)NodeAnim.m_scalings[ScalingIndex].m_time;
-    if (t1 > AnimationTimeTicks) {
-        Out = NodeAnim.m_scalings[ScalingIndex].m_value;
-    } else {
-        float t2 = (float)NodeAnim.m_scalings[NextScalingIndex].m_time;
-        float DeltaTime = t2 - t1;
-        float Factor = (AnimationTimeTicks - (float)t1) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
-        const glm::vec3& Start = NodeAnim.m_scalings[ScalingIndex].m_value;
-        const glm::vec3& End   = NodeAnim.m_scalings[NextScalingIndex].m_value;
-        glm::vec3 Delta = End - Start;
-        Out = Start + Factor * Delta;
-    }
+    Rotation = glm::normalize(glm::quat_cast(R));
 }
 
 
@@ -409,7 +335,7 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
 
         if (pNodeAnim) {
             LocalTransform Transform;
-            CalcLocalTransform(Transform, AnimationTimeTicks, *pNodeAnim);
+            CalcLocalTransform(Transform, AnimationTimeTicks, *pNodeAnim, Node.m_localTransform);
 
             Matrix4f ScalingM;
             ScalingM.InitScaleTransform(Transform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
@@ -458,13 +384,13 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
         LocalTransform StartTransform;
 
         if (pStartNodeAnim) {
-            CalcLocalTransform(StartTransform, StartAnimationTimeTicks, *pStartNodeAnim);
+            CalcLocalTransform(StartTransform, StartAnimationTimeTicks, *pStartNodeAnim, Node.m_localTransform);
         }
 
         const AnimChannel* pEndNodeAnim = EndAnimation.FindNodeAnim(NodeIndex);
         LocalTransform EndTransform;
         if (pEndNodeAnim) {
-            CalcLocalTransform(EndTransform, EndAnimationTimeTicks, *pEndNodeAnim);
+            CalcLocalTransform(EndTransform, EndAnimationTimeTicks, *pEndNodeAnim, Node.m_localTransform);
         }
 
         if (pStartNodeAnim && !pEndNodeAnim) {
@@ -524,11 +450,17 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
 }
 
 
-void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim)
+void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim,
+                                   const Matrix4f& BindPoseTransform)
 {
-    CalcInterpolatedScaling(Transform.Scaling, AnimationTimeTicks, NodeAnim);
-    CalcInterpolatedRotation(Transform.Rotation, AnimationTimeTicks, NodeAnim);
-    CalcInterpolatedPosition(Transform.Translation, AnimationTimeTicks, NodeAnim);
+    // A channel may animate only some of the components (e.g. rotation only),
+    // the missing ones keep their bind pose value
+    LocalTransform BindPose;
+    DecomposeTransform(BindPoseTransform, BindPose.Scaling, BindPose.Rotation, BindPose.Translation);
+
+    Transform.Scaling     = Sample(NodeAnim.m_scalings,  AnimationTimeTicks, BindPose.Scaling);
+    Transform.Rotation    = Sample(NodeAnim.m_rotations, AnimationTimeTicks, BindPose.Rotation);
+    Transform.Translation = Sample(NodeAnim.m_positions, AnimationTimeTicks, BindPose.Translation);
 }
 
 

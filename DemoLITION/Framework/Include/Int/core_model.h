@@ -213,12 +213,6 @@ private:
 	// Skeletal animation stuff
     /////////////////////////////////////
 
-    void CalcInterpolatedScaling(glm::vec3& Out, float AnimationTime, const AnimChannel& NodeAnim);
-    void CalcInterpolatedRotation(glm::quat& Out, float AnimationTime, const AnimChannel& NodeAnim);
-    void CalcInterpolatedPosition(glm::vec3& Out, float AnimationTime, const AnimChannel& NodeAnim);
-    uint FindScaling(float AnimationTime, const AnimChannel& NodeAnim);
-    uint FindRotation(float AnimationTime, const AnimChannel& NodeAnim);
-    uint FindPosition(float AnimationTime, const AnimChannel& NodeAnim);
     void ReadNodeHierarchy(float AnimationTime, const AnimationClip& Animation);
     void ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, 
                                   const AnimationClip &StartAnimation, const AnimationClip& EndAnimation, float BlendFactor);
@@ -230,6 +224,7 @@ private:
         glm::vec3 Translation;
     };
 
-    void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim);
+    void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const AnimChannel& NodeAnim,
+                            const Matrix4f& BindPoseTransform);
 };
 
