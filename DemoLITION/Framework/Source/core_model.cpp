@@ -80,10 +80,6 @@ void CoreModel::InitModel()
     CalculateMeshTransformations();
 
     InitGeometryPost();
-
-#ifndef OGLDEV_VULKAN
-    assert(GLCheckError());
-#endif
 }
 
 
@@ -172,18 +168,18 @@ void CoreModel::InitMaterials()
             
             m_Materials[MaterialIndex].pTextures[TexType] = NULL;
 
-            TextureSource& TextureSource = m_modelData.m_materials[MaterialIndex].m_textures[TexType];
+            TextureSource& TexSource = m_modelData.m_materials[MaterialIndex].m_textures[TexType];
 
-            if (!TextureSource.IsValid()) {
+            if (!TexSource.IsValid()) {
                 continue;
             }
 
-            bool IsSRGB = TextureSource.IsSRGB;
+            bool IsSRGB = TexSource.IsSRGB;
             
-            if (TextureSource.EmbeddedBytes.size() > 0) {            
+            if (TexSource.EmbeddedBytes.size() > 0) {            
                 LoadTextureEmbedded(MaterialIndex, (TEXTURE_TYPE)TexType, IsSRGB);
             } else {               
-                const std::string& Path = TextureSource.Path;
+                const std::string& Path = TexSource.Path;
                 LoadTextureFromFile(Path, MaterialIndex, (TEXTURE_TYPE)TexType, IsSRGB);
             }
         }
