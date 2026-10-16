@@ -225,6 +225,12 @@ void GLModel::InitGeometryPost()
     if (UseIndirectRender) {
         m_indirectRender.Init(m_modelData.m_instances, m_modelData.m_meshes, m_Materials);
     }
+
+    if (glGetError() != GL_NO_ERROR) {
+        printf("Error after populating buffers\n");
+        assert(0);
+        exit(1);
+    }
 }
 
 
