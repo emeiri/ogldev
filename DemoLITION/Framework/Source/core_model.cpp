@@ -71,12 +71,9 @@ void CoreModel::InitModel()
     m_Materials.resize(m_modelData.m_materials.size());
     m_tempGlobalTransforms.resize(m_modelData.m_nodes.size());
 
-    unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
-    unsigned int NumIndices = (unsigned int)m_modelData.m_indices.size();
-
     InitMaterials();
 
-    InitGPUBuffers(NumVertices, NumIndices);
+    InitGPUBuffers();
 
     InitCameras();
 
@@ -90,7 +87,7 @@ void CoreModel::InitModel()
 }
 
 
-void CoreModel::InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices)
+void CoreModel::InitGPUBuffers()
 {
     printf("Num skinned vertices %d\n", (int)m_modelData.m_skinnedVertices.size());
 

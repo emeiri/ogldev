@@ -201,7 +201,7 @@ private:
     void InitMaterials();
     void LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
     void LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
-    void InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices);
+    void InitGPUBuffers();
     void CalculateMeshTransformations();
 
     std::vector<Matrix4f> m_transformations;
