@@ -358,8 +358,9 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
             GlobalTransforms[NodeIndex] = NodeTransformation;
         }
 
-        if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
-            uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
+        int BoneIndex = Node.m_boneIndex;
+
+        if (BoneIndex >= 0) {
             m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
                                                                     GlobalTransforms[NodeIndex] *
                                                                     m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
@@ -440,8 +441,9 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
             GlobalTransforms[NodeIndex] = NodeTransformation;
         }
 
-        if (m_modelData.m_boneNameToIndexMap.find(NodeName) != m_modelData.m_boneNameToIndexMap.end()) {
-            uint BoneIndex = m_modelData.m_boneNameToIndexMap[NodeName];
+        int BoneIndex = Node.m_boneIndex;
+
+        if (BoneIndex >= 0) {
             m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
                                                                     GlobalTransforms[NodeIndex] *
                                                                     m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
