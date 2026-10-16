@@ -106,8 +106,6 @@ public:
 
     bool IsAnimated() const;
 
-    const CoreMaterial* GetMaterialForMesh(int MeshIndex) const;
-
     virtual void SetColorTexture(int TextureHandle) { assert(0); }
 
     virtual void SetNormalMap(int TextureHandle) { assert(0); }
@@ -199,17 +197,11 @@ private:
     virtual void PopulateBuffers(std::vector<Vertex>& Vertices) = 0;    
 
     void InitModel();
-
     void InitCameras();
     void InitMaterials();
     void LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
     void LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB);
-
     void InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices);
-
-    template<typename VertexType>
-    void InitAllMeshes(const std::string& Filename, std::vector<VertexType>& Vertices);
-
     void CalculateMeshTransformations();
 
     std::vector<Matrix4f> m_transformations;
