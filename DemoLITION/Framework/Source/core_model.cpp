@@ -104,6 +104,11 @@ void CoreModel::InitGPUBuffers(unsigned int NumVertices, unsigned int NumIndices
 
 void CoreModel::InitCameras()
 {
+    if (m_modelData.m_cameras.empty()) {
+        printf("No cameras found in the model\n");
+        return;
+    }
+
     m_cameras.resize(m_modelData.m_cameras.size());
 
     int WindowWidth, WindowHeight;
