@@ -31,7 +31,7 @@ bool CoreModel::IsPBR() const
 
     if (m_Materials.size() > 0) {
         // Currently checking only the first material
-        ret = m_Materials[0].m_isPBR;
+        ret = m_modelData.m_materials[0].m_isPBR;
     }
         
     return ret;
@@ -191,12 +191,6 @@ void CoreModel::InitMaterials()
         }
 
         m_Materials[MaterialIndex].m_pMaterialData = &m_modelData.m_materials[MaterialIndex];
-        m_Materials[MaterialIndex].m_isPBR = m_modelData.m_materials[MaterialIndex].m_isPBR;
-        m_Materials[MaterialIndex].m_name = m_modelData.m_materials[MaterialIndex].m_name;
-        m_Materials[MaterialIndex].m_materialType = m_modelData.m_materials[MaterialIndex].m_materialType;
-        m_Materials[MaterialIndex].m_transparencyFactor = m_modelData.m_materials[MaterialIndex].m_transparencyFactor;
-        m_Materials[MaterialIndex].m_alphaTest = m_modelData.m_materials[MaterialIndex].m_alphaTest;
-        m_Materials[MaterialIndex].m_ior = m_modelData.m_materials[MaterialIndex].m_ior;        
     }
 }
 

@@ -152,6 +152,6 @@ void PBRForwardLightingTechnique::SetMaterial(const CoreMaterial& mat)
                 mat.m_pMaterialData->m_clearCoatTransmissionThickness.g,
                 mat.m_pMaterialData->m_clearCoatTransmissionThickness.b,
                 mat.m_pMaterialData->m_clearCoatTransmissionThickness.a);
-    glUniform1f(m_iorLoc, mat.m_ior);
-    glUniform1i(m_materialTypeLoc, mat.m_materialType);
+    glUniform1f(m_iorLoc, mat.m_pMaterialData->m_ior);
+    glUniform1i(m_materialTypeLoc, mat.m_pMaterialData->m_materialType);
 }

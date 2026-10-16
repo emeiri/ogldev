@@ -33,16 +33,7 @@ class CoreMaterial {
  public:
 
     MaterialData* m_pMaterialData = NULL;
-
-    std::string m_name;
-    bool m_isPBR = false;
-    int m_materialType = MaterialType_Invalid;
-
     Texture* pTextures[TEX_TYPE_NUM] = { 0 };
-
-    float m_transparencyFactor = 1.0f;
-    float m_alphaTest = 0.0f;    
-    float m_ior = 1.5f;
 
     ~CoreMaterial()
     {
