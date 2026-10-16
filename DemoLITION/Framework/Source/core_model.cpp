@@ -22,8 +22,7 @@
 #include "Int/core_model.h"
 
 //#define DEBUG_TEXTURES
-
-#define DEBUG_SCENE_HIERARCHY
+//#define DEBUG_SCENE_HIERARCHY
 
 bool CoreModel::IsPBR() const
 {
