@@ -1234,7 +1234,6 @@ int AssimpModelLoader::GetBoneId(const aiBone* pBone)
 }
 
 
-
 static void FlattenNodeHierarchy(const aiNode* pNode, int ParentIndex, 
                                  const Matrix4f& ParentTransform,
                                  std::vector<SkelNode>& Out, 
@@ -1268,12 +1267,14 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParentIndex,
 
     Out.push_back(node);
 
-    if (NodeNameToIndexMap.find(node.m_name) != NodeNameToIndexMap.end()) {
-        printf("Warning! Duplicate node name '%s' found in the hierarchy\n", node.m_name.c_str());
-        exit(0);
-    }
+    auto it = NodeNameToIndexMap.find(node.m_name);
 
-    NodeNameToIndexMap[node.m_name] = NodeIndex;
+    if (it == NodeNameToIndexMap.end()) {
+        NodeNameToIndexMap[node.m_name] = NodeIndex;
+    } else {
+        printf("Warning! Duplicate node name '%s' (nodes %d and %d), using the first\n",
+               node.m_name.c_str(), it->second, NodeIndex);
+    }
 
    // printf("Adding node '%s', index %d with parent index %d\n", node.m_name.c_str(), NodeIndex, ParentIndex);
 
