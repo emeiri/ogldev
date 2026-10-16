@@ -69,6 +69,7 @@ void CoreModel::InitModel()
     printf("\n*** Initializing model ***\n");
     
     m_Materials.resize(m_modelData.m_materials.size());
+    m_tempGlobalTransforms.resize(m_modelData.m_nodes.size());
 
     unsigned int NumVertices = (unsigned int)m_modelData.NumVertices();
     unsigned int NumIndices = (unsigned int)m_modelData.m_indices.size();
@@ -246,11 +247,10 @@ void CoreModel::SetNodePositionXZ(const char* pNodeName, float x, float z)
     Transformation[3][2] = z;
 }
 
+
 //
 // Skeletal Animation Support
 //
-
-
 
 static glm::vec3 Interpolate(const glm::vec3& Start, const glm::vec3& End, float Factor)
 {
@@ -323,8 +323,6 @@ static void DecomposeTransform(const Matrix4f& m, glm::vec3& Scaling, glm::quat&
 void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip& Animation)
 {
     // The nodes are stored parent-first so the parent's global transform is always ready
-    std::vector<Matrix4f> GlobalTransforms(m_modelData.m_nodes.size());
-
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
         std::string NodeName(Node.m_name);
@@ -353,16 +351,16 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
         }
 
         if (Node.m_parentIndex >= 0) {
-            GlobalTransforms[NodeIndex] = GlobalTransforms[Node.m_parentIndex] * NodeTransformation;
+            m_tempGlobalTransforms[NodeIndex] = m_tempGlobalTransforms[Node.m_parentIndex] * NodeTransformation;
         } else {
-            GlobalTransforms[NodeIndex] = NodeTransformation;
+            m_tempGlobalTransforms[NodeIndex] = NodeTransformation;
         }
 
         int BoneIndex = Node.m_boneIndex;
 
         if (BoneIndex >= 0) {
             m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
-                                                                    GlobalTransforms[NodeIndex] *
+                                                                    m_tempGlobalTransforms[NodeIndex] *
                                                                     m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }
@@ -372,8 +370,6 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const AnimationClip&
 void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks,
                                          const AnimationClip& StartAnimation, const AnimationClip& EndAnimation, float BlendFactor) 
 {
-    std::vector<Matrix4f> GlobalTransforms(m_modelData.m_nodes.size());
-
     for (uint NodeIndex = 0; NodeIndex < m_modelData.m_nodes.size(); NodeIndex++) {
         const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
         std::string NodeName(Node.m_name);
@@ -436,16 +432,16 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
         }
 
         if (Node.m_parentIndex >= 0) {
-            GlobalTransforms[NodeIndex] = GlobalTransforms[Node.m_parentIndex] * NodeTransformation;
+            m_tempGlobalTransforms[NodeIndex] = m_tempGlobalTransforms[Node.m_parentIndex] * NodeTransformation;
         } else {
-            GlobalTransforms[NodeIndex] = NodeTransformation;
+            m_tempGlobalTransforms[NodeIndex] = NodeTransformation;
         }
 
         int BoneIndex = Node.m_boneIndex;
 
         if (BoneIndex >= 0) {
             m_modelData.m_boneInfo[BoneIndex].FinalTransformation = m_modelData.m_globalInverseTransform *
-                                                                    GlobalTransforms[NodeIndex] *
+                                                                    m_tempGlobalTransforms[NodeIndex] *
                                                                     m_modelData.m_boneInfo[BoneIndex].OffsetMatrix;
         }
     }

@@ -187,8 +187,8 @@ protected:
     ModelData m_modelData;
     std::vector<CoreMaterial> m_Materials;
     std::vector<GLMCameraFirstPerson> m_cameras;
-
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
+    std::vector<Matrix4f> m_tempGlobalTransforms;
 
 private:
 
