@@ -15,8 +15,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\DemoLITION\Tests\carbonara\DemoLITION_test_carbonara.cpp">
+    <ClCompile Include="..\..\..\..\DemoLITION\Tests\carbonara_ballistics\DemoLITION_carbonara_ballistics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClInclude Include="..\..\..\..\DemoLITION\Tests\carbonara\carbonara.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

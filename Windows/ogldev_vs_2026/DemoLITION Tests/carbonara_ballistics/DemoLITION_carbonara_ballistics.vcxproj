@@ -19,13 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\DemoLITION\Tests\carbonara\DemoLITION_test_carbonara.cpp" />
+    <ClCompile Include="..\..\..\..\DemoLITION\Tests\carbonara_ballistics\DemoLITION_carbonara_ballistics.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\DemoLITION\Tests\carbonara\carbonara.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c94aab9b-8edd-418a-ae64-a1b6935cb7d0}</ProjectGuid>
-    <RootNamespace>DemoLITION_test_carbonara</RootNamespace>
+    <ProjectGuid>{f7c81bb4-7c3e-4ea3-899c-739551145098}</ProjectGuid>
+    <RootNamespace>DemoLITION_carbonara_ballistics</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
