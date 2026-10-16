@@ -226,6 +226,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\model_data.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\perlin.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\terrain_grid.h" />
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />

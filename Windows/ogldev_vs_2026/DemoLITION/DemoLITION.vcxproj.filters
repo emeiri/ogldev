@@ -378,6 +378,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\assimp_model_loader.h">
       <Filter>Include\Int</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\model_data.h">
+      <Filter>Include\Int</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

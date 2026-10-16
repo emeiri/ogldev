@@ -23,7 +23,6 @@
 
 #include "ogldev_math_3d.h"
 #include "Int/core_material.h"
-#include "GL/gl_basic_mesh_entry.h"
 #include "Int/assimp_model_loader.h"
 
 class IndirectRender {

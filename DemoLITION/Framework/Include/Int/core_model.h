@@ -27,7 +27,6 @@
 #include "demolition_scene.h"
 #include "demolition_model.h"
 #include "Int/core_mesh.h"
-#include "GL/gl_basic_mesh_entry.h"
 #include "Int/assimp_model_loader.h"
 
 
