@@ -1241,6 +1241,11 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParentIndex,
                                  std::unordered_map<std::string, int>& NodeNameToIndexMap,
                                  std::vector<MeshInstance>& Instances)
 {
+    if (pNode->mName.length == 0) {
+        printf("Warning! Node with empty name found, parent %d,skipping\n", ParentIndex);
+        return;
+    }
+
     int NodeIndex = (int)Out.size();
 
     SkelNode node;
