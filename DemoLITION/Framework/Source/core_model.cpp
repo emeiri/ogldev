@@ -190,16 +190,10 @@ void CoreModel::InitMaterials()
             }
         }
 
+        m_Materials[MaterialIndex].m_pMaterialData = &m_modelData.m_materials[MaterialIndex];
         m_Materials[MaterialIndex].m_isPBR = m_modelData.m_materials[MaterialIndex].m_isPBR;
         m_Materials[MaterialIndex].m_name = m_modelData.m_materials[MaterialIndex].m_name;
         m_Materials[MaterialIndex].m_materialType = m_modelData.m_materials[MaterialIndex].m_materialType;
-        m_Materials[MaterialIndex].AmbientColor = m_modelData.m_materials[MaterialIndex].m_ambientColor;
-        m_Materials[MaterialIndex].DiffuseColor = m_modelData.m_materials[MaterialIndex].m_diffuseColor;
-        m_Materials[MaterialIndex].SpecularColor = m_modelData.m_materials[MaterialIndex].m_specularColor;
-        m_Materials[MaterialIndex].BaseColor = m_modelData.m_materials[MaterialIndex].m_baseColor;
-        m_Materials[MaterialIndex].EmissiveColor = m_modelData.m_materials[MaterialIndex].m_emissiveColor;
-        m_Materials[MaterialIndex].MetallicRoughnessNormalOcclusion = m_modelData.m_materials[MaterialIndex].m_metallicRoughnessNormalOcclusion;
-        m_Materials[MaterialIndex].ClearCoatTransmissionThickness = m_modelData.m_materials[MaterialIndex].m_clearCoatTransmissionThickness;
         m_Materials[MaterialIndex].m_transparencyFactor = m_modelData.m_materials[MaterialIndex].m_transparencyFactor;
         m_Materials[MaterialIndex].m_alphaTest = m_modelData.m_materials[MaterialIndex].m_alphaTest;
         m_Materials[MaterialIndex].m_ior = m_modelData.m_materials[MaterialIndex].m_ior;        

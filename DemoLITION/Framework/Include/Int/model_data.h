@@ -24,7 +24,6 @@
 
 #include "ogldev_math_3d.h"
 #include "demolition_lights.h"
-#include "demolition_scene.h"
 
 struct MeshDims {
     glm::vec3 Size = glm::vec3(0.0f);
@@ -138,6 +137,36 @@ struct TextureSource {
     std::vector<u8> EmbeddedBytes;     // non-empty for embedded textures
     bool IsSRGB = false;
     bool IsValid() const { return !Path.empty() || !EmbeddedBytes.empty(); }
+};
+
+
+enum MaterialTypeFlags : u32 {
+    MaterialType_Invalid = 0,
+    MaterialType_MetallicRoughness = 0x1,
+    MaterialType_SpecularGlossiness = 0x2,
+    MaterialType_Sheen = 0x4,
+    MaterialType_ClearCoat = 0x8,
+    MaterialType_Specular = 0x10,
+    MaterialType_Transmission = 0x20,
+    MaterialType_Volume = 0x40,
+    MaterialType_Unlit = 0x80,
+};
+
+
+enum TEXTURE_TYPE {
+    TEX_TYPE_BASE = 0,      // Base color / diffuse / albedo
+    TEX_TYPE_SPECULAR = 1,
+    TEX_TYPE_NORMAL = 2,
+    TEX_TYPE_METALNESS = 3,
+    TEX_TYPE_EMISSIVE = 4,
+    TEX_TYPE_NORMAL_CAMERA = 5,
+    TEX_TYPE_EMISSION_COLOR = 6,
+    TEX_TYPE_ROUGHNESS = 7,
+    TEX_TYPE_AMBIENT_OCCLUSION = 8,
+    TEX_TYPE_CLEARCOAT = 9,
+    TEX_TYPE_CLEARCOAT_ROUGHNESS = 10,
+    TEX_TYPE_CLEARCOAT_NORMAL = 11,
+    TEX_TYPE_NUM = 12
 };
 
 

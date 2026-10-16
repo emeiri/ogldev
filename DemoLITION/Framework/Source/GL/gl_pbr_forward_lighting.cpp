@@ -140,18 +140,18 @@ void PBRForwardLightingTechnique::SetClearCoatNormalTextureUnit(int TextureUnit)
 
 void PBRForwardLightingTechnique::SetMaterial(const CoreMaterial& mat)
 {
-    glUniform4f(m_baseColorLoc, mat.BaseColor.r, mat.BaseColor.g, mat.BaseColor.b, mat.BaseColor.a);
-    glUniform4f(m_emissiveColorLoc, mat.EmissiveColor.r, mat.EmissiveColor.g, mat.EmissiveColor.b, mat.EmissiveColor.a);
+    glUniform4f(m_baseColorLoc, mat.m_pMaterialData->m_baseColor.r, mat.m_pMaterialData->m_baseColor.g, mat.m_pMaterialData->m_baseColor.b, mat.m_pMaterialData->m_baseColor.a);
+    glUniform4f(m_emissiveColorLoc, mat.m_pMaterialData->m_emissiveColor.r, mat.m_pMaterialData->m_emissiveColor.g, mat.m_pMaterialData->m_emissiveColor.b, mat.m_pMaterialData->m_emissiveColor.a);
     glUniform4f(m_metallicRoughnessNormalOcclusionLoc,
-                mat.MetallicRoughnessNormalOcclusion.r,
-                mat.MetallicRoughnessNormalOcclusion.g,
-                mat.MetallicRoughnessNormalOcclusion.b,
-                mat.MetallicRoughnessNormalOcclusion.a);
+                mat.m_pMaterialData->m_metallicRoughnessNormalOcclusion.r,
+                mat.m_pMaterialData->m_metallicRoughnessNormalOcclusion.g,
+                mat.m_pMaterialData->m_metallicRoughnessNormalOcclusion.b,
+                mat.m_pMaterialData->m_metallicRoughnessNormalOcclusion.a);
     glUniform4f(m_clearCoatTransmissionThicknessLoc,
-                mat.ClearCoatTransmissionThickness.r,
-                mat.ClearCoatTransmissionThickness.g,
-                mat.ClearCoatTransmissionThickness.b,
-                mat.ClearCoatTransmissionThickness.a);
+                mat.m_pMaterialData->m_clearCoatTransmissionThickness.r,
+                mat.m_pMaterialData->m_clearCoatTransmissionThickness.g,
+                mat.m_pMaterialData->m_clearCoatTransmissionThickness.b,
+                mat.m_pMaterialData->m_clearCoatTransmissionThickness.a);
     glUniform1f(m_iorLoc, mat.m_ior);
     glUniform1i(m_materialTypeLoc, mat.m_materialType);
 }

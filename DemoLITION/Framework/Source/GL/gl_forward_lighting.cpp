@@ -231,10 +231,10 @@ void ForwardLightingTechnique::SetProjectedTextureUnit(unsigned int TextureUnit)
 
 void ForwardLightingTechnique::SetMaterial(const CoreMaterial& material)
 {
-    glUniform4f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b, material.AmbientColor.a);
-    glUniform4f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b, material.DiffuseColor.a);
-    glUniform4f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b, material.SpecularColor.a);
-    glUniform4f(materialLoc.EmissiveColor, material.EmissiveColor.r, material.EmissiveColor.g, material.EmissiveColor.b, material.EmissiveColor.a);
+    glUniform4f(materialLoc.AmbientColor, material.m_pMaterialData->m_ambientColor.r, material.m_pMaterialData->m_ambientColor.g, material.m_pMaterialData->m_ambientColor.b, material.m_pMaterialData->m_ambientColor.a);
+    glUniform4f(materialLoc.DiffuseColor, material.m_pMaterialData->m_diffuseColor.r, material.m_pMaterialData->m_diffuseColor.g, material.m_pMaterialData->m_diffuseColor.b, material.m_pMaterialData->m_diffuseColor.a);
+    glUniform4f(materialLoc.SpecularColor, material.m_pMaterialData->m_specularColor.r, material.m_pMaterialData->m_specularColor.g, material.m_pMaterialData->m_specularColor.b, material.m_pMaterialData->m_specularColor.a);
+    glUniform4f(materialLoc.EmissiveColor, material.m_pMaterialData->m_emissiveColor.r, material.m_pMaterialData->m_emissiveColor.g, material.m_pMaterialData->m_emissiveColor.b, material.m_pMaterialData->m_emissiveColor.a);
 
     bool HasDiffuseTexture = (material.pTextures[TEX_TYPE_BASE] != NULL);
     ControlDiffuseTexture(HasDiffuseTexture);

@@ -193,7 +193,10 @@ void VkModel::CreateMetaData()
 		MetaData[SubmeshIndex].BaseVertex = (u32)m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 
 		CoreMaterial* pMaterial = &m_Materials[MaterialIndex];
-        MetaData[SubmeshIndex].Color = { pMaterial->BaseColor.r, pMaterial->BaseColor.g, pMaterial->BaseColor.b, pMaterial->BaseColor.a };
+        MetaData[SubmeshIndex].Color = { pMaterial->m_pMaterialData->m_baseColor.r, 
+										 pMaterial->m_pMaterialData->m_baseColor.g, 
+										 pMaterial->m_pMaterialData->m_baseColor.b, 
+										 pMaterial->m_pMaterialData->m_baseColor.a };
 	}
 
 	m_metaData = m_pVulkanCore->CreateSSBO(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));

@@ -25,52 +25,18 @@
 #include "ogldev_texture.h"
 #endif
 
-
-enum TEXTURE_TYPE {
-    TEX_TYPE_BASE = 0,      // Base color / diffuse / albedo
-    TEX_TYPE_SPECULAR = 1,
-    TEX_TYPE_NORMAL = 2,
-    TEX_TYPE_METALNESS = 3,
-    TEX_TYPE_EMISSIVE = 4,
-    TEX_TYPE_NORMAL_CAMERA = 5,
-    TEX_TYPE_EMISSION_COLOR = 6,
-    TEX_TYPE_ROUGHNESS = 7,
-    TEX_TYPE_AMBIENT_OCCLUSION = 8,
-    TEX_TYPE_CLEARCOAT = 9,
-    TEX_TYPE_CLEARCOAT_ROUGHNESS = 10,
-    TEX_TYPE_CLEARCOAT_NORMAL = 11,
-    TEX_TYPE_NUM = 12
-};
-
-
-enum MaterialTypeFlags : u32 {
-    MaterialType_Invalid = 0,
-    MaterialType_MetallicRoughness = 0x1,
-    MaterialType_SpecularGlossiness = 0x2,
-    MaterialType_Sheen = 0x4,
-    MaterialType_ClearCoat = 0x8,
-    MaterialType_Specular = 0x10,
-    MaterialType_Transmission = 0x20,
-    MaterialType_Volume = 0x40,
-    MaterialType_Unlit = 0x80,
-};
+#include "model_data.h"
 
 
 class CoreMaterial {
 
  public:
 
+    MaterialData* m_pMaterialData = NULL;
+
     std::string m_name;
     bool m_isPBR = false;
     int m_materialType = MaterialType_Invalid;
-
-    Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f SpecularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f BaseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f EmissiveColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f MetallicRoughnessNormalOcclusion = Vector4f(1.0f);
-    Vector4f ClearCoatTransmissionThickness = Vector4f(1.0f);
 
     Texture* pTextures[TEX_TYPE_NUM] = { 0 };
 

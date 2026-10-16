@@ -100,10 +100,10 @@ void IndirectRender::PrepareIndirectRenderMaterials(const std::vector<CoreMateri
     m_materials.resize(NumMaterials);
 
     for (int i = 0; i < NumMaterials; i++) {
-        m_materials[i].Color.AmbientColor = Materials[i].AmbientColor;
-        m_materials[i].Color.DiffuseColor = Materials[i].DiffuseColor;
-        m_materials[i].Color.SpecularColor = Materials[i].SpecularColor;
-        m_materials[i].Color.EmissiveColor = Materials[i].EmissiveColor;
+        m_materials[i].Color.AmbientColor = Materials[i].m_pMaterialData->m_ambientColor;
+        m_materials[i].Color.DiffuseColor = Materials[i].m_pMaterialData->m_diffuseColor;
+        m_materials[i].Color.SpecularColor = Materials[i].m_pMaterialData->m_specularColor;
+        m_materials[i].Color.EmissiveColor = Materials[i].m_pMaterialData->m_emissiveColor;
 
         if (Materials[i].pTextures[TEX_TYPE_BASE] && (Materials[i].pTextures[TEX_TYPE_BASE]->GetBindlessHandle() == -1)) {
             printf("Diffuse texture exists but bindless handle is missing\n");
@@ -138,10 +138,10 @@ void IndirectRender::RefreshMaterials(const std::vector<CoreMaterial>& Materials
     int NumMaterials = (int)Materials.size();
 
     for (int i = 0; i < NumMaterials; i++) {
-        m_materials[i].Color.AmbientColor = Materials[i].AmbientColor;
-        m_materials[i].Color.DiffuseColor = Materials[i].DiffuseColor;
-        m_materials[i].Color.SpecularColor = Materials[i].SpecularColor;
-        m_materials[i].Color.EmissiveColor = Materials[i].EmissiveColor;
+        m_materials[i].Color.AmbientColor = Materials[i].m_pMaterialData->m_ambientColor;
+        m_materials[i].Color.DiffuseColor = Materials[i].m_pMaterialData->m_diffuseColor;
+        m_materials[i].Color.SpecularColor = Materials[i].m_pMaterialData->m_specularColor;
+        m_materials[i].Color.EmissiveColor = Materials[i].m_pMaterialData->m_emissiveColor;
         if (Materials[i].pTextures[TEX_TYPE_BASE] && (Materials[i].pTextures[TEX_TYPE_BASE]->GetBindlessHandle() == -1)) {
             printf("Diffuse texture exists but bindless handle is missing\n");
             exit(1);
