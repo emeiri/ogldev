@@ -86,14 +86,18 @@ public:
 
     void SetPointLight(int i, const PointLight& Light) 
     { 
-        if (i < m_modelData.m_pointLights.size()) { 
+        assert(i < (int)m_modelData.m_pointLights.size());
+
+        if (i < (int)m_modelData.m_pointLights.size()) { 
             m_modelData.m_pointLights[i] = Light; 
         } 
     }
 
     void SetDirLight(int i, const DirectionalLight& Light)
     {
-        if (i < m_modelData.m_dirLights.size()) {
+        assert(i < (int)m_modelData.m_dirLights.size());
+
+        if (i < (int)m_modelData.m_dirLights.size()) {
             m_modelData.m_dirLights[i] = Light;
         }
     }
