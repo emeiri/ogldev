@@ -50,7 +50,10 @@ class CoreModel : public Model
 public:
     CoreModel() {}
 
-    CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { m_pCoreRenderingSystem = pCoreRenderingSystem; }
+    CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { 
+        assert(pCoreRenderingSystem);
+        m_pCoreRenderingSystem = pCoreRenderingSystem; 
+    }
 
     bool IsPBR() const;
 
