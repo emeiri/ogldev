@@ -59,13 +59,7 @@ public:
 
     void DestroyModel();
 
-    void LoadAssimpModel(const std::string& Filename)
-    {
-        ModelLoadFlags DefaultFlags;
-        LoadAssimpModel(Filename, DefaultFlags);
-    }
-
-    void LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags);
+    void LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags = {});
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
