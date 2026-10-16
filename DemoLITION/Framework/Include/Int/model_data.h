@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <map>
 #include <vector>
 #include <unordered_map>
@@ -128,6 +129,19 @@ struct SkinnedVertex {
     Vector4f Color;
     VertexBoneData Bones;
 };
+
+
+// The vertex attribute setup in GLModel computes offsets by counting floats, so these
+// structs must stay tightly packed. VertexBoneData::index is loader bookkeeping that
+// still goes to the GPU (4 bytes per vertex) until the vertex pulling layout is settled.
+static_assert(sizeof(Vertex) == 80, "Vertex must be 80 bytes");
+static_assert(offsetof(Vertex, Color) == 64, "unexpected Vertex::Color offset");
+static_assert(sizeof(VertexBoneData) == 36, "VertexBoneData must be 36 bytes");
+static_assert(offsetof(VertexBoneData, Weights) == 16, "unexpected VertexBoneData::Weights offset");
+static_assert(offsetof(VertexBoneData, index) == 32, "unexpected VertexBoneData::index offset");
+static_assert(sizeof(SkinnedVertex) == 116, "SkinnedVertex must be 116 bytes");
+static_assert(offsetof(SkinnedVertex, Color) == offsetof(Vertex, Color), "SkinnedVertex must start with the Vertex layout");
+static_assert(offsetof(SkinnedVertex, Bones) == sizeof(Vertex), "SkinnedVertex::Bones must follow the Vertex fields");
 
 
 struct TextureSource {
