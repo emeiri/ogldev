@@ -1253,7 +1253,9 @@ static void FlattenNodeHierarchy(const aiNode* pNode, int ParentIndex,
     node.m_localTransform = Matrix4f(pNode->mTransformation);
     node.m_bindPoseGlobalTransform = ParentTransform * node.m_localTransform;
     node.m_meshes.resize(pNode->mNumMeshes);
-    node.m_firstInstance = (int)Instances.size();
+    if (pNode->mNumMeshes > 0) {
+        node.m_firstInstance = (int)Instances.size();
+    }
     for (unsigned int i = 0; i < pNode->mNumMeshes; i++) {
         int MeshIndex = pNode->mMeshes[i];
         node.m_meshes[i] = MeshIndex;

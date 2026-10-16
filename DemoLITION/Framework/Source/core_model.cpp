@@ -234,6 +234,11 @@ glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)
 
     const SkelNode& Node = m_modelData.m_nodes[NodeIndex];
 
+    if (Node.m_numInstances == 0) {
+        OGLDEV_ERROR("Node %s has no meshes\n", pNodeName);
+        assert(0);
+    }
+
     int FirstInstance = Node.m_firstInstance;
 
     return m_transformationsGLM[FirstInstance];
