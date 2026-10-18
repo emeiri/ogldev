@@ -291,6 +291,11 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
     CreateDescriptorSets(0, ModelDescs[0]);
 
 	m_bigTextureArray.CreateTextureArray(ModelDescs);
+
+    if (m_modelContext.m_pModel->GetDirLights().size() > 0) {
+        Vector3f LightDir = m_modelContext.m_pModel->GetDirLights()[0].WorldDirection;
+        m_lightDir = vec3(LightDir.x, LightDir.y, LightDir.z);
+    }
 }
 
 
