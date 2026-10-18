@@ -882,11 +882,7 @@ void AssimpModelLoader::LoadDiffuseTexture(const std::string& Dir, const aiMater
             Path = ("white.png");   // Single pixel texture to minimize the performance impact of missing textures
         }
 
-#ifdef OGLDEV_VULKAN
-        std::string DefaultTextureDir("../../Content/textures/");
-#else
-        std::string DefaultTextureDir("../Content/textures/");
-#endif
+        std::string DefaultTextureDir = GetOgldevPath("Content/textures/");
         std::string FullPath = GetFullPath(DefaultTextureDir, Path);
         m_pModelData->m_materials[MaterialIndex].m_textures[TEX_TYPE_BASE].Path = FullPath;
     }
