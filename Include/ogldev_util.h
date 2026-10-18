@@ -129,6 +129,12 @@ void glDebugOutput(GLenum source,
 std::string GetDirFromFilename(const std::string& Filename);
 bool IsFileExists(const char* filename);
 
+// Absolute path of the ogldev repo root, found by walking up from the current working directory
+const std::string& GetOgldevRoot();
+
+// Path of a resource given relative to the repo root, e.g. "Content/textures/white.png"
+std::string GetOgldevPath(const std::string& RelativePath);
+
 #define MAX_BONES (200)
 
 int GetGLMajorVersion();

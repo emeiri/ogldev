@@ -22,6 +22,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #ifdef _WIN32
 #include <Windows.h>
 #else
@@ -352,6 +353,42 @@ void glDebugOutput(GLenum source,
 
 #endif
 #endif
+
+static std::string FindOgldevRoot()
+{
+    // The repo root is the first ancestor of the working directory that contains this header
+    std::filesystem::path Dir = std::filesystem::current_path();
+
+    while (true) {
+        if (std::filesystem::exists(Dir / "Include" / "ogldev_util.h")) {
+            return Dir.generic_string() + "/";
+        }
+
+        if (Dir == Dir.parent_path()) {
+            break;
+        }
+
+        Dir = Dir.parent_path();
+    }
+
+    printf("%s:%d - cannot find the ogldev root from '%s'\n",
+           __FILE__, __LINE__, std::filesystem::current_path().generic_string().c_str());
+    exit(1);
+}
+
+
+const std::string& GetOgldevRoot()
+{
+    static const std::string Root = FindOgldevRoot();
+    return Root;
+}
+
+
+std::string GetOgldevPath(const std::string& RelativePath)
+{
+    return GetOgldevRoot() + RelativePath;
+}
+
 
 std::string GetDirFromFilename(const std::string& Filename)
 {
