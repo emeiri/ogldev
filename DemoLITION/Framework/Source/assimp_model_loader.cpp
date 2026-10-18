@@ -276,7 +276,7 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
         InitFromScene();
         m_pScene = NULL;
     } else {
-        printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());
+        OGLDEV_ERROR("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());
     }
 
     m_pModelData = NULL;
