@@ -83,6 +83,7 @@ public:
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 
 	static void UpdateUniformBuffers(VkDevice Device,
+									 const glm::vec3& CameraWorldPos,
 									 const glm::mat4& WVP,
 									 const glm::mat4& World,
 									 const std::vector<glm::mat4>& SubmeshTransformations,

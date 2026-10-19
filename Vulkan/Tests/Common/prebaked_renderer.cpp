@@ -296,7 +296,20 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
     if (m_modelContext.m_pModel->GetDirLights().size() > 0) {
         Vector3f LightDir = m_modelContext.m_pModel->GetDirLights()[0].WorldDirection;
         // m_lightDir points toward the light (it is negated in UpdateUniformBuffers)
-        m_lightDir = vec3(-LightDir.x, -LightDir.y, -LightDir.z);
+        m_lightDir = vec3(LightDir.x, LightDir.y, LightDir.z);
+		m_diffuseIntensity = m_modelContext.m_pModel->GetDirLights()[0].DiffuseIntensity;
+        m_lightColor = vec3(m_modelContext.m_pModel->GetDirLights()[0].Color.x,
+            m_modelContext.m_pModel->GetDirLights()[0].Color.y,
+            m_modelContext.m_pModel->GetDirLights()[0].Color.z);
+
+		m_lights[0] = {
+			.Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
+			.LightType = 0, // Directional light
+            .Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z),
+			.AmbientIntensity = m_ambientIntensity,
+			.WorldPos = glm::vec3(0.0f),
+			.DiffuseIntensity = m_diffuseIntensity
+		};
     }
 }
 
@@ -530,21 +543,9 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 	glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
 	glm::mat4 WVP = VP * World;
-
-    glm::vec4 AmbientLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_ambientIntensity);
-    glm::vec4 DiffuseLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_diffuseIntensity);
-	glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
-
-	m_lights[0] = {
-        .Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
-        .LightType = 0, // Directional light
-        .Direction = LightDirection,
-        .AmbientIntensity = m_ambientIntensity,
-        .WorldPos = glm::vec3(0.0f),
-        .DiffuseIntensity = m_diffuseIntensity
-	};
-        
+      
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
+													m_pGameCamera->GetPosition(),
 													WVP, 
 													World, 
 													m_modelContext.m_pModel->GetTransformations(), 

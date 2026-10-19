@@ -280,6 +280,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 
 void LightingProgram::UpdateUniformBuffers(VkDevice Device,
+										   const glm::vec3& CameraWorldPos,
                                            const glm::mat4& WVP, 
                                            const glm::mat4& World,				
                                            const std::vector<glm::mat4>& SubmeshTransformations,
@@ -303,7 +304,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 
 	UniformDataFS UboDataFS = {
 		.Counts = glm::ivec4(1, 0, 0, 0),       // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
-		.CameraWorldPos = glm::vec4(0.0f),
+		.CameraWorldPos = glm::vec4(CameraWorldPos, 1.0f),
 		.Material = glm::vec4(0.0f),            // .x = specular intensity
 	};
 
