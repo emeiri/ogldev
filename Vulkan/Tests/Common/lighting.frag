@@ -48,6 +48,7 @@ layout(set = 1, binding = 4) readonly uniform UniformBuffer {
     vec4 DiffuseLight;        // .rgb = color, .w = intensity
 } ubo;
 
+vec3 GeoNormal;
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
@@ -58,6 +59,8 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 
 void main() 
 {
+    GeoNormal = normalize(Normal);
+
     vec4 BaseColor = TextureBindless2D(MaterialIndex, TexCoord) * Color;
 
     switch (LIGHTING_MODE) {
@@ -66,7 +69,7 @@ void main()
             break;
 
         case LIGHTING_MODE_NORMALS:
-            OutColor = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
+            OutColor = vec4(GeoNormal * 0.5 + 0.5, 1.0);
             break;
 
         case LIGHTING_MODE_AMBIENT_ONLY:
@@ -75,7 +78,7 @@ void main()
 
         case LIGHTING_MODE_FULL:
             // 1. Normalize Vectors
-            vec3 N = normalize(Normal);
+            vec3 N = GeoNormal;
     
             // We negate the Direction so L points TOWARD the light source for the dot product
             vec3 L = normalize(-ubo.LightDirection.xyz); 
