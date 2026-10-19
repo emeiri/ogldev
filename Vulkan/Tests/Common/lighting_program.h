@@ -86,9 +86,7 @@ public:
 									 const glm::mat4& WVP,
 									 const glm::mat4& World,
 									 const std::vector<glm::mat4>& SubmeshTransformations,
-									 const glm::vec4& AmbientLight,
-									 const glm::vec4& DiffuseLight,
-									 const glm::vec3& LightDirection,
+									 const std::vector<LightSource>& Lights, 
 									 BufferAndMemory& UniformBufferVS,
 									 BufferAndMemory& UniformBufferFS);
 

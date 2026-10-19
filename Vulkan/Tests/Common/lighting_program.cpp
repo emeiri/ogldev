@@ -283,9 +283,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
                                            const glm::mat4& WVP, 
                                            const glm::mat4& World,				
                                            const std::vector<glm::mat4>& SubmeshTransformations,
-                                           const glm::vec4& AmbientLight,
-                                           const glm::vec4& DiffuseLight,
-                                           const glm::vec3& LightDirection,
+										   const std::vector<LightSource>& Lights,
                                            BufferAndMemory& UniformBufferVS,
                                            BufferAndMemory& UniformBufferFS)
 {
@@ -303,21 +301,13 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 
 	UniformBufferVS.Update(Device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
 
-	LightSource Light0 = {
-		.Color = glm::vec3(DiffuseLight),
-		.LightType = 0, //LIGHT_DIRECTIONAL,
-		.Direction = glm::vec4(LightDirection, 0.0f),
-		.AmbientIntensity = AmbientLight.a,
-		.DiffuseIntensity = DiffuseLight.a,
-	};
-
 	UniformDataFS UboDataFS = {
 		.Counts = glm::ivec4(1, 0, 0, 0),       // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
 		.CameraWorldPos = glm::vec4(0.0f),
 		.Material = glm::vec4(0.0f),            // .x = specular intensity
 	};
 
-    UboDataFS.LightSources[0] = Light0;
+    UboDataFS.LightSources[0] = Lights[0];
 
 	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));	
 }

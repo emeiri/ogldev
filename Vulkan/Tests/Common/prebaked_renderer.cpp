@@ -46,6 +46,7 @@ PreBakedRenderer::PreBakedRenderer(int WindowWidth, int WindowHeight,
 	m_windowHeight = WindowHeight;
 	m_appName = AppName;
 	m_pGameCallbacks = pGameCallbacks;
+    m_lights.resize(MAX_NUM_LIGHTS);
 }
 
 
@@ -510,9 +511,9 @@ void PreBakedRenderer::UpdateGUI()
 
 	ImGui::ColorEdit3("Light Color", (float*)&m_lightColor);
 
-	ImGui::DragFloat("Ambient Light", &m_ambientLight, 0.01f, 0.0f, 1.0f, "%.2f");
+	ImGui::DragFloat("Ambient Intensity", &m_ambientIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
 
-	ImGui::DragFloat("Diffuse Light", &m_diffuseLight, 0.01f, 0.0f, 5.0f, "%.2f");
+	ImGui::DragFloat("Diffuse Intensity", &m_diffuseIntensity, 0.01f, 0.0f, 5.0f, "%.2f");
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
@@ -530,17 +531,24 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 
 	glm::mat4 WVP = VP * World;
 
-    glm::vec4 AmbientLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_ambientLight);
-    glm::vec4 DiffuseLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_diffuseLight);
+    glm::vec4 AmbientLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_ambientIntensity);
+    glm::vec4 DiffuseLight = glm::vec4(m_lightColor.x, m_lightColor.y, m_lightColor.z, m_diffuseIntensity);
 	glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
+
+	m_lights[0] = {
+        .Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
+        .LightType = 0, // Directional light
+        .Direction = LightDirection,
+        .AmbientIntensity = m_ambientIntensity,
+        .WorldPos = glm::vec3(0.0f),
+        .DiffuseIntensity = m_diffuseIntensity
+	};
         
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													WVP, 
 													World, 
 													m_modelContext.m_pModel->GetTransformations(), 
-													AmbientLight,
-													DiffuseLight,
-													LightDirection, 
+												    m_lights,
 													m_modelContext.m_uniformBuffersVS[ImageIndex],
 													m_modelContext.m_uniformBuffersFS[ImageIndex]);
 }
