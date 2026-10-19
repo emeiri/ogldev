@@ -26,6 +26,23 @@
 #define LIGHTING_MODE_AMBIENT_ONLY 2
 #define LIGHTING_MODE_FULL 3
 
+#define MAX_NUM_LIGHTS 16
+
+struct LightSource {
+    vec3 Color;                    // offset 0
+    int LightType;                 // offset 12
+    vec3 Direction;                // offset 16
+    float AmbientIntensity;        // offset 28
+    vec3 WorldPos;                 // offset 32
+    float DiffuseIntensity;        // offset 44
+    float Atten_Constant;          // offset 48
+    float Atten_Linear;            // offset 52
+    float Atten_Exp;               // offset 56
+    float Cutoff;                  // offset 60
+};
+
+
+
 layout(push_constant) uniform Constants {
     uint BaseTextureIndex; 
 } push;
@@ -43,9 +60,10 @@ layout(location = 0) out vec4 OutColor;
 layout(set = 0, binding = 0) uniform sampler2D Textures[];
 
 layout(set = 1, binding = 4) readonly uniform UniformBuffer { 
-    vec4 LightDirection;      // .xyz = direction
-    vec4 AmbientLight;        // .rgb = color, .w = intensity    
-    vec4 DiffuseLight;        // .rgb = color, .w = intensity
+    ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+    vec4 CameraWorldPos;
+    vec4 Material;            // .x = specular intensity
+    LightSource LightSources[MAX_NUM_LIGHTS];
 } ubo;
 
 vec3 GeoNormal;
@@ -63,6 +81,11 @@ void main()
 
     vec4 BaseColor = TextureBindless2D(MaterialIndex, TexCoord) * Color;
 
+    vec3 LightColor = ubo.LightSources[0].Color;
+    float AmbientIntensity = ubo.LightSources[0].AmbientIntensity;
+    vec3 LightDirection = -ubo.LightSources[0].Direction;
+    float DiffuseIntensity = ubo.LightSources[0].DiffuseIntensity;
+
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
             OutColor = BaseColor;
@@ -73,7 +96,7 @@ void main()
             break;
 
         case LIGHTING_MODE_AMBIENT_ONLY:
-            OutColor = vec4(BaseColor.rgb * ubo.AmbientLight.rgb * ubo.AmbientLight.w, BaseColor.a);
+            OutColor = vec4(BaseColor.rgb * LightColor * AmbientIntensity, BaseColor.a);
             break;
 
         case LIGHTING_MODE_FULL:
@@ -81,17 +104,17 @@ void main()
             vec3 N = GeoNormal;
     
             // We negate the Direction so L points TOWARD the light source for the dot product
-            vec3 L = normalize(-ubo.LightDirection.xyz); 
+            vec3 L = normalize(LightDirection); 
 
             // 2. Diffuse (Lambertian) Calculation
             float NdotL = max(dot(N, L), 0.0);
     
             // 4. Calculate Lighting Components
             // Ambient: Base Texture * Ambient Color * Ambient Intensity
-            vec3 Ambient = BaseColor.rgb * ubo.AmbientLight.rgb * ubo.AmbientLight.w;
+            vec3 Ambient = BaseColor.rgb * LightColor * AmbientIntensity;
 
             // Diffuse: Base Texture * Light Color * Light Intensity * NdotL
-            vec3 Diffuse = BaseColor.rgb * ubo.DiffuseLight.rgb * ubo.DiffuseLight.w * NdotL;
+            vec3 Diffuse = BaseColor.rgb * LightColor * DiffuseIntensity * NdotL;
 
             // 5. Final Output
             OutColor = vec4(Ambient + Diffuse, BaseColor.a);

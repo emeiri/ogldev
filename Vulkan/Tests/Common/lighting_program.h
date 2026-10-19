@@ -31,12 +31,28 @@
 
 namespace OgldevVK {
 
+#define MAX_NUM_LIGHTS 16
+
 enum LIGHTING_MODE {
 	LIGHTING_MODE_UNLIT        = 0,
 	LIGHTING_MODE_NORMALS      = 1,
 	LIGHTING_MODE_AMBIENT_ONLY = 2,
 	LIGHTING_MODE_FULL         = 3,
 	NUM_LIGHTING_MODES         = 4
+};
+
+
+struct LightSource {
+	glm::vec3 Color = glm::vec3(0.0f);          // offset 0
+	int LightType = 0;							// offset 12
+	glm::vec3 Direction = glm::vec3(0.0f);      // offset 16
+	float AmbientIntensity = 0.0f;				// offset 28
+	glm::vec3 WorldPos = glm::vec3(0.0f);       // offset 32
+	float DiffuseIntensity = 0.0f;				// offset 44
+	float Atten_Constant = 0.0f;				// offset 48
+	float Atten_Linear = 0.0f;					// offset 52
+	float Atten_Exp = 0.0f;						// offset 56
+	float Cutoff = 0.0f;						// offset 60
 };
 
 
@@ -89,9 +105,10 @@ protected:
 private:
 
 	struct UniformDataFS {
-		glm::vec4 LightDirection;    // .xyz = direction
-		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
-		glm::vec4 DiffuseLight;      // .rgb = color, .w = intensity
+		glm::ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+		glm::vec4 CameraWorldPos;
+		glm::vec4 Material;            // .x = specular intensity
+		LightSource LightSources[MAX_NUM_LIGHTS];
 	};
 
 	struct UniformDataVS {

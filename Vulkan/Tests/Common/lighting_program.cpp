@@ -34,6 +34,8 @@ enum Binding {
 	NumBindings = 5
 };
 
+static_assert(sizeof(LightSource) == 64, "LightSource size must be 64 bytes");
+
 
 void LightingProgram::Init(VulkanCore& vkCore,
     VkFormat ColorFormat,
@@ -301,11 +303,21 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 
 	UniformBufferVS.Update(Device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
 
-	UniformDataFS UboDataFS = {
-		.LightDirection = glm::vec4(LightDirection, 0.0f),
-		.AmbientLight = AmbientLight,		
-		.DiffuseLight = DiffuseLight
+	LightSource Light0 = {
+		.Color = glm::vec3(DiffuseLight),
+		.LightType = 0, //LIGHT_DIRECTIONAL,
+		.Direction = glm::vec4(LightDirection, 0.0f),
+		.AmbientIntensity = AmbientLight.a,
+		.DiffuseIntensity = DiffuseLight.a,
 	};
+
+	UniformDataFS UboDataFS = {
+		.Counts = glm::ivec4(1, 0, 0, 0),       // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+		.CameraWorldPos = glm::vec4(0.0f),
+		.Material = glm::vec4(0.0f),            // .x = specular intensity
+	};
+
+    UboDataFS.LightSources[0] = Light0;
 
 	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));	
 }
