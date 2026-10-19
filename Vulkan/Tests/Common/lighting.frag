@@ -34,8 +34,9 @@ layout(constant_id = 0) const uint LIGHTING_MODE = LIGHTING_MODE_FULL;
 
 layout(location = 0) in vec2 TexCoord;
 layout(location = 1) flat in uint MaterialIndex;
-layout(location = 2) in vec3 Normal;
-layout(location = 3) in vec4 Color;
+layout(location = 2) in vec3 WorldPos;
+layout(location = 3) in vec3 Normal;
+layout(location = 4) in vec4 Color;
 
 layout(location = 0) out vec4 OutColor;
 

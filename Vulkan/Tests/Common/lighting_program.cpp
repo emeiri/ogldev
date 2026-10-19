@@ -292,10 +292,11 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 	for (int i = 0; i < SubmeshTransformations.size(); i++) {
 		UboDataVS[i].WVP = WVP * SubmeshTransformations[i];
 
-		glm::mat4 WorldAndBase = World * SubmeshTransformations[i];
-		glm::mat3 NormalMatrix = glm::transpose(glm::inverse(glm::mat3(WorldAndBase)));
+		glm::mat4 WorldTransform = World * SubmeshTransformations[i];
+		glm::mat3 NormalMatrix = glm::transpose(glm::inverse(glm::mat3(WorldTransform)));
 
-		UboDataVS[i].NormalMatrix = glm::mat4(NormalMatrix);
+        UboDataVS[i].WorldTransform = WorldTransform;
+		UboDataVS[i].NormalTransform = glm::mat4(NormalMatrix);
 	}
 
 	UniformBufferVS.Update(Device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());

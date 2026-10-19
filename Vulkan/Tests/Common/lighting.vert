@@ -41,7 +41,8 @@ layout (std430, set = 1, binding = 1) readonly buffer Indices { int i[]; } in_In
 
 struct UniformData {
     mat4 WVP; 
-    mat4 NormalMatrix;
+    mat4 WorldTransform;
+    mat4 NormalTransform;
 };
 
 // Changed from uniform buffer to SSBO to support unlimited meshes
@@ -63,8 +64,9 @@ layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO {
 
 layout(location = 0) out vec2 TexCoord;
 layout(location = 1) flat out uint MaterialIndex;
-layout(location = 2) out vec3 Normal;
-layout(location = 3) out vec4 Color;
+layout(location = 2) out vec3 WorldPos;
+layout(location = 3) out vec3 Normal;
+layout(location = 4) out vec4 Color;
 
 void main() 
 {    
@@ -82,13 +84,17 @@ void main()
 
     vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
 
-    gl_Position = ubo.Data[DrawId].WVP * vec4(pos, 1.0);
+    vec4 Pos4d = vec4(pos, 1.0);
+
+    gl_Position = ubo.Data[DrawId].WVP * Pos4d;
     
     TexCoord = vec2(vtx.u0, vtx.v0);
 
     vec3 OrigNorm = vec3(vtx.normal_x, vtx.normal_y, vtx.normal_z);
 
-    Normal = mat3(ubo.Data[DrawId].NormalMatrix) * OrigNorm;
+    Normal = mat3(ubo.Data[DrawId].NormalTransform) * OrigNorm;
+
+    WorldPos = vec3(ubo.Data[DrawId].WorldTransform * Pos4d);
 
     Color = md.Color;
 

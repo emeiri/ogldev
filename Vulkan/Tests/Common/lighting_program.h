@@ -96,7 +96,8 @@ private:
 
 	struct UniformDataVS {
 		glm::mat4 WVP;
-		glm::mat4 NormalMatrix;
+        glm::mat4 WorldTransform;
+		glm::mat4 NormalTransform;
 	};
 
 	int m_numImages = 0;
