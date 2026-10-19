@@ -294,7 +294,8 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 
     if (m_modelContext.m_pModel->GetDirLights().size() > 0) {
         Vector3f LightDir = m_modelContext.m_pModel->GetDirLights()[0].WorldDirection;
-        m_lightDir = vec3(LightDir.x, LightDir.y, LightDir.z);
+        // m_lightDir points toward the light (it is negated in UpdateUniformBuffers)
+        m_lightDir = vec3(-LightDir.x, -LightDir.y, -LightDir.z);
     }
 }
 
