@@ -293,24 +293,51 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 
 	m_bigTextureArray.CreateTextureArray(ModelDescs);
 
-    if (m_modelContext.m_pModel->GetDirLights().size() > 0) {
-        Vector3f LightDir = m_modelContext.m_pModel->GetDirLights()[0].WorldDirection;
+	int NumTotalLights = 0;
+
+	const std::vector<DirectionalLight>& DirLights = m_modelContext.m_pModel->GetDirLights();
+
+    if (DirLights.size() > 0) {				
+
+        Vector3f LightDir = DirLights[0].WorldDirection;
         // m_lightDir points toward the light (it is negated in UpdateUniformBuffers)
         m_lightDir = vec3(LightDir.x, LightDir.y, LightDir.z);
-		m_diffuseIntensity = m_modelContext.m_pModel->GetDirLights()[0].DiffuseIntensity;
-        m_lightColor = vec3(m_modelContext.m_pModel->GetDirLights()[0].Color.x,
-            m_modelContext.m_pModel->GetDirLights()[0].Color.y,
-            m_modelContext.m_pModel->GetDirLights()[0].Color.z);
+		m_diffuseIntensity = DirLights[0].DiffuseIntensity;
+        m_lightColor = vec3(DirLights[0].Color.x, DirLights[0].Color.y, DirLights[0].Color.z);
+        
+        for (int i = 0; i < (int)DirLights.size(); i++) {
+			const DirectionalLight& l = DirLights[i];
+			m_lights[NumTotalLights + i] = {
+				.Color = l.Color.ToGLM(),
+				.LightType = LIGHT_TYPE_DIR,
+				.Direction = l.WorldDirection.ToGLM(),
+				.AmbientIntensity = l.AmbientIntensity,
+				.WorldPos = glm::vec3(0.0f),
+				.DiffuseIntensity = l.DiffuseIntensity,				
+			};
+        }
 
-		m_lights[0] = {
-			.Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
-            .LightType = LIGHT_TYPE_DIR,
-            .Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z),
-			.AmbientIntensity = m_ambientIntensity,
-			.WorldPos = glm::vec3(0.0f),
-			.DiffuseIntensity = m_diffuseIntensity
-		};
+		NumTotalLights += (int)DirLights.size();
     }
+
+	const std::vector<PointLight>& PointLights = m_modelContext.m_pModel->GetPointLights();
+
+	for (int i = 0; i < (int)PointLights.size(); i++) {
+		const PointLight& l = PointLights[i];
+		m_lights[NumTotalLights + i] = {
+			.Color = l.Color.ToGLM(),
+			.LightType = LIGHT_TYPE_POINT,
+			.Direction = glm::vec3(0),
+			.AmbientIntensity = l.AmbientIntensity,
+			.WorldPos = l.WorldPosition.ToGLM(),
+			.DiffuseIntensity = l.DiffuseIntensity,
+			.Atten_Constant = l.Attenuation.Constant,
+			.Atten_Linear = l.Attenuation.Linear,
+			.Atten_Exp = l.Attenuation.Exp
+		};
+	}
+
+	NumTotalLights += (int)PointLights.size();
 }
 
 
@@ -540,12 +567,15 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 	glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
 	glm::mat4 WVP = VP * World;
+
+	int NumLights = m_modelContext.m_pModel->GetNumLights();
       
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													m_pGameCamera->GetPosition(),
 													WVP, 
 													World, 
 													m_modelContext.m_pModel->GetTransformations(), 
+												    NumLights,
 												    m_lights,
 													m_modelContext.m_uniformBuffersVS[ImageIndex],
 													m_modelContext.m_uniformBuffersFS[ImageIndex]);

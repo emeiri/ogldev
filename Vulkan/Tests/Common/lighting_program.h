@@ -90,6 +90,7 @@ public:
 									 const glm::mat4& WVP,
 									 const glm::mat4& World,
 									 const std::vector<glm::mat4>& SubmeshTransformations,
+								     int NumLights,
 									 const std::vector<LightSource>& Lights, 
 									 BufferAndMemory& UniformBufferVS,
 									 BufferAndMemory& UniformBufferFS);
