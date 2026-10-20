@@ -75,6 +75,12 @@ PreBakedRenderer::~PreBakedRenderer()
         m_offscreenImages[i].Destroy(m_device);
     }
 
+	for (int Image = 0; Image < (int)m_shadowMaps.size(); Image++) {
+        for (int Light = 0; Light < (int)m_shadowMaps[Image].size(); Light++) {
+            m_shadowMaps[Image][Light].Destroy(m_device);
+        }
+	}
+
     m_bigTextureArray.Destroy();		
 
 	vkDestroyDescriptorPool(m_device, m_descPool, NULL);
@@ -95,6 +101,7 @@ void PreBakedRenderer::Init(const std::string& AssetPath)
 	CreateDescriptorPool();
 	InitBigTextureArray();
 	CreateOffscreenImages();
+    CreateShadowMaps();
 	CreatePipelines();
 	CreateMesh(AssetPath);
 	CreateCommandBuffers();
@@ -275,6 +282,25 @@ void PreBakedRenderer::CreateOffscreenImages()
         m_vkCore.CreateTexture(m_offscreenImages[i].m_depth, SwapChainExtent.width, SwapChainExtent.height, 
 								DepthUsage, DepthFormat, false);
 
+    }
+}
+
+
+void PreBakedRenderer::CreateShadowMaps()
+{
+	VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
+
+    m_shadowMaps.resize(m_numImages);
+
+	VkImageUsageFlags DepthUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	VkFormat DepthFormat = m_vkCore.GetDepthFormat();
+
+    for (int Image = 0; Image < m_numImages; Image++) {
+        m_shadowMaps[Image].resize(MAX_NUM_LIGHTS);
+        for (int l = 0; l < MAX_NUM_LIGHTS; l++) {
+            m_vkCore.CreateTexture(m_shadowMaps[Image][l], SwapChainExtent.width, SwapChainExtent.height,
+								   DepthUsage, DepthFormat, false);
+        }
     }
 }
 
