@@ -70,6 +70,8 @@ layout(set = 1, binding = 4) readonly uniform UniformBuffer {
     LightSource LightSources[MAX_NUM_LIGHTS];
 } ubo;
 
+bool gCellShadingEnabled = false;
+bool gEnableSpecularExponent = false;
 vec3 GeoNormal;
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
@@ -147,21 +149,21 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
 
-      //  if (!gCellShadingEnabled && (SpecularFactor > 0)) {
-       //     float SpecularExponent = 128.0;
+        if (!gCellShadingEnabled && (SpecularFactor > 0)) {
+            float SpecularExponent = 128.0;
 
-      //      if (gEnableSpecularExponent) {
+            if (gEnableSpecularExponent) {
                 // Inside a divergent branch: explicit gradients keep the LOD well defined.
-      //          SpecularExponent = textureGrad(gSamplerSpecularExponent, TexCoord, TexDx, TexDy).r * 255.0;
-      //          SpecularExponent = max(SpecularExponent, 1.0);   // pow(x, 0) == 1 gave full-power specular
-      //      }
+             //   SpecularExponent = textureGrad(gSamplerSpecularExponent, TexCoord, TexDx, TexDy).r * 255.0;
+            //    SpecularExponent = max(SpecularExponent, 1.0);   // pow(x, 0) == 1 gave full-power specular
+            }
 
-      //      SpecularFactor = pow(SpecularFactor, SpecularExponent);
-      //      SpecularColor = vec4(ubo.Lights[Index].Color, 1.0f) *
-      //                           ubo.Lights[Index].DiffuseIntensity * // using the diffuse intensity for diffuse/specular
-      //                           GetMaterialSpecularColor() *
-     //                            SpecularFactor;
-     //   }
+            SpecularFactor = pow(SpecularFactor, SpecularExponent);
+            SpecularColor = vec4(ubo.LightSources[Index].Color, 1.0f) *
+                                 ubo.LightSources[Index].DiffuseIntensity * // using the diffuse intensity for diffuse/specular
+                                 GetMaterialSpecularColor() *
+                                 SpecularFactor;
+        }
 
      //   if (gRimLightEnabled) {
       //     float RimFactor = CalcRimLightFactor(PixelToCamera, Normal);
