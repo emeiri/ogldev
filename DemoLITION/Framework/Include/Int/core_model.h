@@ -170,6 +170,12 @@ public:
         return glm::vec3(Transformation[3]);
     }
 
+    int GetNumLights() const
+    {
+        int NumLights = (int)(m_modelData.m_dirLights.size() + m_modelData.m_pointLights.size() + m_modelData.m_spotLights.size());
+        return NumLights;
+    }
+
 protected:
 
     // This is a hack for Vulkan that doesn't have a CoreWindowSystem pointer right now.
