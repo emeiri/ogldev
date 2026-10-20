@@ -710,6 +710,7 @@ static glm::vec4 ConvertAssimpColor(const aiColor3D& c)
     glm::vec3 Color = (Intensity > 0.0f) ? glm::vec3(c.r, c.g, c.b) / Intensity : glm::vec3(1.0f);
     float m_lightUnitScale = 0.0005f;
     float DiffuseIntensity = Intensity * m_lightUnitScale;   // one scale factor, exposed in the GUI
+    printf("Intensity %f --> %f\n", Intensity, DiffuseIntensity);
     glm::vec4 ret = glm::vec4(Color, DiffuseIntensity);
     return ret;
 }
@@ -814,7 +815,7 @@ void AssimpModelLoader::InitSpotLight(const aiLight& light)
 
     l.Attenuation.Constant = light.mAttenuationConstant;
     l.Attenuation.Linear = light.mAttenuationLinear;
-    l.Attenuation.Exp = light.mAttenuationQuadratic / 100.0f;
+    l.Attenuation.Exp = light.mAttenuationQuadratic;
 
     printf("Attenuation: constant %f linear %f exp (adjusted!) %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
 
