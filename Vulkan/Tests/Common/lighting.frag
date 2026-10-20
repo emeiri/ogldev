@@ -214,14 +214,15 @@ vec4 CalcSpotLight(int Index)
     vec3 PixelToLight = normalize(ubo.LightSources[Index].WorldPos - WorldPos);
     float SpotFactor = dot(PixelToLight, -normalize(ubo.LightSources[Index].Direction));
 
+    vec4 Color = vec4(0);
+
     if (SpotFactor > ubo.LightSources[Index].Cutoff) {
-        vec4 Color = CalcPointLight(Index, false);
+        Color = CalcPointLight(Index, false);
         float SpotLightIntensity = (1.0 - (1.0 - SpotFactor)/(1.0 - ubo.LightSources[Index].Cutoff));
-        return Color * SpotLightIntensity;
+        Color *= SpotLightIntensity;
     }
-    else {
-        return vec4(0,0,0,0);
-    }
+
+    return Color;
 }
 
 
