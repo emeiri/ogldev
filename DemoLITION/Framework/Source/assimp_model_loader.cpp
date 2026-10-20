@@ -704,18 +704,23 @@ void AssimpModelLoader::InitSingleLight(const aiLight& light)
 }
 
 
-void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
+static glm::vec4 ConvertAssimpColor(const aiColor3D& c)
 {
-    aiColor3D c = light.mColorDiffuse;
     float Intensity = std::max({ c.r, c.g, c.b });          // the multiplier Assimp folded in
     glm::vec3 Color = (Intensity > 0.0f) ? glm::vec3(c.r, c.g, c.b) / Intensity : glm::vec3(1.0f);
     float m_lightUnitScale = 0.0005f;
     float DiffuseIntensity = Intensity * m_lightUnitScale;   // one scale factor, exposed in the GUI
+    glm::vec4 ret = glm::vec4(Color, DiffuseIntensity);
+    return ret;
+}
+
+void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
+{
+    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse);
 
     DirectionalLight l;
-    l.Color = Vector3f(Color.x, Color.y, Color.z);
-   // l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = DiffuseIntensity;
+    l.Color = Vector3f(ColorAndIntensity.x, ColorAndIntensity.y, ColorAndIntensity.z);
+    l.DiffuseIntensity = ColorAndIntensity.w;
 
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
@@ -740,11 +745,12 @@ void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
 
 void AssimpModelLoader::InitPointLight(const aiLight& light)
 {
+    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse);
+
     PointLight l;
-    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.Color = Vector3f(ColorAndIntensity.x, ColorAndIntensity.y, ColorAndIntensity.z);
     printf("Point light color [%f %f %f]\n", l.Color.x, l.Color.y, l.Color.z);
-    //l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = 1.0f; // TODO
+    l.DiffuseIntensity = ColorAndIntensity.w;
 
     Vector3f Position = VectorFromAssimpVector(light.mPosition);
     printf("Original Position: "); Position.Print();
@@ -771,10 +777,11 @@ void AssimpModelLoader::InitPointLight(const aiLight& light)
 
 void AssimpModelLoader::InitSpotLight(const aiLight& light)
 {
-    SpotLight l;
-    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
-    l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = 1.0f; // TODO
+    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse);
+
+    SpotLight l;    
+    l.Color = Vector3f(ColorAndIntensity.x, ColorAndIntensity.y, ColorAndIntensity.z);
+    l.DiffuseIntensity = ColorAndIntensity.w;
 
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
