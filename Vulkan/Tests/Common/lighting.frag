@@ -99,26 +99,16 @@ vec4 GetMaterialSpecularColor()
 }
 
 
-vec4 GetTexColor()
-{
-    vec4 TexColor;
+// ---------------------------------------------------------------------------
+// Shadows
+// ---------------------------------------------------------------------------
 
-    //if (gIsCubemapping) {
-    //    vec3 CameraToPixel = normalize(WorldPos - ubo.CameraWorldPos.xyz);
-    //    vec3 ReflectionDir = normalize(reflect(CameraToPixel, GeoNormal));   // reflect() needs a unit normal
-    //    TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
-    //} else if (gIsIndirectRender) {
-    //    TexColor = textureGrad(materials[MaterialIndex].DiffuseMap, TexCoord, TexDx, TexDy);
-    //} else if (gHasSampler) {
-    //    TexColor = textureGrad(gSampler, TexCoord, TexDx, TexDy);
-    //} else {
-   //     TexColor = vec4(1.0, 0.0, 0.0, 1.0);
-    //}
 
-    TexColor = TextureBindless2D(MaterialIndex, TexCoord);
 
-    return TexColor;
-}
+// ---------------------------------------------------------------------------
+// Lighting
+// ---------------------------------------------------------------------------
+
 
 
 vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
@@ -255,6 +245,30 @@ vec4 GetTotalLight()
 }
 
 
+// ---------------------------------------------------------------------------
+// Texture / reflection / refraction
+// ---------------------------------------------------------------------------
+
+vec4 GetTexColor()
+{
+    vec4 TexColor;
+
+    //if (gIsCubemapping) {
+    //    vec3 CameraToPixel = normalize(WorldPos - ubo.CameraWorldPos.xyz);
+    //    vec3 ReflectionDir = normalize(reflect(CameraToPixel, GeoNormal));   // reflect() needs a unit normal
+    //    TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
+    //} else if (gIsIndirectRender) {
+    //    TexColor = textureGrad(materials[MaterialIndex].DiffuseMap, TexCoord, TexDx, TexDy);
+    //} else if (gHasSampler) {
+    //    TexColor = textureGrad(gSampler, TexCoord, TexDx, TexDy);
+    //} else {
+   //     TexColor = vec4(1.0, 0.0, 0.0, 1.0);
+    //}
+
+    TexColor = TextureBindless2D(MaterialIndex, TexCoord);
+
+    return TexColor;
+}
 vec4 CalcPhongLighting(vec4 BaseColor)
 {
     vec4 TotalLight = GetTotalLight();
@@ -282,6 +296,10 @@ vec4 CalcPhongLighting(vec4 BaseColor)
     return FinalColor;
 }
 
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 
 void main() 
 {
