@@ -759,10 +759,8 @@ void AssimpModelLoader::InitPointLight(const aiLight& light)
 
     m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
 
-    Vector4f Pos4D(Position, 1.0f);
-    Pos4D = Transformation * Pos4D;
+    l.WorldPosition = LocalToLeftHandedWorld(Transformation, light.mPosition, 1.0f);
 
-    l.WorldPosition = Vector3f(Pos4D);
     printf("Final Position: "); l.WorldPosition.Print();
 
     l.Attenuation.Constant = light.mAttenuationConstant;
