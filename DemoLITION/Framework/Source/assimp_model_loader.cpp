@@ -706,10 +706,16 @@ void AssimpModelLoader::InitSingleLight(const aiLight& light)
 
 void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
 {
+    aiColor3D c = light.mColorDiffuse;
+    float Intensity = std::max({ c.r, c.g, c.b });          // the multiplier Assimp folded in
+    glm::vec3 Color = (Intensity > 0.0f) ? glm::vec3(c.r, c.g, c.b) / Intensity : glm::vec3(1.0f);
+    float m_lightUnitScale = 0.0005f;
+    float DiffuseIntensity = Intensity * m_lightUnitScale;   // one scale factor, exposed in the GUI
+
     DirectionalLight l;
-    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
-    l.Color = Vector3f(1.0f);
-    l.DiffuseIntensity = 1.0f; // TODO
+    l.Color = Vector3f(Color.x, Color.y, Color.z);
+   // l.Color = Vector3f(1.0f);
+    l.DiffuseIntensity = DiffuseIntensity;
 
     Matrix4f Transformation;
     m_pModelData->GetNodeWorldTransform(light.mName.C_Str(), Transformation);
