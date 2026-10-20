@@ -338,6 +338,24 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 	}
 
 	NumTotalLights += (int)PointLights.size();
+
+	const std::vector<SpotLight>& SpotLights = m_modelContext.m_pModel->GetSpotLights();
+
+	for (int i = 0; i < (int)SpotLights.size(); i++) {
+		const SpotLight& l = SpotLights[i];
+		m_lights[NumTotalLights + i] = {
+			.Color = l.Color.ToGLM(),
+			.LightType = LIGHT_TYPE_SPOT,
+			.Direction = l.WorldDirection.ToGLM(),
+			.AmbientIntensity = l.AmbientIntensity,
+			.WorldPos = l.WorldPosition.ToGLM(),
+			.DiffuseIntensity = l.DiffuseIntensity,
+			.Atten_Constant = l.Attenuation.Constant,
+			.Atten_Linear = l.Attenuation.Linear,
+			.Atten_Exp = l.Attenuation.Exp,
+            .Cutoff = cosf(ToRadian(l.Cutoff))
+		};
+	}
 }
 
 
