@@ -1528,6 +1528,7 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView Image
 
 	VkRenderingAttachmentInfo DepthAttachment = {};
 	bool UseDepth = (DepthView != VK_NULL_HANDLE);
+    bool UseColor = (ImageView != VK_NULL_HANDLE);
 
 	if (UseDepth) {
 		DepthAttachment = {
@@ -1552,8 +1553,8 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView Image
 		.renderArea = { {0, 0}, {(u32)GetSwapChainExtent().width, (u32)GetSwapChainExtent().height} },
 		.layerCount = 1,
 		.viewMask = 0,
-		.colorAttachmentCount = 1,
-		.pColorAttachments = &ColorAttachment,
+		.colorAttachmentCount = UseColor ? 1u : 0u,
+		.pColorAttachments = UseColor ? &ColorAttachment : NULL,
 		.pDepthAttachment = UseDepth ? &DepthAttachment : NULL
 	};
 

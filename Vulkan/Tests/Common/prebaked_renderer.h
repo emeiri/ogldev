@@ -146,8 +146,8 @@ private:
 	};
 	std::vector<MeshCmdBufs> m_cmdBufs;	// dim: lighting modes
 	std::vector<VkCommandBuffer> m_swapChainColorToPresentCmdBufs;
-	std::vector<VkCommandBuffer> m_toneMappingCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
+    VkCommandBuffer m_utilCmdBuf = VK_NULL_HANDLE;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];

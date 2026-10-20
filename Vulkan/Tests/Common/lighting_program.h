@@ -83,7 +83,8 @@ public:
 	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
 							  std::vector<VkDescriptorSet>& DescSets,
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
-							  std::vector<BufferAndMemory>& UniformBuffersFS);
+							  std::vector<BufferAndMemory>& UniformBuffersFS,
+							  std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps);
 
 	static void UpdateUniformBuffers(VkDevice Device,
 									 const glm::vec3& CameraWorldPos,

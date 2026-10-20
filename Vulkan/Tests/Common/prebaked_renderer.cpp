@@ -288,6 +288,8 @@ void PreBakedRenderer::CreateOffscreenImages()
 
 void PreBakedRenderer::CreateShadowMaps()
 {
+	m_vkCore.CreateCommandBuffers(1, &m_utilCmdBuf);
+
 	VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
 
     m_shadowMaps.resize(m_numImages);
@@ -300,10 +302,20 @@ void PreBakedRenderer::CreateShadowMaps()
         for (int l = 0; l < MAX_NUM_LIGHTS; l++) {
             m_vkCore.CreateTexture(m_shadowMaps[Image][l], SwapChainExtent.width, SwapChainExtent.height,
 								   DepthUsage, DepthFormat, false);
+            OgldevVK::BeginCommandBuffer(m_utilCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+			VkClearValue DepthValue = {
+				.depthStencil = {.depth = 1.0f, .stencil = 0 }
+			};
+
+            m_vkCore.BeginDynamicRendering(m_utilCmdBuf, NULL, NULL, 
+										   m_shadowMaps[Image][l].m_view, &DepthValue);
+			vkCmdEndRendering(m_utilCmdBuf);
+			vkEndCommandBuffer(m_utilCmdBuf);
+            m_pQueue->SubmitSync(m_utilCmdBuf);
+			m_pQueue->WaitIdle();
         }
-    }
-
-
+    }	
 }
 
 
@@ -430,7 +442,8 @@ void PreBakedRenderer::CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& 
 	m_pipelines[0].AllocDescSets(m_modelContext.m_descSets);
 	m_pipelines[0].UpdateDescriptorSets(md, m_modelContext.m_descSets,
 											m_modelContext.m_uniformBuffersVS, 
-											m_modelContext.m_uniformBuffersFS);
+											m_modelContext.m_uniformBuffersFS,
+									        m_shadowMaps);
 }
 
 

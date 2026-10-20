@@ -32,7 +32,8 @@ enum Binding {
 	BindingUniformVS = 2,
 	BindingMetaData = 3,
 	BindingUniformFS = 4,
-	NumBindings = 5
+	BindingShadowMapFS = 5,
+	NumBindings = 6
 };
 
 static_assert(sizeof(LightSource) == 64, "LightSource size must be 64 bytes");
@@ -144,6 +145,12 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
+		}, {
+			.binding = BindingShadowMapFS,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = MAX_NUM_LIGHTS,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
 		}
 	};
 
@@ -169,11 +176,11 @@ std::vector<VkPushConstantRange> LightingProgram::GetPushConstantRange()
 }
 
 
-
 void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 										   std::vector<VkDescriptorSet>& DescSets,
 										   std::vector<BufferAndMemory>& UniformBuffersVS,
-										   std::vector<BufferAndMemory>& UniformBuffersFS)
+										   std::vector<BufferAndMemory>& UniformBuffersFS,
+										   std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps)
 {
 	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescSets.size());
 
@@ -190,6 +197,17 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		BufferInfoUniformsFS[i].offset = 0;
 		BufferInfoUniformsFS[i].range = VK_WHOLE_SIZE;
 	}
+
+    std::vector<VkDescriptorImageInfo> ShadowMapImageInfos(DescSets.size() * MAX_NUM_LIGHTS);
+
+    for (int i = 0; i < (int)DescSets.size(); i++) {
+        for (int j = 0; j < MAX_NUM_LIGHTS; j++) {
+            int Index = i * MAX_NUM_LIGHTS + j;
+            ShadowMapImageInfos[Index].sampler = m_shadowMapSampler;
+            ShadowMapImageInfos[Index].imageView = ShadowMaps[i][j].m_view;
+            ShadowMapImageInfos[Index].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
+    }
 
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = ModelDesc.m_vb,
@@ -279,6 +297,19 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.pBufferInfo = &BufferInfoUniformsFS[i]
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = BindingShadowMapFS,
+			.dstArrayElement = 0,
+			.descriptorCount = MAX_NUM_LIGHTS,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = ShadowMapImageInfos.data() + i * MAX_NUM_LIGHTS
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());
