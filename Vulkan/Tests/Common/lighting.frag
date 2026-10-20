@@ -190,6 +190,41 @@ vec4 CalcDirectionalLight(int Index)
 }
 
 
+vec4 CalcPointLight(int Index, bool IsPoint)
+{
+    vec3 LightWorldDir = WorldPos - ubo.LightSources[Index].WorldPos;   // deliberately not normalized yet
+    float ShadowFactor = 1.0; //CalcShadowFactor(LightWorldDir, IsPoint);
+
+    float Distance = length(LightWorldDir);
+    LightWorldDir = LightWorldDir / max(Distance, 1e-6);
+    vec4 Color = CalcLightInternal(Index, LightWorldDir, ShadowFactor);
+
+    // Note: dividing by (1 + attenuation) is non-standard; with Atten_Constant = 1 the
+    // light is already halved at distance 0. Kept as-is to preserve the current look.
+    float Attenuation =  ubo.LightSources[Index].Atten_Constant +
+                         ubo.LightSources[Index].Atten_Linear * Distance +
+                         ubo.LightSources[Index].Atten_Exp * Distance * Distance;
+
+    return Color / (1.0 + Attenuation);
+}
+
+
+vec4 CalcSpotLight(int Index)
+{
+    vec3 PixelToLight = normalize(ubo.LightSources[Index].WorldPos - WorldPos);
+    float SpotFactor = dot(PixelToLight, -normalize(ubo.LightSources[Index].Direction));
+
+    if (SpotFactor > ubo.LightSources[Index].Cutoff) {
+        vec4 Color = CalcPointLight(Index, false);
+        float SpotLightIntensity = (1.0 - (1.0 - SpotFactor)/(1.0 - ubo.LightSources[Index].Cutoff));
+        return Color * SpotLightIntensity;
+    }
+    else {
+        return vec4(0,0,0,0);
+    }
+}
+
+
 vec4 GetTotalLight()
 {
     vec4 TotalLight = vec4(0.0);
@@ -203,12 +238,12 @@ vec4 GetTotalLight()
                 TotalLight += CalcDirectionalLight(i);
                 break;
 
-          //  case LIGHT_TYPE_POINT:
-           //     TotalLight += CalcPointLight(i, true);
-           //     break;
+            case LIGHT_TYPE_POINT:
+                TotalLight += CalcPointLight(i, true);
+                break;
 
-          //  case LIGHT_TYPE_SPOT:
-           //     TotalLight += CalcSpotLight(i);
+            case LIGHT_TYPE_SPOT:
+                TotalLight += CalcSpotLight(i);
                 break;
         }
     }
