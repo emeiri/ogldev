@@ -304,7 +304,7 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 
 		m_lights[0] = {
 			.Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
-			.LightType = 0, // Directional light
+            .LightType = LIGHT_TYPE_DIR,
             .Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z),
 			.AmbientIntensity = m_ambientIntensity,
 			.WorldPos = glm::vec3(0.0f),
@@ -527,6 +527,15 @@ void PreBakedRenderer::UpdateGUI()
 	ImGui::DragFloat("Ambient Intensity", &m_ambientIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
 
 	ImGui::DragFloat("Diffuse Intensity", &m_diffuseIntensity, 0.01f, 0.0f, 5.0f, "%.2f");
+
+	m_lights[0] = {
+	.Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
+	.LightType = LIGHT_TYPE_DIR,
+	.Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z),
+	.AmbientIntensity = m_ambientIntensity,
+	.WorldPos = glm::vec3(0.0f),
+	.DiffuseIntensity = m_diffuseIntensity
+	};
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 

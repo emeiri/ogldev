@@ -41,6 +41,9 @@ enum LIGHTING_MODE {
 	NUM_LIGHTING_MODES         = 4
 };
 
+#define LIGHT_TYPE_DIR   0
+#define LIGHT_TYPE_POINT 1
+#define LIGHT_TYPE_SPOT  2
 
 struct LightSource {
 	glm::vec3 Color = glm::vec3(0.0f);          // offset 0

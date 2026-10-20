@@ -28,6 +28,10 @@
 
 #define MAX_NUM_LIGHTS 16
 
+#define LIGHT_TYPE_DIR   0
+#define LIGHT_TYPE_POINT 1
+#define LIGHT_TYPE_SPOT  2
+
 struct LightSource {
     vec3 Color;                    // offset 0
     int LightType;                 // offset 12
@@ -75,15 +79,182 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 }
 
 
+vec4 GetMaterialAmbientColor()  
+{ 
+    return vec4(1.0); 
+}
+
+
+vec4 GetMaterialDiffuseColor()  
+{ 
+    return vec4(1.0); 
+}
+
+
+vec4 GetMaterialSpecularColor() 
+{ 
+    return vec4(ubo.Material.x); 
+}
+
+
+vec4 GetTexColor()
+{
+    vec4 TexColor;
+
+    //if (gIsCubemapping) {
+    //    vec3 CameraToPixel = normalize(WorldPos - ubo.CameraWorldPos.xyz);
+    //    vec3 ReflectionDir = normalize(reflect(CameraToPixel, GeoNormal));   // reflect() needs a unit normal
+    //    TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
+    //} else if (gIsIndirectRender) {
+    //    TexColor = textureGrad(materials[MaterialIndex].DiffuseMap, TexCoord, TexDx, TexDy);
+    //} else if (gHasSampler) {
+    //    TexColor = textureGrad(gSampler, TexCoord, TexDx, TexDy);
+    //} else {
+   //     TexColor = vec4(1.0, 0.0, 0.0, 1.0);
+    //}
+
+    TexColor = TextureBindless2D(MaterialIndex, TexCoord);
+
+    return TexColor;
+}
+
+
+vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
+{
+    LightDirection = normalize(LightDirection);
+
+    vec4 AmbientColor = vec4(ubo.LightSources[Index].Color, 1.0f) *
+                        ubo.LightSources[Index].AmbientIntensity *
+                        GetMaterialAmbientColor();
+
+    float DiffuseFactor = dot(GeoNormal, -LightDirection);
+
+    vec4 DiffuseColor = vec4(0, 0, 0, 0);
+    vec4 SpecularColor = vec4(0, 0, 0, 0);
+    vec4 RimColor = vec4(0, 0, 0, 0);
+
+    if (DiffuseFactor > 0) {
+     //   if (gCellShadingEnabled) {
+     //       DiffuseFactor = ceil(DiffuseFactor * toon_color_levels) * toon_scale_factor;
+    //    }
+
+        DiffuseColor = vec4(ubo.LightSources[Index].Color, 1.0f) *
+                       ubo.LightSources[Index].DiffuseIntensity *
+                       GetMaterialDiffuseColor() *
+                       DiffuseFactor;
+
+        vec3 PixelToCamera = normalize(ubo.CameraWorldPos.xyz - WorldPos);
+        vec3 LightReflect = normalize(reflect(LightDirection, Normal));
+        float SpecularFactor = dot(PixelToCamera, LightReflect);
+
+      //  if (!gCellShadingEnabled && (SpecularFactor > 0)) {
+       //     float SpecularExponent = 128.0;
+
+      //      if (gEnableSpecularExponent) {
+                // Inside a divergent branch: explicit gradients keep the LOD well defined.
+      //          SpecularExponent = textureGrad(gSamplerSpecularExponent, TexCoord, TexDx, TexDy).r * 255.0;
+      //          SpecularExponent = max(SpecularExponent, 1.0);   // pow(x, 0) == 1 gave full-power specular
+      //      }
+
+      //      SpecularFactor = pow(SpecularFactor, SpecularExponent);
+      //      SpecularColor = vec4(ubo.Lights[Index].Color, 1.0f) *
+      //                           ubo.Lights[Index].DiffuseIntensity * // using the diffuse intensity for diffuse/specular
+      //                           GetMaterialSpecularColor() *
+     //                            SpecularFactor;
+     //   }
+
+     //   if (gRimLightEnabled) {
+      //     float RimFactor = CalcRimLightFactor(PixelToCamera, Normal);
+      //     RimColor = DiffuseColor * RimFactor;
+      //  }
+    }
+
+  //  if (gHasNormalMap) {
+        // Fade out light on faces that point away from the light according to the
+        // geometric normal. Clamped: a negative value used to subtract light.
+   //     float OriginalDiffuse = max(dot(GeoNormal, -LightDirection), 0.0);
+  //      DiffuseColor *= OriginalDiffuse;
+   // }
+
+    return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
+   //return AmbientColor;
+}
+
+
+
+vec4 CalcDirectionalLight(int Index)
+{
+    vec3 Direction = normalize(ubo.LightSources[Index].Direction);
+    float ShadowFactor = 1.0; //CalcShadowFactor(Direction, false);
+    return CalcLightInternal(Index, Direction, ShadowFactor);
+}
+
+
+vec4 GetTotalLight()
+{
+    vec4 TotalLight = vec4(0.0);
+
+    int NumLights = ubo.Counts.x;
+
+    for (int i = 0 ; i < NumLights ; i++) {
+        switch (ubo.LightSources[i].LightType) {
+
+            case LIGHT_TYPE_DIR:
+                TotalLight += CalcDirectionalLight(i);
+                break;
+
+          //  case LIGHT_TYPE_POINT:
+           //     TotalLight += CalcPointLight(i, true);
+           //     break;
+
+          //  case LIGHT_TYPE_SPOT:
+           //     TotalLight += CalcSpotLight(i);
+                break;
+        }
+    }
+
+    return TotalLight;
+}
+
+
+vec4 CalcPhongLighting(vec4 BaseColor)
+{
+    vec4 TotalLight = GetTotalLight();
+
+    vec4 TexColor = BaseColor;
+
+    // gColorMod and gColorAdd are used to enhance the color in youtube thumbnails.
+    // They are not an integral part of the lighting equation.
+    //TexColor = TexColor * gColorMod + gColorAdd;
+
+    vec4 FinalColor = TexColor * TotalLight;
+
+    //if (gRefRefractEnabled) {
+    //    FinalColor = ApplyRefRefract(FinalColor, Normal);
+    //}
+
+    // The light alphas add up (ambient uses 1.0 per light), so take alpha from the texture.
+    FinalColor.a = TexColor.a;
+
+    // HDR tone mapping / gamma correction: do these as the very last step, ideally via an
+    // sRGB framebuffer (GL_FRAMEBUFFER_SRGB) and sRGB textures instead of by hand.
+    // FinalColor.rgb = FinalColor.rgb / (FinalColor.rgb + vec3(1.0));
+    // FinalColor.rgb = pow(FinalColor.rgb, vec3(1.0/2.2));
+
+    return FinalColor;
+}
+
+
 void main() 
 {
     GeoNormal = normalize(Normal);
 
-    vec4 BaseColor = TextureBindless2D(MaterialIndex, TexCoord) * Color;
+    vec4 TexColor = GetTexColor();
+
+    vec4 BaseColor = TexColor * Color;
 
     vec3 LightColor = ubo.LightSources[0].Color;
     float AmbientIntensity = ubo.LightSources[0].AmbientIntensity;
-    vec3 LightDirection = -ubo.LightSources[0].Direction;
     float DiffuseIntensity = ubo.LightSources[0].DiffuseIntensity;
 
     switch (LIGHTING_MODE) {
@@ -100,24 +271,9 @@ void main()
             break;
 
         case LIGHTING_MODE_FULL:
-            // 1. Normalize Vectors
-            vec3 N = GeoNormal;
-    
-            // We negate the Direction so L points TOWARD the light source for the dot product
-            vec3 L = normalize(LightDirection); 
+            vec4 Color = CalcPhongLighting(BaseColor);
 
-            // 2. Diffuse (Lambertian) Calculation
-            float NdotL = max(dot(N, L), 0.0);
-    
-            // 4. Calculate Lighting Components
-            // Ambient: Base Texture * Ambient Color * Ambient Intensity
-            vec3 Ambient = BaseColor.rgb * LightColor * AmbientIntensity;
-
-            // Diffuse: Base Texture * Light Color * Light Intensity * NdotL
-            vec3 Diffuse = BaseColor.rgb * LightColor * DiffuseIntensity * NdotL;
-
-            // 5. Final Output
-            OutColor = vec4(Ambient + Diffuse, BaseColor.a);
+            OutColor = Color;
 
             break;
 
