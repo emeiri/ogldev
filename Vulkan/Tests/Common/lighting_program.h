@@ -123,6 +123,7 @@ private:
 	int m_numImages = 0;
     VkDescriptorSetLayout m_textureDescSetLayout = VK_NULL_HANDLE;
 	VkDescriptorSet m_textureDescSet = VK_NULL_HANDLE;
+	VkSampler m_shadowMapSampler = VK_NULL_HANDLE;
 };
 
 }

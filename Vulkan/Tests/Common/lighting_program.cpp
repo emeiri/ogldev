@@ -20,6 +20,7 @@
 #include "ogldev_types.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_util.h"
+#include "ogldev_vulkan_wrapper.h"
 #include "lighting_program.h"
 
 
@@ -64,6 +65,13 @@ void LightingProgram::Init(VulkanCore& vkCore,
 	};
 
 	GraphicsPipeline::Init(vkCore, ColorFormat, DescPool, vs, fs, NULL, &SpecInfo);
+
+	VkFilter MinFilter = VK_FILTER_LINEAR;
+	VkFilter MaxFilter = VK_FILTER_LINEAR;
+	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+	float MaxAnisotropy = -1.0f;
+
+	m_shadowMapSampler = OgldevVK::CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
 }
 
 
@@ -84,6 +92,8 @@ void LightingProgram::Destroy()
 	// so we don't destroy it here. 
 	// The second layout was created by this class, so we destroy it.
 	vkDestroyDescriptorSetLayout(m_device, m_descSetLayouts[1], NULL);
+
+	vkDestroySampler(m_device, m_shadowMapSampler, NULL);
 }
 
 

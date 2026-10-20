@@ -302,6 +302,8 @@ void PreBakedRenderer::CreateShadowMaps()
 								   DepthUsage, DepthFormat, false);
         }
     }
+
+
 }
 
 

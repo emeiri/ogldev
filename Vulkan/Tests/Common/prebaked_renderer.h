@@ -139,7 +139,7 @@ private:
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
 	std::vector<OgldevVK::OffscreenImage> m_offscreenImages;
-	std::vector< std::vector<OgldevVK::VulkanTexture > > m_shadowMaps;
+	std::vector< std::vector<OgldevVK::VulkanTexture > > m_shadowMaps;    
 	int m_numImages = 0;
 	struct MeshCmdBufs {
 		std::vector<VkCommandBuffer> BaseMeshDraw; // Size: m_numImages
