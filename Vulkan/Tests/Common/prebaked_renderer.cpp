@@ -507,14 +507,6 @@ void PreBakedRenderer::UpdateGUI()
 		}
 	}
 
-	if (ImGui::CollapsingHeader("Scale")) {
-		ImGui::DragFloat("##Scale", &m_scale, 0.001f, 0.001f, 2.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-		ImGui::SameLine();
-		if (ImGui::Button("Reset##Scale")) {
-			m_scale = 1.0f;
-		}
-	}
-
 	static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
 	for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
 		ImGui::RadioButton(lightingModeNames[i], (int*)&m_lightingMode, i);
@@ -528,14 +520,10 @@ void PreBakedRenderer::UpdateGUI()
 
 	ImGui::DragFloat("Diffuse Intensity", &m_diffuseIntensity, 0.01f, 0.0f, 5.0f, "%.2f");
 
-	m_lights[0] = {
-	.Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z),
-	.LightType = LIGHT_TYPE_DIR,
-	.Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z),
-	.AmbientIntensity = m_ambientIntensity,
-	.WorldPos = glm::vec3(0.0f),
-	.DiffuseIntensity = m_diffuseIntensity
-	};
+	m_lights[0].Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z);
+	m_lights[0].Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z);
+	m_lights[0].AmbientIntensity = m_ambientIntensity;
+	m_lights[0].DiffuseIntensity = m_diffuseIntensity;
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
