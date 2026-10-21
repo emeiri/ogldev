@@ -1109,11 +1109,11 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 	// Step 2: get the buffer memory requirements
 	VkMemoryRequirements MemReqs = { 0 };
 	vkGetImageMemoryRequirements(m_device, Tex.m_image, &MemReqs);
-	printf("Image requires %d bytes\n", (int)MemReqs.size);
+	//printf("Image requires %d bytes\n", (int)MemReqs.size);
 
 	// Step 3: get the memory type index
 	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, PropertyFlags);
-	printf("Memory type index %d\n", MemoryTypeIndex);
+	//printf("Memory type index %d\n", MemoryTypeIndex);
 
 	// Step 4: allocate memory
 	VkMemoryAllocateInfo MemAllocInfo = {

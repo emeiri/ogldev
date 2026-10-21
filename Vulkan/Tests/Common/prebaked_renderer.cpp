@@ -28,7 +28,6 @@
 #include "prebaked_renderer.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-//#include "Int/model_desc.h"
 
 #define MAX_TEXTURES 4096
 

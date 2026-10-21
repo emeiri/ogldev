@@ -70,7 +70,7 @@ layout(set = 1, binding = 4) readonly uniform UniformBuffer {
     LightSource LightSources[MAX_NUM_LIGHTS];
 } ubo;
 
-layout(set = 1, binding = 5) uniform sampler2D ShadowMap[MAX_NUM_LIGHTS];
+layout(set = 1, binding = 5) uniform sampler2D ShadowMaps[MAX_NUM_LIGHTS];
 
 bool gCellShadingEnabled = false;
 bool gEnableSpecularExponent = false;
