@@ -58,6 +58,7 @@ layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 WorldPos;
 layout(location = 3) in vec3 Normal;
 layout(location = 4) in vec4 Color;
+layout(location = 5) in vec4 LightSpacePos[MAX_NUM_LIGHTS];
 
 layout(location = 0) out vec4 OutColor;
 
@@ -81,6 +82,14 @@ layout(set = 1, binding = 6) uniform LightMats {
 bool gCellShadingEnabled = false;
 bool gEnableSpecularExponent = false;
 vec3 GeoNormal;
+
+// Light level of a fully shadowed pixel (ambient is added separately).
+const float kShadowFloor = 0.05;
+
+// ---------------------------------------------------------------------------
+// Material
+// ---------------------------------------------------------------------------
+
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
@@ -111,6 +120,70 @@ vec4 GetMaterialSpecularColor()
 // Shadows
 // ---------------------------------------------------------------------------
 
+bool IsOutsideShadowMap(vec3 ShadowCoords)
+{
+    return ShadowCoords.z > 1.0 ||
+           ShadowCoords.z < 0 ||
+           any(lessThan(ShadowCoords.xy, vec2(0.0))) ||
+           any(greaterThan(ShadowCoords.xy, vec2(1.0)));
+}
+
+
+// Returns 1.0 if lit, 0.0 if shadowed. Always samples mip 0 (shadow maps are not mip-filtered)
+// which also makes the call safe inside divergent branches.
+float ShadowTest(int Index, vec2 UV, float RefZ, float Bias)
+{
+    float Depth = textureLod(ShadowMaps[Index], UV, 0.0).x;
+    return (Depth + Bias < RefZ) ? 0.0 : 1.0;
+}
+
+
+vec3 CalcShadowCoords(int Index)
+{
+    vec3 ProjCoords = LightSpacePos[Index].xyz / LightSpacePos[Index].w;
+    vec2 XY = vec2(ProjCoords.x * 0.5 + 0.5, -ProjCoords.y * 0.5 + 0.5);
+    vec3 ShadowCoords = vec3(XY, ProjCoords.z);
+    return ShadowCoords;
+}
+
+
+float CalcShadowFactorBasic(int Index, vec3 LightDirection)
+{
+    vec3 ShadowCoords = CalcShadowCoords(Index);
+
+    if (IsOutsideShadowMap(ShadowCoords)) {
+        return 1.0;
+    }
+
+    float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
+
+    float bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
+
+    return (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
+}
+
+// LightToPixel is the (unnormalized) vector from the light to the pixel.
+// Point lights use the cube map; spot and directional lights use the 2D map.
+float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
+{
+  //  if (!gShadowsEnabled) {
+   //     return 1.0;
+  //  }
+
+  //  if (IsPoint) {
+  //      return CalcShadowFactorPointLight(LightToPixel);
+  //  }
+
+    vec3 LightDirection = normalize(LightToPixel);
+
+ //   if (gShadowMapRandomRadius > 0.0) {
+  //      return CalcShadowFactorWithRandomSampling(LightDirection);
+ //   } else if (gShadowMapFilterSize > 0) {
+ //      return CalcShadowFactorPCF(LightDirection);
+ //   } else {
+        return CalcShadowFactorBasic(Index, LightDirection);
+  //  }
+}
 
 
 // ---------------------------------------------------------------------------
@@ -193,7 +266,9 @@ vec4 CalcDirectionalLight(int Index)
 vec4 CalcPointLight(int Index, bool IsPoint)
 {
     vec3 LightWorldDir = WorldPos - ubo.LightSources[Index].WorldPos;   // deliberately not normalized yet
-    float ShadowFactor = 1.0; //CalcShadowFactor(LightWorldDir, IsPoint);
+    float ShadowFactor = CalcShadowFactor(Index, LightWorldDir, IsPoint);
+
+    return vec4(ShadowFactor);
 
     float Distance = length(LightWorldDir);
     LightWorldDir = LightWorldDir / max(Distance, 1e-6);
@@ -277,6 +352,8 @@ vec4 GetTexColor()
 
     return TexColor;
 }
+
+
 vec4 CalcPhongLighting(vec4 BaseColor)
 {
     vec4 TotalLight = GetTotalLight();
