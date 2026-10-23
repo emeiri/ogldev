@@ -43,9 +43,9 @@ void ShadowProgram::Init(VulkanCore& vkCore, VkDescriptorPool DescPool,
     m_numImages = vkCore.GetNumImages();
     m_lightingDescSetLayouts = DescSetLayouts;
 
-	m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "../Common/shadow.vert");
+	m_vs = OgldevVK::CreateShaderModuleFromText(vkCore.GetDevice(), "../Common/shadow.vert");
 
-	m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "../Common/shadow.frag");
+	m_fs = OgldevVK::CreateShaderModuleFromText(vkCore.GetDevice(), "../Common/shadow.frag");
 
 	GraphicsPipeline::Init(vkCore, VK_FORMAT_UNDEFINED, DescPool, m_vs, m_fs, NULL, NULL);
 }
@@ -88,7 +88,7 @@ std::vector<VkPushConstantRange> ShadowProgram::GetPushConstantRange()
 {
 	std::vector<VkPushConstantRange> PushConstantRanges = {
 		{
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.offset = 0,
 			.size = sizeof(u32)
 		}

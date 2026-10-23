@@ -57,9 +57,13 @@ PreBakedRenderer::~PreBakedRenderer()
 
 	m_imGUIRenderer.Destroy();
 
-    for (MeshCmdBufs& v : m_cmdBufs) {
+    for (MeshCmdBufs& v : m_lightPassCmdBufs) {
 		m_vkCore.FreeCommandBuffers((u32)v.BaseMeshDraw.size(), v.BaseMeshDraw.data());
 	}
+
+    for (std::vector<VkCommandBuffer>& v : m_shadowPassCmdBufs) {
+        m_vkCore.FreeCommandBuffers((u32)v.size(), v.data());
+    }
         
 	m_modelContext.Destroy(m_device);
 
@@ -69,6 +73,8 @@ PreBakedRenderer::~PreBakedRenderer()
 	for (OgldevVK::LightingProgram& p : m_pipelines) {
 		p.Destroy();
 	}
+
+    m_shadowProgram.Destroy();
         
     for (int i = 0; i < (int)m_offscreenImages.size(); i++) {
         m_offscreenImages[i].Destroy(m_device);
@@ -124,7 +130,13 @@ void PreBakedRenderer::RenderScene()
 
 	std::vector<VkCommandBuffer> SubmissionCmdBufs;
 
-	SubmissionCmdBufs.push_back(m_cmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
+	int NumActiveLights = 1;
+
+    for (int LightIndex = 0; LightIndex < NumActiveLights; LightIndex++) {
+        SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][LightIndex]);
+    }
+
+/*	SubmissionCmdBufs.push_back(m_lightPassCmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
 
 	SubmissionCmdBufs.push_back(m_fallbackCopyCmdBufs[ImageIndex]);
 
@@ -134,7 +146,7 @@ void PreBakedRenderer::RenderScene()
 		SubmissionCmdBufs.push_back(ImGUICmdBuf);
 	} else {
 		SubmissionCmdBufs.push_back(m_swapChainColorToPresentCmdBufs[ImageIndex]);
-	}
+	}*/
 
 	m_pQueue->SubmitAsync(SubmissionCmdBufs);
 	m_pQueue->Present(ImageIndex);
@@ -238,11 +250,18 @@ void PreBakedRenderer::InitCameraFromModel()
 
 void PreBakedRenderer::CreateCommandBuffers()
 {		
-	m_cmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
+	m_lightPassCmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
 
-	for (MeshCmdBufs& v : m_cmdBufs) {
+	for (MeshCmdBufs& v : m_lightPassCmdBufs) {
 		v.BaseMeshDraw.resize(m_numImages);
 		m_vkCore.CreateCommandBuffers(m_numImages, v.BaseMeshDraw.data());
+	}
+
+	m_shadowPassCmdBufs.resize(m_numImages);
+
+	for (std::vector<VkCommandBuffer>& v : m_shadowPassCmdBufs) {
+		v.resize(MAX_NUM_LIGHTS);
+		m_vkCore.CreateCommandBuffers(MAX_NUM_LIGHTS, v.data());
 	}
 
 	printf("Created command buffers\n");
@@ -314,6 +333,7 @@ void PreBakedRenderer::CreateShadowMaps()
             m_vkCore.BeginDynamicRendering(m_utilCmdBuf, NULL, NULL, 
 										   m_shadowMaps[Image][l].m_view, &DepthValue);
 			vkCmdEndRendering(m_utilCmdBuf);
+			m_shadowMaps[Image][l].TransitionLayout(m_utilCmdBuf, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 			vkEndCommandBuffer(m_utilCmdBuf);
             m_pQueue->SubmitSync(m_utilCmdBuf);
 			m_pQueue->WaitIdle();
@@ -416,6 +436,8 @@ void PreBakedRenderer::CreatePipelines()
 		m_pipelines[i].Init(m_vkCore, OffscreenColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
 				            m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 	}
+
+    m_shadowProgram.Init(m_vkCore, m_descPool, m_pipelines[0].GetDescSetLayouts());
 }
 
 
@@ -460,12 +482,52 @@ void PreBakedRenderer::RecordCommandBuffers()
 	// 1. Bake the baseline mesh draw calls (No conditional post-process paths inside here anymore!)
 	for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
 		// Note: RecordCommandBuffersInternal now only takes 3 parameters
-		RecordCommandBuffersInternal(LightMode, m_cmdBufs[LightMode].BaseMeshDraw);
+		RecordCommandBuffersInternal(LightMode, m_lightPassCmdBufs[LightMode].BaseMeshDraw);
 	}
+
+    RecordShadowPassCommandBuffers();
 
 	RecordFallbackCopyCommandBuffers();
 
 	RecordSwapChainColorToPresentCommandBuffers();
+}
+
+
+void PreBakedRenderer::RecordShadowPassCommandBuffers()
+{
+	VkFormat DepthFormat = m_vkCore.GetDepthFormat();
+
+    for (uint ImageIndex = 0; ImageIndex < (uint)m_numImages; ImageIndex++) {
+
+        for (uint LightIndex = 0; LightIndex < MAX_NUM_LIGHTS; LightIndex++) {
+            
+			VkCommandBuffer& CmdBuf = m_shadowPassCmdBufs[ImageIndex][LightIndex];
+            OgldevVK::VulkanTexture& ShadowMap = m_shadowMaps[ImageIndex][LightIndex];
+            
+			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+            
+			VkImageLayout SrcDepthLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            VkImageLayout DstDepthLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            ShadowMap.TransitionLayout(CmdBuf, SrcDepthLayout, DstDepthLayout);
+
+            // Draw Geometry
+            VkClearValue DepthValue = {
+                .depthStencil = {.depth = 1.0f, .stencil = 0 }
+            };
+            m_vkCore.BeginDynamicRendering(CmdBuf, NULL, NULL, ShadowMap.m_view, &DepthValue);
+            m_shadowProgram.Bind(ImageIndex, 
+								 CmdBuf, 
+								 m_modelContext.m_descSets[ImageIndex], 
+								 m_bigTextureArray.GetDescSet(), LightIndex);
+
+            m_modelContext.m_pModel->RecordCommandBufferIndirect(CmdBuf);
+            vkCmdEndRendering(CmdBuf);
+
+            ShadowMap.TransitionLayout(CmdBuf, SrcDepthLayout);
+            VkResult res = vkEndCommandBuffer(CmdBuf);
+            CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
+        }
+    }
 }
 
 
@@ -506,7 +568,7 @@ void PreBakedRenderer::RecordFallbackCopyCommandBuffers()
 	m_vkCore.CreateCommandBuffers(m_numImages, m_fallbackCopyCmdBufs.data());
 	VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
 
-	for (int i = 0; i < m_numImages; i++) {
+	for (int i = 0; i < (int)m_numImages; i++) {
 		VkCommandBuffer CmdBuf = m_fallbackCopyCmdBufs[i];
         OgldevVK::VulkanBaseImage& SwapChainImage = m_vkCore.GetSwapChainImage(i);
 		OgldevVK::VulkanTexture& OffscreenImage = m_offscreenImages[i].m_color;

@@ -56,6 +56,8 @@ public:
 
 	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets, int DescSetLayoutIndex = 0);
 
+    const std::vector<VkDescriptorSetLayout>& GetDescSetLayouts() const { return m_descSetLayouts; }
+
 protected:
 
 	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;

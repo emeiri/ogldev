@@ -248,12 +248,14 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 		.pAttachments = &BlendAttachState
 	};
 
+    u32 NumColorAttachments = ColorFormat == VK_FORMAT_UNDEFINED ? 0 : 1;
+
 	VkPipelineRenderingCreateInfo RenderingInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
 		.pNext = NULL,
 		.viewMask = 0,
-		.colorAttachmentCount = 1,
-		.pColorAttachmentFormats = &ColorFormat,
+		.colorAttachmentCount = NumColorAttachments,
+		.pColorAttachmentFormats = ColorFormat == VK_FORMAT_UNDEFINED ? VK_NULL_HANDLE : &ColorFormat,
 		.depthAttachmentFormat = DepthFormat,
 		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 	};

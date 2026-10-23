@@ -27,9 +27,10 @@
 #include "ogldev_vulkan_imgui.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_big_texture_array.h"
+#include "ogldev_vulkan_model.h"
 #include "ogldev_glm_camera.h"
 #include "lighting_program.h"
-#include "ogldev_vulkan_model.h"
+#include "shadow_program.h"
 
 
 struct ModelContext {
@@ -117,6 +118,8 @@ private:
 
 	void RecordCommandBuffers();
 
+	void RecordShadowPassCommandBuffers();
+
 	void RecordCommandBuffersInternal(int LightingMode, std::vector<VkCommandBuffer>& CmdBufs);
 
 	void RecordFallbackCopyCommandBuffers();
@@ -145,13 +148,15 @@ private:
 	struct MeshCmdBufs {
 		std::vector<VkCommandBuffer> BaseMeshDraw; // Size: m_numImages
 	};
-	std::vector<MeshCmdBufs> m_cmdBufs;	// dim: lighting modes
+	std::vector<MeshCmdBufs> m_lightPassCmdBufs;	// dim: lighting modes
+    std::vector< std::vector<VkCommandBuffer> > m_shadowPassCmdBufs; // outer dim: m_numImages, inner dim: MAX_NUM_LIGHTS
 	std::vector<VkCommandBuffer> m_swapChainColorToPresentCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
     VkCommandBuffer m_utilCmdBuf = VK_NULL_HANDLE;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
+    OgldevVK::ShadowProgram m_shadowProgram;
 	ModelContext m_modelContext;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;

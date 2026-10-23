@@ -37,6 +37,11 @@ const int NUM_FLOATS_IN_VERTEX_DATA = 20;
 const int FLOAT_SIZE_IN_BYTES = 4;
 const int INDEX_SIZE_IN_BYTES = 4;
 
+layout(push_constant) uniform Constants {
+    uint LightIndex; 
+} push;
+
+
 layout (std430, set = 1, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
 layout (std430, set = 1, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
@@ -78,8 +83,6 @@ void main()
 
     MetaData md = MetaBuf.metas[DrawId];
 
-    MaterialIndex = md.MaterialIndex;
-
     uint BaseIndex = md.IndexOffset / INDEX_SIZE_IN_BYTES;
     int Index = in_Indices.i[BaseIndex + gl_VertexIndex];
 
@@ -89,7 +92,7 @@ void main()
     vec4 Pos4d = vec4(vtx.pos_x, vtx.pos_y, vtx.pos_z, 1.0);
 
     mat4 WorldTransform = ubo.Data[DrawId].WorldTransform;
-    mat4 WVTransform = LightMats.LightVP[push.LightIndex];
+    mat4 WVTransform = LightMatrices.LightVP[push.LightIndex];
 
     gl_Position = WVTransform * WorldTransform * Pos4d;    
 }
