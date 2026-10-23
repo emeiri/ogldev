@@ -76,7 +76,6 @@ layout(location = 1) flat out uint MaterialIndex;
 layout(location = 2) out vec3 WorldPos;
 layout(location = 3) out vec3 Normal;
 layout(location = 4) out vec4 Color;
-layout(location = 5) out vec4 LightSpacePos[MAX_NUM_LIGHTS];
 
 void main() 
 {    
@@ -107,10 +106,6 @@ void main()
     WorldPos = vec3(WorldTransform * Pos4d);
 
     Color = md.Color;
-
-    for (int i = 0; i < LightMatrices.Counts.x; i++) {
-        LightSpacePos[i] = LightMatrices.LightVP[i] * WorldTransform * Pos4d;
-    }
 
     // DEBUGGING
     //Normal = OrigNorm;  

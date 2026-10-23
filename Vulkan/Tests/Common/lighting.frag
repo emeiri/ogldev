@@ -58,7 +58,7 @@ layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 WorldPos;
 layout(location = 3) in vec3 Normal;
 layout(location = 4) in vec4 Color;
-layout(location = 5) in vec4 LightSpacePos[MAX_NUM_LIGHTS];
+
 
 layout(location = 0) out vec4 OutColor;
 
@@ -140,7 +140,8 @@ float ShadowTest(int Index, vec2 UV, float RefZ, float Bias)
 
 vec3 CalcShadowCoords(int Index)
 {
-    vec3 ProjCoords = LightSpacePos[Index].xyz / LightSpacePos[Index].w;
+    vec4 LightSpacePos = LightMatrices.LightVP[Index] * vec4(WorldPos, 1.0);
+    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
     vec2 XY = vec2(ProjCoords.x * 0.5 + 0.5, -ProjCoords.y * 0.5 + 0.5);
     vec3 ShadowCoords = vec3(XY, ProjCoords.z);
     return ShadowCoords;
@@ -267,8 +268,6 @@ vec4 CalcPointLight(int Index, bool IsPoint)
 {
     vec3 LightWorldDir = WorldPos - ubo.LightSources[Index].WorldPos;   // deliberately not normalized yet
     float ShadowFactor = CalcShadowFactor(Index, LightWorldDir, IsPoint);
-
-    return vec4(ShadowFactor);
 
     float Distance = length(LightWorldDir);
     LightWorldDir = LightWorldDir / max(Distance, 1e-6);
