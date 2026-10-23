@@ -136,7 +136,7 @@ void PreBakedRenderer::RenderScene()
         SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][LightIndex]);
     }
 
-/*	SubmissionCmdBufs.push_back(m_lightPassCmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
+	SubmissionCmdBufs.push_back(m_lightPassCmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
 
 	SubmissionCmdBufs.push_back(m_fallbackCopyCmdBufs[ImageIndex]);
 
@@ -146,7 +146,7 @@ void PreBakedRenderer::RenderScene()
 		SubmissionCmdBufs.push_back(ImGUICmdBuf);
 	} else {
 		SubmissionCmdBufs.push_back(m_swapChainColorToPresentCmdBufs[ImageIndex]);
-	}*/
+	}
 
 	m_pQueue->SubmitAsync(SubmissionCmdBufs);
 	m_pQueue->Present(ImageIndex);
@@ -362,12 +362,6 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 
     if (DirLights.size() > 0) {				
 
-        Vector3f LightDir = DirLights[0].WorldDirection;
-        // m_lightDir points toward the light (it is negated in UpdateUniformBuffers)
-        m_lightDir = vec3(LightDir.x, LightDir.y, LightDir.z);
-		m_diffuseIntensity = DirLights[0].DiffuseIntensity;
-        m_lightColor = vec3(DirLights[0].Color.x, DirLights[0].Color.y, DirLights[0].Color.z);
-        
         for (int i = 0; i < (int)DirLights.size(); i++) {
 			const DirectionalLight& l = DirLights[i];
 			m_lights[NumTotalLights + i] = {
@@ -401,7 +395,7 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 	}
 
 	NumTotalLights += (int)PointLights.size();
-
+	
 	const std::vector<SpotLight>& SpotLights = m_modelContext.m_pModel->GetSpotLights();
 
 	for (int i = 0; i < (int)SpotLights.size(); i++) {
