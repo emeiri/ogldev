@@ -1191,3 +1191,12 @@ img {
 #content ol {
 	line-height: 1.7;
 }
+
+.tutorial-page .tutorial-nav {
+	flex-wrap: wrap;
+	gap: var(--space-3);
+}
+
+.tutorial-page .tutorial-nav a.prev {
+	margin-right: auto;
+}
