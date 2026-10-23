@@ -1209,3 +1209,10 @@ img {
 #homepage::after {
 	content: none;
 }
+
+/* The global padding reset removed list indentation, so the numbers and
+   bullets hung outside the tutorial cards */
+.tutorial-page #content ol,
+.tutorial-page #content ul {
+	padding-left: 24px;
+}
