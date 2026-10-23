@@ -704,20 +704,28 @@ void AssimpModelLoader::InitSingleLight(const aiLight& light)
 }
 
 
-static glm::vec4 ConvertAssimpColor(const aiColor3D& c)
+static glm::vec4 ConvertAssimpColor(const aiColor3D& c, bool IsPointOrSpot)
 {
     float Intensity = std::max({ c.r, c.g, c.b });          // the multiplier Assimp folded in
     glm::vec3 Color = (Intensity > 0.0f) ? glm::vec3(c.r, c.g, c.b) / Intensity : glm::vec3(1.0f);
     float m_lightUnitScale = 0.0005f;
     float DiffuseIntensity = Intensity * m_lightUnitScale;   // one scale factor, exposed in the GUI
     printf("Intensity %f --> %f\n", Intensity, DiffuseIntensity);
+
+    // Blender's "Unitless" glTF export is 683x smaller than "Standard" (W/4pi vs W*683/4pi).
+    // A result this low almost certainly came from a Unitless file.
+    if (IsPointOrSpot && (DiffuseIntensity < 0.1f)) {
+        DiffuseIntensity *= 683.0f;
+        printf("Light intensity looks unitless, scaling by 683 to %f\n", DiffuseIntensity);
+    }
+
     glm::vec4 ret = glm::vec4(Color, DiffuseIntensity);
     return ret;
 }
 
 void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
 {
-    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse);
+    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse, false);
 
     DirectionalLight l;
     l.Color = Vector3f(ColorAndIntensity.x, ColorAndIntensity.y, ColorAndIntensity.z);
@@ -746,7 +754,7 @@ void AssimpModelLoader::InitDirectionalLight(const aiLight& light)
 
 void AssimpModelLoader::InitPointLight(const aiLight& light)
 {
-    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse);
+    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse, true);
 
     PointLight l;
     l.Color = Vector3f(ColorAndIntensity.x, ColorAndIntensity.y, ColorAndIntensity.z);
@@ -776,7 +784,7 @@ void AssimpModelLoader::InitPointLight(const aiLight& light)
 
 void AssimpModelLoader::InitSpotLight(const aiLight& light)
 {
-    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse);
+    glm::vec4 ColorAndIntensity = ConvertAssimpColor(light.mColorDiffuse, true);
 
     SpotLight l;    
     l.Color = Vector3f(ColorAndIntensity.x, ColorAndIntensity.y, ColorAndIntensity.z);
