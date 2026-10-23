@@ -1200,3 +1200,12 @@ img {
 .tutorial-page .tutorial-nav a.prev {
 	margin-right: auto;
 }
+
+/* The legacy clearfix pseudo-elements become grid/flex items and leave
+   an empty first cell in the table of contents and extra gaps in the hero */
+#hero::before,
+#hero::after,
+#homepage::before,
+#homepage::after {
+	content: none;
+}
