@@ -327,6 +327,7 @@ img {
 }
 
 .section-title {
+	font-size: 2em;
 	margin-bottom: var(--space-5);
 }
 
@@ -488,6 +489,7 @@ img {
 	margin-top: 30px;
 }
 
+#content h1,
 #content h3 {
 	font-size: 18px;
 	color: var(--color-heading);
@@ -679,7 +681,7 @@ img {
 	box-shadow: var(--shadow-sm);
 }
 
-.contact-page #content h3 {
+.contact-page #content h1 {
 	font-size: 34px;
 	padding-bottom: var(--space-4);
 }
@@ -719,7 +721,7 @@ img {
 }
 
 @media all and (max-width: 1099px) {
-	.contact-page #content h3 {
+	.contact-page #content h1 {
 		font-size: 30px;
 	}
 
@@ -747,7 +749,7 @@ img {
 	box-shadow: var(--shadow-sm);
 }
 
-.books-page #content .books-intro h3 {
+.books-page #content .books-intro h1 {
 	font-size: 34px;
 	padding-bottom: var(--space-3);
 }
@@ -818,7 +820,7 @@ img {
 }
 
 @media all and (max-width: 1099px) {
-	.books-page #content .books-intro h3 {
+	.books-page #content .books-intro h1 {
 		font-size: 30px;
 	}
 
@@ -850,7 +852,7 @@ img {
 	margin-bottom: var(--space-4);
 }
 
-.news-page #content .news-intro h3 {
+.news-page #content .news-intro h1 {
 	font-size: 34px;
 	padding-bottom: var(--space-2);
 }
@@ -900,7 +902,7 @@ img {
 }
 
 @media all and (max-width: 1099px) {
-	.news-page #content .news-intro h3 {
+	.news-page #content .news-intro h1 {
 		font-size: 30px;
 	}
 
@@ -932,7 +934,7 @@ img {
 	margin-bottom: var(--space-4);
 }
 
-.faq-page #content .faq-intro h3 {
+.faq-page #content .faq-intro h1 {
 	font-size: 34px;
 	padding-bottom: var(--space-2);
 }
@@ -985,7 +987,7 @@ img {
 }
 
 @media all and (max-width: 1099px) {
-	.faq-page #content .faq-intro h3 {
+	.faq-page #content .faq-intro h1 {
 		font-size: 30px;
 	}
 }
@@ -1009,7 +1011,7 @@ img {
 	margin-bottom: var(--space-4);
 }
 
-.donate-page #content .donate-intro h3 {
+.donate-page #content .donate-intro h1 {
 	font-size: 34px;
 	padding-bottom: var(--space-2);
 }
@@ -1067,7 +1069,7 @@ img {
 }
 
 @media all and (max-width: 1099px) {
-	.donate-page #content .donate-intro h3 {
+	.donate-page #content .donate-intro h1 {
 		font-size: 30px;
 	}
 
@@ -1103,7 +1105,7 @@ img {
 	margin-top: var(--space-4);
 }
 
-.setup-page #content .setup-intro h3 {
+.setup-page #content .setup-intro h1 {
 	font-size: 34px;
 	padding-bottom: var(--space-2);
 }
@@ -1169,7 +1171,7 @@ img {
 }
 
 @media all and (max-width: 1099px) {
-	.setup-page #content .setup-intro h3 {
+	.setup-page #content .setup-intro h1 {
 		font-size: 30px;
 	}
 
