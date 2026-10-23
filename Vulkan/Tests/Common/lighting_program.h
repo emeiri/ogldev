@@ -84,6 +84,7 @@ public:
 							  std::vector<VkDescriptorSet>& DescSets,
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
 							  std::vector<BufferAndMemory>& UniformBuffersFS,
+							  std::vector<BufferAndMemory>& UniformBuffersLights,
 							  std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps);
 
 	static void UpdateUniformBuffers(VkDevice Device,
@@ -94,11 +95,14 @@ public:
 								     int NumLights,
 									 const std::vector<LightSource>& Lights, 
 									 BufferAndMemory& UniformBufferVS,
-									 BufferAndMemory& UniformBufferFS);
+									 BufferAndMemory& UniformBufferFS,
+									 BufferAndMemory& UniformBufferLights);
 
 	static size_t GetUniformBufferSizeVS(size_t NumSubmeshes) { return NumSubmeshes * sizeof(UniformDataVS); }
 
     static size_t GetUniformBufferSizeFS() { return sizeof(UniformDataFS); }
+
+    static size_t GetUniformBufferSizeLights() { return sizeof(UniformBufferLights); }
 
 protected:
 
@@ -120,6 +124,11 @@ private:
         glm::mat4 WorldTransform;
 		glm::mat4 NormalTransform;
 	};
+
+    struct UniformBufferLights {
+        glm::ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+        LightSource LightSources[MAX_NUM_LIGHTS];
+    };
 
 	int m_numImages = 0;
     VkDescriptorSetLayout m_textureDescSetLayout = VK_NULL_HANDLE;

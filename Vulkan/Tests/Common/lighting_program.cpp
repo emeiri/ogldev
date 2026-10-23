@@ -33,7 +33,8 @@ enum Binding {
 	BindingMetaData = 3,
 	BindingUniformFS = 4,
 	BindingShadowMapFS = 5,
-	NumBindings = 6
+	BindingLightVP = 6,
+	NumBindings = 7
 };
 
 static_assert(sizeof(LightSource) == 64, "LightSource size must be 64 bytes");
@@ -116,40 +117,46 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 {
 	std::vector<VkDescriptorSetLayoutBinding> Bindings{
 		{.
-		     binding = BindingVB,
+		     binding = BindingVB,	// 0
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = BindingIB,
+			.binding = BindingIB,	// 1
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = BindingUniformVS,
+			.binding = BindingUniformVS,	// 2
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = BindingMetaData,
+            .binding = BindingMetaData, // 3
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = BindingUniformFS,
+            .binding = BindingUniformFS, // 4
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = BindingShadowMapFS,
+            .binding = BindingShadowMapFS,	// 5
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = MAX_NUM_LIGHTS,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		}, {
+            .binding = BindingLightVP, // 6
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}
 	};
@@ -180,6 +187,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 										   std::vector<VkDescriptorSet>& DescSets,
 										   std::vector<BufferAndMemory>& UniformBuffersVS,
 										   std::vector<BufferAndMemory>& UniformBuffersFS,
+										   std::vector<BufferAndMemory>& UniformBuffersLights,
 										   std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps)
 {
 	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescSets.size());
@@ -196,6 +204,14 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		BufferInfoUniformsFS[i].buffer = UniformBuffersFS[i].m_buffer;
 		BufferInfoUniformsFS[i].offset = 0;
 		BufferInfoUniformsFS[i].range = VK_WHOLE_SIZE;
+	}
+
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsLights(DescSets.size());
+
+	for (int i = 0; i < (int)BufferInfoUniformsLights.size(); i++) {
+		BufferInfoUniformsLights[i].buffer = UniformBuffersLights[i].m_buffer;
+		BufferInfoUniformsLights[i].offset = 0;
+		BufferInfoUniformsLights[i].range = VK_WHOLE_SIZE;
 	}
 
     std::vector<VkDescriptorImageInfo> ShadowMapImageInfos(DescSets.size() * MAX_NUM_LIGHTS);
@@ -314,6 +330,19 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 		assert(WdsIndex < WriteDescriptorSet.size());
 		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = BindingLightVP,	// 6
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &BufferInfoUniformsLights[i]
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
 	}
 
 	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
@@ -328,7 +357,8 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 										   int NumLights,
 										   const std::vector<LightSource>& Lights,
                                            BufferAndMemory& UniformBufferVS,
-                                           BufferAndMemory& UniformBufferFS)
+                                           BufferAndMemory& UniformBufferFS,
+                                           BufferAndMemory& UniformBufferLights)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 

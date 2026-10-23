@@ -21,15 +21,19 @@
   <ItemGroup>
     <None Include="..\..\..\..\Vulkan\Tests\Common\lighting.frag" />
     <None Include="..\..\..\..\Vulkan\Tests\Common\lighting.vert" />
+    <None Include="..\..\..\..\Vulkan\Tests\Common\shadow.frag" />
+    <None Include="..\..\..\..\Vulkan\Tests\Common\shadow.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Vulkan\Tests\Common\lighting_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tests\Common\prebaked_renderer.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\Tests\Common\shadow_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tests\LightingTest\lighting_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\Tests\Common\lighting_program.h" />
     <ClInclude Include="..\..\..\..\Vulkan\Tests\Common\prebaked_renderer.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\Tests\Common\shadow_program.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

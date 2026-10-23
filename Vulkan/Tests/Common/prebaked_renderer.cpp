@@ -80,6 +80,10 @@ PreBakedRenderer::~PreBakedRenderer()
         }
 	}
 
+	for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersLights) {
+        ub.Destroy(m_device);
+	}
+
     m_bigTextureArray.Destroy();		
 
 	vkDestroyDescriptorPool(m_device, m_descPool, NULL);
@@ -430,6 +434,10 @@ void PreBakedRenderer::CreateUniformBuffers(int MeshIndex)
     // FS uniform buffers
 	size_t UniformBufferSizeFS = OgldevVK::LightingProgram::GetUniformBufferSizeFS();
 	m_modelContext.m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
+
+    // Light uniform buffers
+    size_t UniformBufferSizeLights = OgldevVK::LightingProgram::GetUniformBufferSizeLights();
+    m_uniformBuffersLights = m_vkCore.CreateUniformBuffers(UniformBufferSizeLights);
 }
 
 
@@ -442,6 +450,7 @@ void PreBakedRenderer::CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& 
 	m_pipelines[0].UpdateDescriptorSets(md, m_modelContext.m_descSets,
 											m_modelContext.m_uniformBuffersVS, 
 											m_modelContext.m_uniformBuffersFS,
+									        m_uniformBuffersLights,
 									        m_shadowMaps);
 }
 
@@ -636,5 +645,6 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 												    NumLights,
 												    m_lights,
 													m_modelContext.m_uniformBuffersVS[ImageIndex],
-													m_modelContext.m_uniformBuffersFS[ImageIndex]);
+													m_modelContext.m_uniformBuffersFS[ImageIndex],
+													m_uniformBuffersLights[ImageIndex]);
 }

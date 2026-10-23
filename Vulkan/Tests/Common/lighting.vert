@@ -19,6 +19,8 @@
 
 #version 460
 
+#define MAX_NUM_LIGHTS 16
+
 // Any change here must be reflected in NUM_FLOATS_IN_VERTEX_DATA!
 struct VertexData
 {
@@ -43,6 +45,7 @@ struct UniformData {
     mat4 WVP; 
     mat4 WorldTransform;
     mat4 NormalTransform;
+    mat4 LightVP[MAX_NUM_LIGHTS];
 };
 
 // Changed from uniform buffer to SSBO to support unlimited meshes
