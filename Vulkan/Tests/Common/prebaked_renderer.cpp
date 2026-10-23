@@ -130,11 +130,11 @@ void PreBakedRenderer::RenderScene()
 
 	std::vector<VkCommandBuffer> SubmissionCmdBufs;
 
-	int NumActiveLights = 1;
+    int NumActiveLights = m_modelContext.m_pModel->GetNumLights();
 
-   // for (int LightIndex = 0; LightIndex < NumActiveLights; LightIndex++) {
-        SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][2]);
-   // }
+    for (int LightIndex = 0; LightIndex < NumActiveLights; LightIndex++) {
+        SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][LightIndex]);
+    }
 
 /*	SubmissionCmdBufs.push_back(m_lightPassCmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
 

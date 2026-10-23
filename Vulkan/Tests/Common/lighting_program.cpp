@@ -423,20 +423,30 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 #define SHADOW_MAP_WIDTH 2560
 #define SHADOW_MAP_HEIGHT 1415
 
-	int LightIndex = 2;                                   // must match the shadow pass's push constant
-	const LightSource& Light = Lights[LightIndex];
-
-	glm::vec3 Dir = glm::normalize(Light.Direction);
-	glm::vec3 Up = (fabsf(Dir.y) > 0.99f) ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::mat4 View = glm::lookAtLH(Light.WorldPos, Light.WorldPos + Dir, Up);
-
-	float FOV = 2.0f * acosf(Light.Cutoff);               // Cutoff is cos(half-angle) -> full cone angle in radians
-	float Aspect = (float)SHADOW_MAP_WIDTH / (float)SHADOW_MAP_HEIGHT;
-	glm::mat4 Proj = glm::perspectiveLH_ZO(FOV, Aspect, 1.0f, 100.0f);
-
 	UniformBufferLights UBL = {};
 	UBL.Counts = glm::ivec4(NumLights, 0, 0, 0);
-	UBL.ViewProj[LightIndex] = Proj * View;
+
+	for (int i = 0; i < NumLights; i++) {
+		const LightSource& Light = Lights[i];
+
+		switch (Light.LightType) {
+		case LIGHT_TYPE_SPOT:
+		{
+			glm::vec3 Dir = glm::normalize(Light.Direction);
+			glm::vec3 Up = (fabsf(Dir.y) > 0.99f) ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
+			glm::mat4 View = glm::lookAtLH(Light.WorldPos, Light.WorldPos + Dir, Up);
+
+			float FOV = 2.0f * acosf(Light.Cutoff);               // Cutoff is cos(half-angle) -> full cone angle in radians
+			float Aspect = (float)SHADOW_MAP_WIDTH / (float)SHADOW_MAP_HEIGHT;
+			glm::mat4 Proj = glm::perspectiveLH_ZO(FOV, Aspect, 1.0f, 100.0f);
+			UBL.ViewProj[i] = Proj * View;			
+		}
+		break;
+
+		default:
+			;
+		}
+	}
 
     UBOLights.Update(Device, &UBL, sizeof(UBL));
 }
