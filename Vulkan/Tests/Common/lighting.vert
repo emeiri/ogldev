@@ -82,9 +82,7 @@ void main()
     uint BaseVertex = md.VertexOffset / (NUM_FLOATS_IN_VERTEX_DATA * FLOAT_SIZE_IN_BYTES);
     VertexData vtx = in_Vertices.v[BaseVertex + Index];
 
-    vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
-
-    vec4 Pos4d = vec4(pos, 1.0);
+    vec4 Pos4d = vec4(vtx.pos_x, vtx.pos_y, vtx.pos_z, 1.0);
 
     gl_Position = ubo.Data[DrawId].WVP * Pos4d;
     
