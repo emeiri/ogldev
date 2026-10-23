@@ -91,7 +91,7 @@
     </div>
 
     <a id="logo" class="small" href="../../index.html" title="Homepage">
-      <img src="../logo ldpi.png">
+      <img src="../logo ldpi.png" alt="OGLDEV home">
     </a>
   </header>
 
@@ -104,7 +104,7 @@
 
       <p>Texture mapping means applying any type of picture on one or more faces of a 3D model. The picture (a.k.a 'texture') can be anything but is often a pattern such as bricks, foliage, barren land, etc, that adds realism
       to the scene. For example, compare the following images:</p>
-      <img class="center" src="txt_example.png">
+      <img class="center" src="txt_example.png" alt="Basic Texture Mapping - figure 1">
       <p>To get texture mapping working you need to do three things: load a texture into OpenGL, supply texture coordinates with the vertices (to map the texture to them) and perform a sampling operation from the texture
       using the texture coordinates in order to get the pixel color. Since a triangle is scaled, rotated, translated and finally projected it can land
       on the screen in numerous ways and look very different depending on its orientation to the camera. What the GPU needs to do is make the texture follow the movement of the vertices of the triangle so that it
@@ -119,13 +119,13 @@
       the texture has a width of 320 and a height of 200 the texel location will be (160,20) (0.5 * 320 = 160 and 0.1 * 200 = 20).</p>
       <p>The usual convention is to use U and V as the axis of the texture space where U corresponds to X in the 2D cartesian coordinate system and V corresponds to Y. OpenGL treats the values of the UV axes as going from
       left to right on the U axis and down to up on the V axis. Take a look at the following image:</p>
-      <img class="center" src="txt_coords.png">
+      <img class="center" src="txt_coords.png" alt="Basic Texture Mapping - figure 2">
       <p>This image presents the texture space and you can see the origin of that space in the bottom left corner. U grows towards the right and V grows up. Now consider a triangle whose texture coordinates are specified in
       the following picture:</p>
-      <img class="center" src="tri1.png">
+      <img class="center" src="tri1.png" alt="Basic Texture Mapping - figure 3">
       <p>Let's say that we apply a texture such that when using these texture coordinates we get the picture of the small house in the location above. Now the triangle goes through various transformations and when the time
       comes to rasterize it it looks like this:</p>
-      <img class="center" src="tri2.png">
+      <img class="center" src="tri2.png" alt="Basic Texture Mapping - figure 4">
       <p>As you can see, the texture coordinates "stick" to the vertices as they are a core attributes and they don't change under the transformations. When interpolating the texture coordinates most pixels get the same texture
       coordinates as in the original picture (because they remained in the same place relative to the vertices) and since the triangle was flipped so is the texture which is applied to it. This means that as the original triangle is rotated, stretched or squeezed the texture diligently follows it.
       Note that there are also techniques that change the texture coordinates in order to move texture across the triangle face in some controlled way but for now our coordinates will stay the same.</p>
@@ -155,7 +155,7 @@
       the sampling operation. These parameters are part of the sampling state. However, you can also create a sampler object, configure it with a sampling state and bind it to the texture unit. When you do that the sampler object
       will override any sampling state defined in the texture object. Don't worry - for now we won't be using sampler objects at all but it is good to know that they exist.</p>
       <p>The following diagram summarizes the relationships between the texturing concepts that we just learned:</p>
-      <img class="center" src="sampling_diagram.png">
+      <img class="center" src="sampling_diagram.png" alt="Basic Texture Mapping - figure 5">
     </section>
 
     <section>

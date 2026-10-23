@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -109,7 +109,7 @@
                                 a part of the skybox hovering above the real models and filling up all those empty pixels.
                                 Here's an example of a skybox from the game Half-Life:
                         </p>
-                        <img class="center" src="Halflife_skybox.jpg">
+                        <img class="center" src="Halflife_skybox.jpg" alt="Skybox - figure 1">
                         <p>
                                 The idea behind the skybox is to render a big cube and place the viewer at its center. As the camera
                                 moves the cube follows it so that the viewer can never reach the "horizon" of the scene. This is similar to
@@ -122,7 +122,7 @@
                                 the edges of the internal faces are perfectly aligned with one another and create a sense of continuity
                                 for someone who is located inside the box. For example, see the following texture:
                         </p>
-                        <img class="center" src="skybox.jpg">
+                        <img class="center" src="skybox.jpg" alt="Skybox - figure 2">
                         <p>
                                 If we cut away the white margins of the texture above and fold the remaining parts along the white lines we will
                                 get a box with the required properties. OpenGL calls such a texture a<i> Cubemap</i>.
@@ -133,7 +133,7 @@
                                 out which of the six faces of the cubemap contains the required texel and then fetch it from within that face.
                                 This process can be seen in the following picture which is taken from above (looking down at the box):
                         </p>
-                        <img class="center" src="texel_fetch.png">
+                        <img class="center" src="texel_fetch.png" alt="Skybox - figure 3">
                         <p>
                                 The proper face is selected based on the highest magnitude component of the texture coordinate. In the above
                                 example we see that Z has the largest magnitude (Y cannot be seen but let's assume it is smaller than Z).

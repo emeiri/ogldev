@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -113,7 +113,7 @@
                         <p>In the following picture we see the camera positioned somewhere with its back to us. There is a virtual 2D plane before it and the ball is projected
                         into the plane. The camera is tilted somewhat so the plane is tilted accordingly. Since the view from the camera is limited by its field of view angle
                         the visible part of the (endless) 2D plane is the rectangle. Anything outside it is clipped out. Getting the rectangle onto the screen is our target.</p>
-                        <img class="center" src="camera_space.png">
+                        <img class="center" src="camera_space.png" alt="Camera Space - figure 1">
                         <p>Theoretically, it is possible to generate the transformations that would take an object in the 3D world and project it onto a 2D plane lying infront of
                         a camera positioned in an arbitrary location in the world. However, that math is much more complex than what we have previously seen. It is much more simple
                          to do it when the camera is stationed at the origin of the 3D world and looking down the Z axe.
@@ -124,7 +124,7 @@
                         <p>The example above was simple because the camera was already looking down the Z axe and was in general aligned to the axes of the coordinate system.
                         But what happens if the camera is looking somewhere else? Take a
                         look at the following picture. For simplicity, this is a 2D coordinate system and we are looking at the camera from the top.</p>
-                        <img class="center" src="camera_axes2.png">
+                        <img class="center" src="camera_axes2.png" alt="Camera Space - figure 2">
                         <p>The camera was originally looking down the Z axe but then turned 45 degrees clockwise.
                         As you can see, the camera defines its own coordinate system which may be identical to the world (upper picture) and may be different (lower picture).
                         So there are actually two coordinate systems simulatenously. There is the 'world coordinate system' in which the objects are specified and there is a
@@ -142,7 +142,7 @@
                         <p>Moving the camera is very simple. If the camera is located at (x,y,z), then the translation transformation is (-x, -y, -z). The reason is
                         straightforward - the camera was placed in the world using a translation transformation based on the vector (x,y,z) so to move it back to the origin
                         we need a translation transformation based on the opposite of that vector. This is how the transformation matrix looks like:</p>
-                        <img class="center" src="camera_space_translation.png">
+                        <img class="center" src="camera_space_translation.png" alt="Camera Space - figure 3">
                         <p>The next step is to turn the camera toward some target specified in world space coordinates. We want to find out the location of the vertices in
                         the new coordinate system that the camera defines. So the actual question is: how do we transform from one coordinate system to another?</p>
                         <p>Take another look at the picture above. We can say that the world coordinate system is defined by the three linearly independent unit vectors (1,0,0),
@@ -152,7 +152,7 @@
                         It is easy to see that the camera coordinate system is defined by the vectors (1,0,-1), (0,1,0), (1,0,1). After normalizing these vectors we get
                         (0.7071,0,-0.7071), (0,1,0) and (0.7071,0,0.7071).</p>
                         <p>The following image shows how the location of a vector is specified in two different coordinate systems:</p>
-                        <img class="center" src="camera_axes.png">
+                        <img class="center" src="camera_axes.png" alt="Camera Space - figure 4">
                         <p>We know how to get the unit vectors that represent the camera axes in world space and we know the location of the vector in world space (x,y,z). What we are
                         looking for is the vector (x',y',z'). We now take advantage of an attribute of the dot product operation known as 'scalar projection'. Scalar projection is
                          the result of a dot product between an arbitrary vector A and a unit vector B and results in the magnitude of A in the direction of B. In other words,
@@ -168,7 +168,7 @@
                         </ol>
                         <p>In order to transform a position in world space to the camera space defined by the UVN vectors we need to perform a dot product operation between
                         the position and the UVN vectors. A matrix represents this best:</p>
-                        <img class="center" src="uvn.png">
+                        <img class="center" src="uvn.png" alt="Camera Space - figure 5">
                         <p>In the code that accompanies this tutorial you will notice that the shader global variable 'gWorld' has been renamed 'gWVP'. This change reflects the way the series
                         of transformations is known in many textbooks. WVP stands for - World-View-Projection.</p>
                 </section>

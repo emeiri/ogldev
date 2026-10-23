@@ -91,7 +91,7 @@
     </div>
 
     <a id="logo" class="small" href="../../index.html" title="Homepage">
-      <img src="../logo ldpi.png">
+      <img src="../logo ldpi.png" alt="OGLDEV home">
     </a>
   </header>
 
@@ -133,7 +133,7 @@
       the shadow volume and Depth Fail fixes that problem. Therefore, I've skipped Depth Pass altogether
       and went directly to Depth Fail. Take a look at the following picture:
       </p>
-      <img class="center" src="shadow_volume1.jpg"/>
+      <img class="center" src="shadow_volume1.jpg" alt="Stencil Shadow Volume - figure 1">
       <p>
       We have a light bulb at the bottom left corner and a green object (called an occluder) which casts shadow due to
       that light. Three round objects are rendered in this scene as well. Object B is shadowed
@@ -176,7 +176,7 @@
       <p>
       Here's a more complex scene that includes two occluders:
       </p>
-      <img class="center" src="shadow_volume2.jpg"/>
+      <img class="center" src="shadow_volume2.jpg" alt="Stencil Shadow Volume - figure 2">
       <p>
       To make it simpler to detect the shadow volume of the second occluder it is marked
       by thinner red arrows. You can follow the changes to the stencil buffer (marked by +1 and -1)
@@ -193,7 +193,7 @@
       from the light position to the vertices. By extending into infinity we make sure the volume
       captures everything which lies in the path of the shadow. This quad is depicted in the following picture:
       </p>
-      <img class="center" src="quad.jpg">
+      <img class="center" src="quad.jpg" alt="Stencil Shadow Volume - figure 3">
       <p>
       When we repeat this process of emitting quads from all silhouette edges a volume is created. Is that enough?
       definitely not. The problem is that this volume looks kind of like a truncated cone without its caps.
@@ -201,7 +201,7 @@
       volume we might end up with a case where the vector from the eye to the pixel goes through only either
       the front or back of the volume:
       </p>
-      <img class="center" src="caps.jpg">
+      <img class="center" src="caps.jpg" alt="Stencil Shadow Volume - figure 4">
       <p>
       The solution to this problem is to generate a volume which is closed on both sides. This is done by
       creating a front and a back cap to the volume (the dotted lines in the picture above). Creating the front cap is very easy.
@@ -215,7 +215,7 @@
       The word 'infinity' has been mentioned here a few times and we now need to define exactly what this means.
       Take a look at the following picture:
       </p>
-      <img class="center" src="infinity.jpg"/>
+      <img class="center" src="infinity.jpg" alt="Stencil Shadow Volume - figure 5">
       <p>
       What we see is a picture of the frustum taken from above. The light bulb emits a ray which goes through
       point 'p' and continues to infinity. In other words, 'p' is extended to infinity. Obviously, at infinity
@@ -231,11 +231,11 @@
       to point 'p' and 't' is a scalar which goes from 0 towards infinity. From the above picture and due
       to triangle similarities we can say that:
       </p>
-      <img class="center" src="infinity1.jpg"/>
+      <img class="center" src="infinity1.jpg" alt="Stencil Shadow Volume - figure 6">
       <p>
       Where 'n' is the Z value of the near plane. As 't' goes to infinity we are left with:
       </p>
-      <img class="center" src="infinity2.jpg"/>
+      <img class="center" src="infinity2.jpg" alt="Stencil Shadow Volume - figure 7">
       <p>
       So this is how we find the projection of 'p' at infinity on the near plane. Now here's a bit of magic -
       turns out that to calculate Xp and Yp according to the above we just need to multiply the vector

@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -118,11 +118,11 @@
                         are represented by some closed mesh of triangles and most vertices
                         participate in more than one triangle.</p>
                         <p>Here is an example of an ordered draw:</p>
-                        <img class="center" src="ordered_draw.png">
+                        <img class="center" src="ordered_draw.png" alt="Indexed Draws - figure 1">
                         <p>If we are rendering triangles the GPU will generate the following set:
                         V0/1/2, V3/4/5, V6/7/8, etc.</p>
                         <p>Here is an example of an indexed draw:</p>
-                        <img class="center" src="indexed_draw.png">
+                        <img class="center" src="indexed_draw.png" alt="Indexed Draws - figure 2">
                         <p>In this case the GPU will generate the following triangles: V2/0/1,
                         V5/2/4, V6/5/7, etc.</p>
                         <p>Using index draws in OpenGL requires generating and populating an index
@@ -147,7 +147,7 @@
                         much easier to generate manually...</p>
                         <p>When looking at these vertices from the top (along the Y axis) we get
                         the following layout:</p>
-                        <img class="center" src="pyramid.png"><br>
+                        <img class="center" src="pyramid.png" alt="Indexed Draws - figure 3"><br>
                         <code>unsigned int Indices[] = { 0, 3, 1,<br>
                         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         1, 3, 2,<br>

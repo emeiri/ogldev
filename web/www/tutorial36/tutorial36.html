@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -138,7 +138,7 @@
                         to add a few dozen vertices by rendering a bounding sphere around each light source. In the following picture
                         you can see the light volume of three light sources:
                         </p>
-                        <img class="center" src="bsphere.jpg">
+                        <img class="center" src="bsphere.jpg" alt="Deferred Shading - Part 2 - figure 1">
                         <p>
                         If we execute the FS only on the pixels inside those gray patches it will dramatically reduce the total
                         number of FS invocations. In the case of a complex scene with a large depth complexity the gap becomes even greater.
@@ -156,7 +156,7 @@
                         is black). Since the maximum channel of color can be less than 256 the attenuation that will cause it to drop below
                         the threshold can also be less than 256. This is how we calculate the distance:
                         </p>
-                        <img class="center" src="threshold.jpg">
+                        <img class="center" src="threshold.jpg" alt="Deferred Shading - Part 2 - figure 2">
                         <p>
                         The above is based on the <a href="http://en.wikipedia.org/wiki/Quadratic_equation">quadratic equation solution</a>.
                         </p>

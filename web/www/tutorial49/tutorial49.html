@@ -91,7 +91,7 @@
         </div>
 
         <a id="logo" class="small" href="../../index.html" title="Homepage">
-            <img src="../logo ldpi.png">
+            <img src="../logo ldpi.png" alt="OGLDEV home">
         </a>
     </header>
 
@@ -101,7 +101,7 @@
 <p>
     Let's take a close up look of the shadow from <a href="../tutorial47/tutorial47.html">tutorial 47</a>:
 </p>
-<img src="img1.jpg">
+<img src="img1.jpg" alt="Cascaded Shadow Mapping - figure 1">
 <p>
     As you can see, the qaulity of the shadow is not high. It's too blocky. We've touched on the reason for that
     blockiness at the end of tutorial 47 and referred to it as <i>Perspective Aliasing</i> which
@@ -128,16 +128,16 @@
     the depth from the shadow map we will need to select the appropriate map based on the distance from the viewer.
     Let's take a look at a generic view frustum:
 </p>
-<img src="img2.png">
+<img src="img2.png" alt="Cascaded Shadow Mapping - figure 2">
 <p>
     As usual, we have a small near plane and a larger far plane. Now let's take a look at the same fustum from above:
 </p>
-<img src="img3.png">
+<img src="img3.png" alt="Cascaded Shadow Mapping - figure 3">
 <p>
     The next step is to split the range from the near plane to the far plane into three parts. We will call this near, middle and far.
     In addition, let's add the light direction (the arrow on the right hand side):
 </p>
-<img src="img4.png">
+<img src="img4.png" alt="Cascaded Shadow Mapping - figure 4">
 <p>
     So how are we going to render each cascade into its own private shadow map? Let's think about the shadow
     phase in the shadow mapping algorithm. We set up things to render the scene from the light point of view. This
@@ -158,15 +158,15 @@
     of view pixels to shadow map pixels as low as possible. This means creating a bounding box for each cascade
     which is oriented along the light direction vector. Let's create such a bounding box for the first cascade:
 </p>
-<img src="img5.png">
+<img src="img5.png" alt="Cascaded Shadow Mapping - figure 5">
 <p>
     Now let's create a bounding box for the second cascade:
     </p>
-<img src="img6.png">
+<img src="img6.png" alt="Cascaded Shadow Mapping - figure 6">
 <p>
     And finally a bouding box for the last cascade:
     </p>
-<img src="img7.png">
+<img src="img7.png" alt="Cascaded Shadow Mapping - figure 7">
 <p>
     As you can see, there is some overlap of the bounding boxes due to the orientationn of the light which
     means some pixels will be rendered into more than one shadow map. There is no problem with that
@@ -185,7 +185,7 @@
     <ol>
         <li>Calculate the eight corners of each cascade in view space. This is easy and requires simple trigonometry:</li>
         <br>
-          <img src="frustum1.png">
+          <img src="frustum1.png" alt="Cascaded Shadow Mapping - figure 8">
         </li>
         <p>
             The above image represents an arbitrary cascade (since each cascade on its own is basically a frustum and
@@ -193,8 +193,8 @@
             down to the XZ plane. We need to calculate X<sub>1</sub> and
             X<sub>2</sub>:
             </p>
-            <img src="calc1.png">
-            <img src="calc2.png">
+            <img src="calc1.png" alt="Cascaded Shadow Mapping - figure 9">
+            <img src="calc2.png" alt="Cascaded Shadow Mapping - figure 10">
             <p>
                 This gives us the X and Z components of the eight coordinates of the cascade in view space. Using
                 similar math with the vertical field-of-view angle we can get the Y component and finalize the coordinates.
@@ -203,14 +203,14 @@
             but ignore it for now):</li>
             <br>
         </li>
-        <img src="frustum2.png">
+        <img src="frustum2.png" alt="Cascaded Shadow Mapping - figure 11">
         <p>
             In order to transform from world space to view space we multiply the world position vector by
             the view matrix (which is based on the camera location and rotation). This means that if we already
             have the coordinates of the cascade in view space we must multiply them by the inverse of the view matrix
             in order to transform them to world space:
             </p>
-    <img src="calc3.png">
+    <img src="calc3.png" alt="Cascaded Shadow Mapping - figure 12">
     <li>
         With the frustum coordinates in world space we can now transform them to light space as any other object.
         Remember that the light space is exactly like view space but instead of the camera we use the light source.
@@ -220,7 +220,7 @@
         diagram (with the red arrow being the light direction) the cascade frustum in light space should look like:
         </li>
         <br>
-        <img src="frustum3.png">
+        <img src="frustum3.png" alt="Cascaded Shadow Mapping - figure 13">
         <li>
             With the cascade coordinates finally in light space we just need to generate a bounding box for it
             by taking the min/max values of the X/Y/Z components of the eight coordinates. This bounding box
@@ -661,7 +661,7 @@ void main()<br>
     very useful for debugging because you can actually see the extent of each cascade.
     With the CSM algorithm (and the cascade indicator) the scene should now look like this:
     </p>
-<img src="final.jpg">
+<img src="final.jpg" alt="Cascaded Shadow Mapping - figure 14">
 </section>
 </article>
 

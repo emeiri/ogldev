@@ -91,7 +91,7 @@
         </div>
 
         <a id="logo" class="small" href="../../index.html" title="Homepage">
-            <img src="../logo ldpi.png">
+            <img src="../logo ldpi.png" alt="OGLDEV home">
         </a>
     </header>
 
@@ -153,7 +153,7 @@
     interested in the view space position we can look at the projection matrix rather
     than the combined WVP (because projection works on the view space position):
 </p>
-<img src="diagram1.jpg">
+<img src="diagram1.jpg" alt="SSAO With Depth Reconstruction - figure 1">
 <p>
     What we see above is the projection of the view space vector to clip space (the result on
     the right). Few notations:
@@ -169,13 +169,13 @@
     projection matrix 'S' and the value in location (3,4) 'T'. This means that the value
     of the Z in NDC is (remember perspective divide):
 </p>
-<img src="diagram2.jpg">
+<img src="diagram2.jpg" alt="SSAO With Depth Reconstruction - figure 2">
 <p>
     And since we need to transform the NDC value from (-1,1) to (0,1) the actual
     value written to the depth buffer is:
 </p>
 <p>
-    <img src="diagram3.jpg">
+    <img src="diagram3.jpg" alt="SSAO With Depth Reconstruction - figure 3">
 </p>
 <p>
     It is now easy to see that we can extract the view space Z from the above
@@ -183,7 +183,7 @@
     should be able to do them yourself. The final result is:
 </p>
 <p>
-    <img src="diagram4.jpg">
+    <img src="diagram4.jpg" alt="SSAO With Depth Reconstruction - figure 4">
 </p>
 <p>
     So we have the view space Z. Let's see how we can recover X and Y. Remember
@@ -195,12 +195,12 @@
     applies (showing for X only; same applies to Y just without 'ar'):
 </p>
 <p>
-    <img src="diagram5.jpg">
+    <img src="diagram5.jpg" alt="SSAO With Depth Reconstruction - figure 5">
 </p>
 <p>
     We can write the same as:
 </p>
-    <img src="diagram6.jpg">
+    <img src="diagram6.jpg" alt="SSAO With Depth Reconstruction - figure 6">
 <p>
     Note that the left and right hand side of the inequality are basically constants
     and can be calculated by the application before the draw call. This means that

@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -108,14 +108,14 @@
                         using a technique called Shadow Mapping. The shadows that result from Shadow Mapping aren't that
                         great and there is quite a lot of aliasing there, as you can see in the following picture:
                         </p>
-                        <img class="center" src="no_pcf.png">
+                        <img class="center" src="no_pcf.png" alt="Percentage Closer Filtering - figure 1">
                         <p>
                         This tutorial describes a method (one of many) to reduce that problem. It is called <i>Percentage
                         Closer Filtering</i>, or PCF. The idea is to sample from the shadow map around the current pixel
                         and compare its depth to all the samples. By averaging out the results we get a smoother line
                         between light and shadow. For example, take a look at the following shadow map:
                         </p>
-                        <img class="center" src="shadow_map.png">
+                        <img class="center" src="shadow_map.png" alt="Percentage Closer Filtering - figure 2">
                         <p>
                         Each cell contains the depth value for each pixel (when viewed from the light source).
                         To make life simple, let's say that the depth of all the pixels above is 0.5
@@ -277,7 +277,7 @@
                         <p>
                         After applying all the changes that we discussed the shadow looks like this:
                         </p>
-                        <img class="center" src="pcf.png">
+                        <img class="center" src="pcf.png" alt="Percentage Closer Filtering - figure 3">
                 </section>
 
                 <nav class="tutorial-nav">

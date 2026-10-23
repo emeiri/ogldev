@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -121,14 +121,14 @@
                                 to the square of the distance from the source of light. This is described in mathematical terms by the
                                 following formula:
                         </p>
-                        <img class="center" src="inverse_square_law.png">
+                        <img class="center" src="inverse_square_law.png" alt="Point Light - figure 1">
                         <p>
                                 This formula doesn't provide good looking results in 3D graphics. For example, as the distance becomes
                                 smaller the strength of light approaches infinity. In addition, the developer has no control over the results
                                 except for setting the initial strength of light. This is too limiting. Therefore, we add a few factors to the
                                 formula to make it more flexible:
                         </p>
-                                <img class="center" src="attenuation.png">
+                                <img class="center" src="attenuation.png" alt="Point Light - figure 2">
                         <p>
                                 We've added three light attenuation factors to the denominator. A constant factor, a linear factor and
                                 an exponential factor. The physically accurate formula is achieved when setting the constant and linear

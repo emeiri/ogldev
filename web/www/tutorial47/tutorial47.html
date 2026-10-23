@@ -91,7 +91,7 @@
             </div>
 
             <a id="logo" class="small" href="../../index.html" title="Homepage">
-                <img src="../logo ldpi.png">
+                <img src="../logo ldpi.png" alt="OGLDEV home">
             </a>
         </header>
 
@@ -111,7 +111,7 @@
                     because they behave in the same way as our standard camera. The spot light has a location and a direction vector
                     and the area covered by the light grows as we move further away from its source:
                 </p>
-                <img src="spotlight.jpg">
+                <img src="spotlight.jpg" alt="Shadow Mapping With Directional Lights - figure 1">
                 <p>
                     The fact that the spotlight behaves like a frustum makes it easier to implement shadow mapping because we
                     can use the same perspective projection matrix as the camera in order to render into the shadow map. Implementing
@@ -123,7 +123,7 @@
                     is usually used to mimic the behavior of the sun which due to its size and distance seems to cast
                     parallel lights rays:
                 </p>
-                <img src="dirlight.jpg">
+                <img src="dirlight.jpg" alt="Shadow Mapping With Directional Lights - figure 2">
                 <p>
                     In this case, we can no longer use Perspective Projection. Enter Orthographic Projection. The idea
                     here is that of converging all light rays in one spot (the camera), the light rays remain parallel so
@@ -133,7 +133,7 @@
                     In the following image we see the same box using perspective projection on the left hand side and
                     orthographic projection on the right hand side:
                 </p>
-                <img src="boxes.jpg">
+                <img src="boxes.jpg" alt="Shadow Mapping With Directional Lights - figure 3">
                 <p>
                     The left box looks real, just as you would expect it to be and delivers the correct sense of depth.
                     The right one doesn't look real since the front and back rectangles are exactly the same. We know that
@@ -144,7 +144,7 @@
                     and the Z is the value which is written there. An Orthographic projection takes a general box and maps it to the normalized
                     cube (l,r,b,t,n,f stands for left, right, bottom, top, near, far, respectively):
                 </p>
-                <img src="ortho.jpg">
+                <img src="ortho.jpg" alt="Shadow Mapping With Directional Lights - figure 4">
                 <p>
                     Now think about the rays of the directional light as if they are originating from the front face of the box
                     and going parallel to each other until they hit the back face. If we do the mapping between the general box
@@ -156,24 +156,24 @@
                     This is a simple linear mapping without divide-by-zero after that (since it is orthographic and not perspective).
                     The general form of an equation that maps range (a,b) to (c,d) is:
                 </p>
-                <img src="calc1.jpg">
+                <img src="calc1.jpg" alt="Shadow Mapping With Directional Lights - figure 5">
                 <p>
                     Where a<=X<=b. Let's do the mapping on the X-axis. Plug the ranges (l,r) to (-1,1) in the
                     above equation and we get:
                 </p>
-                <img src="calc2.png">
+                <img src="calc2.png" alt="Shadow Mapping With Directional Lights - figure 6">
                 <p>
                     Following the same logic we do the mapping on the Y-axis from (b,t) to (-1,1):
                 </p>
-                <img src="calc3.png">
+                <img src="calc3.png" alt="Shadow Mapping With Directional Lights - figure 7">
                 <p>
                     In the case of the Z-axis we need to map (n,f) to (-1,1):
                 </p>
-                <img src="calc4.png">
+                <img src="calc4.png" alt="Shadow Mapping With Directional Lights - figure 8">
                 <p>
                     Now that we have the three mapping equations let's create a matrix to wrap them together nicely:
                 </p>
-                <img src="calc5.png">
+                <img src="calc5.png" alt="Shadow Mapping With Directional Lights - figure 9">
                 <p>
                     Compare this matrix with the one we created for perpective projection in <a href='../tutorial12/tutorial12.html'>tutorial 12</a>.
                     An important difference is that in location [3,2] (count starts at zero) we have 0 instead of 1. For perspective
@@ -191,13 +191,13 @@
                     anything. Let's see an example. In the scene below left and bottom are -10, right and top are 10, the near plane is -10
                     and the far plane is 100:
                 </p>
-                <img src='high_res.jpg'>
+                <img src='high_res.jpg' alt="Shadow Mapping With Directional Lights - figure 10">
                 <p>
                     The problem is that the objects are placed at distance of 30 from each other so the projection was not wide enough in order
                     to capture everything (remember that the light direction is orthogonal to the viewer so the objects are scattered on a wide
                     field relative to the light). Now let's multiply left/right/bottom/top by 10 (near/far planes unchanged):
                 </p>
-                <img src='low_res.jpg'>
+                <img src='low_res.jpg' alt="Shadow Mapping With Directional Lights - figure 11">
                 <p>
                     Now all the objects have a shadow. However, we have a new problem. The shadows don't look as good as when only one object
                     had a shadow. This problem is called <i>Perspective Aliasing</i> and the reason is that many pixels in view space (when

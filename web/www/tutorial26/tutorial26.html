@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -109,7 +109,7 @@
                                 texture represents a bumpy surface, it makes it look too flat. As an example, take a look at
                                 the following two images:
                         </p>
-                        <img class="center" src="compare.jpg" />
+                        <img class="center" src="compare.jpg" alt="Normal Mapping - figure 1">
                         <p>
                                 The left image definitely looks better the than the right one. It conveys the sense of the bumpiness
                                 of the stone much better while the right image looks too smooth for a brick texture. The left image has
@@ -128,7 +128,7 @@
                                 in the fragment shader the specific normal for each pixel is sampled and used as usual. The following
                                 images show the difference between the normals in regular lighting and normal mapping:
                         </p>
-                        <img class="center" src="normals.jpg" />
+                        <img class="center" src="normals.jpg" alt="Normal Mapping - figure 2">
                         <p>
                                 We now have our normal map and the true (or at least a good approximation of) surface normals
                                 are stored in it. Can we simply go ahead and use it? no. Think for a moment on the cube with
@@ -152,7 +152,7 @@
                                 bottom left corner of the texture). The Z component of the system is considered to be going straight up from the
                                 texture and is perpendicular to both X and Y:
                         </p>
-                        <img class="center" src="tangent_space.jpg" />
+                        <img class="center" src="tangent_space.jpg" alt="Normal Mapping - figure 3">
                         <p>
                                 The normal vectors can now be specified in reference to that coordinate system and stored in the RGB texels of the
                                 texture. Note that even on a bumpy surface we still expect the general direction of the normals to point out from
@@ -160,7 +160,7 @@
                                  (or a lot) from side to side. Storing the XYZ vector in an RGB texel makes most normal maps rather
                                  bluish as in the following example:
                         </p>
-                        <img class="center" src="normal_map.jpg" />
+                        <img class="center" src="normal_map.jpg" alt="Normal Mapping - figure 4">
                         <p>
                                 Here's the first five texels of the top row of this normal map (when going from left to right): (136,102,248),
                                 (144,122,255), (141,145,253), (102, 168, 244) and (34,130,216). The dominance of the Z here cannot be mistaken.
@@ -171,7 +171,7 @@
                                 coordinate of a given triangle are (0.5,0), (1, 0.5) and (0,1). The normal map will be placed as
                                 follows:
                         </p>
-                        <img class="center" src="tangent_space4.jpg" />
+                        <img class="center" src="tangent_space4.jpg" alt="Normal Mapping - figure 5">
                         <p>
                                 In the picture above the coordinate system on the bottom left corner represents the object local space.
                         </p>
@@ -193,34 +193,34 @@
                                 at positions P<sub>0</sub>, P<sub>1</sub> and P<sub>2</sub> and texture
                                 coordinates (U<sub>0</sub>,V<sub>0</sub>), (U<sub>1</sub>,V<sub>1</sub>) and (U<sub>2</sub>,V<sub>2</sub>):
                         </p>
-                        <img class="center" src="tangent_space5.jpg" />
+                        <img class="center" src="tangent_space5.jpg" alt="Normal Mapping - figure 6">
                         <p>
                                 We want to find the vectors T (representing the tangent) and B (representing the bitangent) in object space.
                                 We can see that the two triangle edges E<sub>1</sub> and E<sub>2</sub>
                                 can be written as a linear combination of T and B:
                         </p>
-                        <img class="center" src="tangent_space_calc1.jpg" />
+                        <img class="center" src="tangent_space_calc1.jpg" alt="Normal Mapping - figure 7">
                         <p>
                                 This can also be written as follows:
                         </p>
-                        <img class="center" src="tangent_space_calc2.jpg" />
+                        <img class="center" src="tangent_space_calc2.jpg" alt="Normal Mapping - figure 8">
                         <p>
                                 It is now very easy to move to a matrix form:
                         </p>
-                        <img class="center" src="tangent_space_calc3.jpg" />
+                        <img class="center" src="tangent_space_calc3.jpg" alt="Normal Mapping - figure 9">
                         <p>
                                 We want to extract the matrix on the right hand side. To do that we can multiply both ends of the equation
                                 by the inverse of the matrix marked in red above:
                         </p>
-                        <img class="center" src="tangent_space_calc4.jpg" />
+                        <img class="center" src="tangent_space_calc4.jpg" alt="Normal Mapping - figure 10">
                         <p>
                                 Now we have the following:
                         </p>
-                        <img class="center" src="tangent_space_calc5.jpg" />
+                        <img class="center" src="tangent_space_calc5.jpg" alt="Normal Mapping - figure 11">
                         <p>
                                 After calculating the matrix inverse we get:
                         </p>
-                        <img class="center" src="tangent_space_calc6.jpg" />
+                        <img class="center" src="tangent_space_calc6.jpg" alt="Normal Mapping - figure 12">
                         <p>
                                 We can run this process on every triangle in the mesh and generate tangent and bitangent
                                 vectors per triangle (same vectors for the three triangle vertices). The common practice

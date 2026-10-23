@@ -91,7 +91,7 @@
         </div>
 
         <a id="logo" class="small" href="../../index.html" title="Homepage">
-            <img src="../logo ldpi.png">
+            <img src="../logo ldpi.png" alt="OGLDEV home">
         </a>
     </header>
 
@@ -132,7 +132,7 @@
     We will study the core components of Vulkan one by one as we make progress throught the code
     so at this point I just want to present a diagram of the general picture:
     </p>    
-    <img src="vulkan.jpg"</img>
+    <img src="vulkan.jpg"</img alt="Introduction to Vulkan - figure 1">
 <p>
     This diagram is by all means not a complete representation. It includes only the major components 
     that will probably be present in most applications. The connectors between the objects represent
@@ -269,13 +269,13 @@
         and then to <b>'Configuration Properties -&gt; C/C++ -&gt; General'</b>. Now you must add <b>'c:\VulkanSDK\&lt;version&gt;\Include'</b>
 		to <b>'Additional Include Directories'</b>. See example below:
 	</p><br>
-	<img src="include.jpg"><br>
+	<img src="include.jpg" alt="Introduction to Vulkan - figure 2"><br>
 	<p>
 		To update the link directory right click on the project in the solution explorer, go to <b>'Properties'</b>
 		and then to <b>'Configuration Properties -&gt; Link -&gt; General'</b>. Now you must add <b>'c:\VulkanSDK\&lt;version&gt;\Bin32'</b>
         to <b>'Additional Library Directories'</b>. See example below:
 	</p><br>
-	<img src="link.jpg"><br>
+	<img src="link.jpg" alt="Introduction to Vulkan - figure 3"><br>
 	<p>
 		While you are still in the linker settings go to <b>'Input'</b> (just one below 'General') and add <b>'vulkan-1.lib'</b> to 
 		<b>'Additional Dependencies"</b>.

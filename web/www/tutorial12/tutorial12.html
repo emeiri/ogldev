@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -153,7 +153,7 @@
                         However, remember that this has no real effect since the projected
                         coordinates are mapped to the screen and the location of the camera
                         plays no part. </p>
-                        <img class="center" src="FOV.png">
+                        <img class="center" src="FOV.png" alt="Perspective Projection - figure 1">
                         <p>We start by determining the distance of the projection plane from the
                         camera. The projection plane is a plane which is parallel to the XY
                         plane. Obviously, not the entire plane is visible because this is too
@@ -164,28 +164,28 @@
                         which means the width is exactly twice the aspect ratio (see the above
                         equation). If we place the camera in the origin and look at the area
                         from behind the camera's back we will see the following:</p>
-                        <img class="center" src="projection_window.png">
+                        <img class="center" src="projection_window.png" alt="Perspective Projection - figure 2">
                         <p>Anything outside this rectangle is going to be clipped away and we
                         already see that coordinates inside it will have their Y component in
                         the required range. The X component is currently a bit bigger but we
                         will provide a fix later on.</p>
                         <p>Now let's take a look at this "from the side" (looking down at the YZ
                         plane):</p>
-                        <img class="center" src="side_view1.png">
+                        <img class="center" src="side_view1.png" alt="Perspective Projection - figure 3">
                         <p>We find the distance from the camera to the projection plane using the
                         vertical field of view (denoted by the angle alpha):</p>
-                        <img class="center" src="12_01.png">
+                        <img class="center" src="12_01.png" alt="Perspective Projection - figure 4">
                         <p>The next step is to calculate the projected coordinates of X and Y.
                         Consider the next image (again looking down at the YZ plane).</p>
-                        <img class="center" src="side_view2.png">
+                        <img class="center" src="side_view2.png" alt="Perspective Projection - figure 5">
                         <p>We have a point in the 3D world with the coordinates (x,y,z). We want to find (x<sub>p</sub>,y<sub>p</sub>)
                         that represent the projected coordinates on the projection plane. Since
                         the X component is out of scope in this diagram (it is pointing in and
                         out of the page) we'll start with Y. According to the rule of similar
                         triangles we can determine the following:</p>
-                        <img class="center" src="12_02.png">
+                        <img class="center" src="12_02.png" alt="Perspective Projection - figure 6">
                         <p>In the same manner for the X component:</p>
-                        <img class="center" src="12_03.png">
+                        <img class="center" src="12_03.png" alt="Perspective Projection - figure 7">
                         <p>Since our projection window is 2*ar (width) by 2 (height) in size we
                         know that a point in the 3D world is inside the window if it is
                         projected to a point whose projected X component is between -ar and +ar
@@ -199,7 +199,7 @@
                         is 0.375. To summarize, the division by the aspect ratio has the effect
                         of condensing the points on the X axis. </p>
                         <p>We have reached the following projection equations for the X and Y components:</p>
-                        <img class="center" src="12_04.png">
+                        <img class="center" src="12_04.png" alt="Perspective Projection - figure 8">
                         <p>Before completing the full process let's try to see how the projection
                         matrix would look like at this point. This means representing the above
                         using a matrix. Now we run into a problem. In both equations we need to
@@ -208,7 +208,7 @@
                         so you cannot place it into one matrix that projects all vertices. To
                         understand this better think about the top row vector of the matrix (a, b, c, d). We need to select the values of the
                         vector such that the following will hold true:</p>
-                        <img class="center" src="12_05.png">
+                        <img class="center" src="12_05.png" alt="Perspective Projection - figure 9">
                         <p>This is the dot product operation between the top
                         row vector of the matrix with the vertex position which yields the
                         final X component. We can select 'b' and 'd' to be zero but we cannot
@@ -233,7 +233,7 @@
                         </p>
                         <p>We can now generate an intermediate matrix that represents the above
                         two equations as well as the copying of the Z into the W component:</p>
-                        <img class="center" src="12_06.png">
+                        <img class="center" src="12_06.png" alt="Perspective Projection - figure 10">
                         <p>As I said earlier, we want to include the normalization of the Z value
                         as well to make it easier for the clipper to work without knowing the
                         near and far Z values. However, the matrix above turns Z into zero.
@@ -245,20 +245,20 @@
                         parts. First we scale down the range [NearZ, FarZ] down to any range with a width of 2. Then we move (or translate)
                         the range such that it will start at -1. Scaling the Z value and then
                         translating it is represented by the general function:</p>
-                        <img class="center" src="12_07.png">
+                        <img class="center" src="12_07.png" alt="Perspective Projection - figure 11">
                         <p>But following perspective divide the right hand side of the function becomes:</p>
-                        <img class="center" src="12_08.png">
+                        <img class="center" src="12_08.png" alt="Perspective Projection - figure 12">
                         <p>Now we need to find the values of A and B that will perform the maping to [-1,1]. We know that when
                         Z equals NearZ the result must be -1 and that when Z equals FarZ the result must be 1. Therefore we can write:</p>
-                        <img class="center" src="12_09.png">
+                        <img class="center" src="12_09.png" alt="Perspective Projection - figure 13">
                         <p>Now we need to select the third row of the matrix as the vector (a b c d) that will satisfy:</p>
-                        <img class="center" src="12_10.png">
+                        <img class="center" src="12_10.png" alt="Perspective Projection - figure 14">
                         <p>We can immediately set 'a' and 'b' to be zero because we don't
                         want X and Y to have any effect on the transformation of Z. Then our A
                         value can become 'c' and the B value can become 'd' (since W is known
                         to be 1). </p>
                         <p>Therefore, the final transformation matrix is:</p>
-                        <img class="center" src="12_11.png">
+                        <img class="center" src="12_11.png" alt="Perspective Projection - figure 15">
                         <p>After multiplying the vertex position by the projection matrix the coordinates are said to be
                         in <i>Clip Space</i> and after performing the perspective divide the coordinates are in <i>NDC Space</i> (<span
                          style="text-decoration: underline;">N</span>ormalized <span

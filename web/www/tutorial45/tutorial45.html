@@ -91,7 +91,7 @@
         </div>
 
         <a id="logo" class="small" href="../../index.html" title="Homepage">
-            <img src="../logo ldpi.png">
+            <img src="../logo ldpi.png" alt="OGLDEV home">
         </a>
     </header>
 
@@ -130,7 +130,7 @@
     this calculation is an ambient occlusion term which will control the ambient light
     in the final lighting stage. Here's a visualization of this ambient occlusion term:
 </p>
-<img src = "ao.jpg">
+<img src = "ao.jpg" alt="Screen Space Ambient Occlusion - figure 1">
 <p>
     You can see how the edges are the brightest and the corners where we expect
     to get the smaller amount of lighting are much darker.
@@ -156,7 +156,7 @@
     If many points are outside of any geometry it means the original pixel is "highly exposed"
     and therefore receives more light. For example, take a look at the following image:
 </p>
-<img src="algorithm.jpg">
+<img src="algorithm.jpg" alt="Screen Space Ambient Occlusion - figure 2">
 <p>
     We have a surface with two points on it - P0 and P1. Assume that we are looking
     at it from somewhere on the upper left corner of the image. We sample a few points
@@ -190,7 +190,7 @@
     Naturally, that actual geometry point must lie on the ray that goes from the camera to the virtual
     point. Take a look at the following diagram:
 </p>
-<img src="diagram1.jpg"</img>
+<img src="diagram1.jpg"</img alt="Screen Space Ambient Occlusion - figure 3">
 <p>
     Point P lies on the red surface and the red and green points were generated randomly around it.
     The green point lies outside (before) the geometry and the red is inside (thus contributes to

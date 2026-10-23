@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -120,7 +120,7 @@
                         <p>
                                 Let's see how we can bring in the viewer location into the calculation of specular light. Take a look at the following picture:
                         </p>
-                                <img class="center" src="specular_light.png">
+                                <img class="center" src="specular_light.png" alt="Specular Lighting - figure 1">
                         <p>
                                 There are five things we need to pay attention to:
                                 <ul>
@@ -157,7 +157,7 @@
                                 The only thing left is to calculate the reflected ray 'R' using the vector 'I' (which is provided by the application to
                                 the shader). Take a look at the following picture:
                         </p>
-                                <img class="center" src="reflected_light.png">
+                                <img class="center" src="reflected_light.png" alt="Specular Lighting - figure 2">
                         <p>
                                 Remember that a vector doesn't really have a starting point and all vectors that have the same direction and magnitude
                                 are equal. Therefore, the vector 'I' was copied "below" the surface and the copy is identical to the original. The
@@ -167,7 +167,7 @@
                                 This magnitude is exactly half the magnitude of 'V'. Since 'V' has the same direction as 'N' we can calculate 'V' by
                                 multiplying 'N' (whose length is 1.0) by twice that magnitude. To summarize:
                         </p>
-                                <img class="center" src="reflect.png">
+                                <img class="center" src="reflect.png" alt="Specular Lighting - figure 3">
                         <p>
                                 Now that you understand the math it is time to let you in on a little secret - GLSL provides an internal function called
                                 'reflect' that does exactly this calculation. See below how it is used in the shader.
@@ -175,7 +175,7 @@
                         <p>
                                 Let's finalize the formula of specular light:
                         </p>
-                                <img class="center" src="specular1.png">
+                                <img class="center" src="specular1.png" alt="Specular Lighting - figure 4">
                         <p>
                                 We start by multiplying the color of light by the color of the surface. This is the same as with ambient and diffuse light.
                                 The result is multiplied by the specular intensity of the material ('M'). A material which does not have any specular property
@@ -185,11 +185,11 @@
                                 the 'specular power' or the 'shininess factor'. Its job is to intensify and sharpen the edges if the area where the
                                 specular light is present. The following picture shows the effect of the specular power when it is set to 1:
                         </p>
-                                <img class="center" src="shininess_1.png">
+                                <img class="center" src="shininess_1.png" alt="Specular Lighting - figure 5">
                         <p>
                                 While the following shows a specular exponent of 32:
                         </p>
-                                <img class="center" src="shininess_32.png">
+                                <img class="center" src="shininess_32.png" alt="Specular Lighting - figure 6">
                         <p>
                                 The specular power is also considered as an attribute of the material so different objects will have different specular power values.
                         </p>

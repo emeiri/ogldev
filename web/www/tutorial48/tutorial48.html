@@ -91,7 +91,7 @@
         </div>
 
         <a id="logo" class="small" href="../../index.html" title="Homepage">
-            <img src="../logo ldpi.png">
+            <img src="../logo ldpi.png" alt="OGLDEV home">
         </a>
     </header>
 
@@ -314,7 +314,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     The above is everything you need to basically have ATB up and running in your application.
     Your ATB bar should now look like this:
     <br><br>
-    <img src="atb1.jpg">
+    <img src="atb1.jpg" alt="User Interface With AntTweakBar - figure 1">
     <br>
     From now on what we need to do is to add widgets and link them to our application
     so that they can be used to tweak parameters of our code.
@@ -346,7 +346,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     </code>
     The result should look like this:
     <br><br>
-    <img src="atb2.jpg">
+    <img src="atb2.jpg" alt="User Interface With AntTweakBar - figure 2">
     <br>
     We can add a seperator using the following line:
     <code>
@@ -356,7 +356,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     </code>
     Now we have:
     <br><br>
-    <img src="atb3.jpg">
+    <img src="atb3.jpg" alt="User Interface With AntTweakBar - figure 3">
     <br>
     Let's see how we can link our camera so that its position and direction will always 
     be displayed. Until now you are probably already used to printing the current
@@ -402,7 +402,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     <br><br>
     Here's how the tweak bar looks with the camera added:
     <br><br>    
-    <img src="atb4.jpg">
+    <img src="atb4.jpg" alt="User Interface With AntTweakBar - figure 4">
     <br>
 
     You are probably spending a lot of time playing with the orientation of your meshes. Let's add
@@ -431,7 +431,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     </code>
     Our tweak bar now looks like this:
     <br><br>    
-    <img src="atb5.jpg">
+    <img src="atb5.jpg" alt="User Interface With AntTweakBar - figure 5">
     <br>
     Now let's add a check box. We will use the check box to toggle between automatic
     rotation of the mesh around the Y-axis and manual rotation (using the quaternion we
@@ -458,7 +458,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     <br>
     Here's how the tweak bar looks like:
     <br><br>    
-    <img src="atb6.jpg">
+    <img src="atb6.jpg" alt="User Interface With AntTweakBar - figure 6">
     <br>    
     Another useful widget that we can add is a read/write widget for controlling the speed
     of rotation (when auto rotation is enabled). This widget provides multiple ways to control
@@ -475,7 +475,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
      bar. You can either type in the value directly, use the shortcut keys, click on the '+' or '-' icons on the right or use the lever to
      modify the value (click on the circle to bring up the rotation lever). Here's the bar with this widget: 
     <br><br>    
-    <img src="atb7.jpg">
+    <img src="atb7.jpg" alt="User Interface With AntTweakBar - figure 7">
     <br>    
     In all of the tutorials there is usually at least one light source so it makes sense to add some code that will allow us to
     easily hook it up to the tweak bar so we can play with it parameters. So I went ahead and added the following methods to the
@@ -526,7 +526,7 @@ void SpotLight::AddToATB(TwBar *bar)<br>
     function so the correct instance according to the concrete class is always called. Here's the bar
     with a directional light source:
     <br><br>    
-    <img src="atb8.jpg">
+    <img src="atb8.jpg" alt="User Interface With AntTweakBar - figure 8">
     <br>  
     The last thing that I want to demonstrate is the ability to get and set various parameters that control the behaviour 
     of the tweak bar. Here's an example of setting the refresh rate of the bar to one tenth of a second:

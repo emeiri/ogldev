@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -139,13 +139,13 @@
                         <p>
                                 We are going to use a special case of a Bezier Surface called a <i>Bezier Triangle</i> which
                                 has the following form:</p>
-                        <img class="center" src="bezier_tri.jpg">
+                        <img class="center" src="bezier_tri.jpg" alt="PN Triangles Tessellation - figure 1">
                         <p>
                                 Let's decipher this step by step. 'u/v/w' are barycentric coordinates (i.e. they always maintain
                                 the equation 'u + v + w = 1'). The ten 'B<sub>xyz</sub>' are CPs. We are going to deviate
                                 a bit from the classical definition of a Bezier Triangle and place the CPs as follows:
                         </p>
-                        <img class="center" src="control_points.jpg">
+                        <img class="center" src="control_points.jpg" alt="PN Triangles Tessellation - figure 2">
                         <p>
                                 As you can see, the general form of the CPs resembles a somewhat puffy surface on top of a triangle.
                                 By evaluating a lot of barycentric coordinates in the polynomial above we will get an exproximation of
@@ -169,7 +169,7 @@
                                         <li>Each midpoint is projected on the plane created by the nearest vertex and its normal:</li>
                                 </ul>
                         </p>
-                        <img class="center" src="cp_projection.jpg">
+                        <img class="center" src="cp_projection.jpg" alt="PN Triangles Tessellation - figure 3">
                         <p>
                                 The picture above shows the triangle from the side. Each of the two endpoints has its own normal (in
                                 green) from the original mesh. The combination of a point and a normal creates a plane. We take
@@ -377,7 +377,7 @@
                                 by the normal and substract it from point in order to reach the projection. The following picture
                                 illustrates this calculation:
                         </p>
-                        <img class="center" src="cp_projection2.jpg">
+                        <img class="center" src="cp_projection2.jpg" alt="PN Triangles Tessellation - figure 4">
                         <p>
                                 P<sub>1</sub> and P<sub>2</sub> are located on different half spaces created by the plane. When we
                                 project v<sub>1</sub> on the green normal we get the length of d<sub>1</sub>. Multiply that length

@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -135,7 +135,7 @@
                                 and the second shader stage is called <i>Tessellation Evaluation Shader</i> (TES). Here's a diagram showing
                                 the location of the new stages in the pipeline:
                         </p>
-                                <img class="center" src="pipeline.jpg" />
+                                <img class="center" src="pipeline.jpg" alt="Basic Tessellation - figure 1">
                         <p>
                                 The TCS works on a group of vertices called <i>Control Points</i> (CP).
                                 The CPs don't have a well defined polygonal form such as a triangle, square, pentagon or whatever. Instead,
@@ -145,7 +145,7 @@
                                 of CPs is usually called a <i>Patch</i>. The yellow surface in the following picture is defined by
                                 a patch with 16 CPs:
                         </p>
-                                <img class="center" src="patch.jpg" />
+                                <img class="center" src="patch.jpg" alt="Basic Tessellation - figure 2">
                         <p>
                                 The TCS takes an
                                 input patch and emits an output patch. The developer has the option in the shader to do some transformation on the
@@ -165,7 +165,7 @@
                                 takes the TLs and subdivides what is called a <i>Domain</i>. The domain can either be a normalized (in the range of
                                 0.0-1.0) square of 2D coordinates or an equilateral triangle defined by 3D barycentric coordinates:
                         </p>
-                        <img class="center" src="domains.png">
+                        <img class="center" src="domains.png" alt="Basic Tessellation - figure 3">
                         <p>
                                 <a href="http://mathworld.wolfram.com/BarycentricCoordinates.html">Barycentric coordinates</a> of a
                                 triangle is a method of defining a location inside a triangle as a combination of the weight of the three vertices.
@@ -184,7 +184,7 @@
                                 the pipeline to be rasterized as points. If triangles are chosen the PG connects all the points together
                                 so that the entire face of the triangle is tessellated with smaller triangles:
                         </p>
-                        <img class="center" src="subdivision.jpg">
+                        <img class="center" src="subdivision.jpg" alt="Basic Tessellation - figure 4">
                         <p>
                                 In general, the TLs tell the PG the number of segments on the outer edge of the triangle and the number rings
                         towards the center</p>
@@ -361,7 +361,7 @@
                                 determines how many rings the triangle will contain. If we designate the triangle vertices as U, V and W
                                 then the corresponding edge for each vertex is the one which is opposite to it:
                         </p>
-                        <img src="domain.jpg">
+                        <img src="domain.jpg" alt="Basic Tessellation - figure 5">
                         <p>
                                 The algorithm we use to calculate the TLs is very simple and is based on the distance in world space
                                 between the camera and the vertices. It is implemented in the function GetTessLevel (see below). We

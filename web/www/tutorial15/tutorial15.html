@@ -91,7 +91,7 @@
     </div>
 
     <a id="logo" class="small" href="../../index.html" title="Homepage">
-      <img src="../logo ldpi.png">
+      <img src="../logo ldpi.png" alt="OGLDEV home">
     </a>
   </header>
 
@@ -108,7 +108,7 @@
       up until we complete a full circle or tilt it in a way a plane fuselage tilts during a turn. These levels of freedom are in the domain of flight simulators which is out of scope for this tutorial. At any rate, we
       will have a camera that will allow us to conveniently explore the 3D world will are going to develop in the coming tutorials.</p>
       <p>The following world war 2 anti aircraft gun demonstrates the kind of camera we are going to build:</p>
-      <img class="center" src="aa_gun.jpg">
+      <img class="center" src="aa_gun.jpg" alt="Camera Control - Part 2 - figure 1">
       <p>The gun has two control axis:<p>
       <ol>
       <li>It can turn 360 degrees around the vector (0,1,0). This angle is called the 'horizontal angle' and the vector is the 'vertical axis'.</li>
@@ -124,23 +124,23 @@
       target vector after is was turned by the horizontal angle, but turning around an arbitrary vector (lifting the gun up and down) can be tricky.</p>
       <p>Luckily, we have an extremely useful mathematical tool for that problem - the quaternion. Quaternions were discovered in 1843 by Sir Willilam Rowan Hamilton, an irish mathematician, and are based on the complex
       number system. The quaternion 'Q' is defined as:</p>
-      <img class="center" src="quaternion.png">
+      <img class="center" src="quaternion.png" alt="Camera Control - Part 2 - figure 2">
       <p>Where i, j and k are complex numbers and the following equation holds true:</p>
-      <img class="center" src="quaternion1.png">
+      <img class="center" src="quaternion1.png" alt="Camera Control - Part 2 - figure 3">
       <p>In practice, we specify a quaternion as the 4-vector (x, y, z, w). The conjugate of quaternion 'Q' is defined as:</p>
-      <img class="center" src="conjugate.png">
+      <img class="center" src="conjugate.png" alt="Camera Control - Part 2 - figure 4">
       <p>Normalizing a quaternion is the same as normalizing a vector. I'm going to describe the steps required to rotate a vector around an arbitrary vector using a quaternion. More details about the mathematical
       proof behind the steps can be found on the web.</p>
       <p>The general function to calculate a quaternion 'W' that represents the rotated vector 'V' by the angle 'a' is:</p>
-      <img class="center" src="rotation.png">
+      <img class="center" src="rotation.png" alt="Camera Control - Part 2 - figure 5">
       <p>Where Q is the rotation quaternion which is defined as:</p>
-      <img class="center" src="rotationq.png">
+      <img class="center" src="rotationq.png" alt="Camera Control - Part 2 - figure 6">
       <p>After calculating 'W' the rotated vector is simply (W.x,W.y,W.z). An important point to note in the calculation of 'W' is that first we need to multiple 'Q' by 'V' which is a quaternion-by-vector multiplication that results
       in a quaternion, and then we need to do a quaternion-by-quaternion multiplication (the result of Q*V multiplied by the conjugate of 'Q'). The two types of multiplications are not the same. The file math_3d.cpp includes
       the implementations of these multiplication types.</p>
       <p>We will need to keep the horizontal and vertical angles updated all the time as the user moves the mouse around the screen and we need to decide how to initialize them. The logical choice is to initialize them
       according to the target vector that is supplied to the constructor of the camera. Let's start with the horizontal angle. Take a look at the following diagram which looks down the XZ plane from above:</p>
-      <img class="center" src="h_angle.png">
+      <img class="center" src="h_angle.png" alt="Camera Control - Part 2 - figure 7">
       <p>The target vector is (x,z) and we want to find the horizontal angle which is represented by the letter alpha (the Y component is relevant only for the vertical angle). Since the length of the radius of the circle is 1 it
       is very easy to see that the sine function of alpha is exactly z. Therefore, calculating the asine of z will provide alpha. Are we done? - not yet. Since z can be in the range [-1,1], the result of asine is
       -90 degrees to +90 degrees. But the range of the horizontal angle is 360 degrees. In addition, our quaternion does rotation clockwise. This means that when we rotate 90 degrees with the quaternion

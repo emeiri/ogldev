@@ -91,7 +91,7 @@
                 </div>
 
                 <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="../logo ldpi.png">
+                        <img src="../logo ldpi.png" alt="OGLDEV home">
                 </a>
         </header>
 
@@ -112,7 +112,7 @@
                         is responsible to moving an object along a vector of any length and
                         direction. Let's say you want to move the triangle in the left picture
                         to the location on the right:</p>
-                        <img class="center" src="translation.png">
+                        <img class="center" src="translation.png" alt="Translation Transformation - figure 1">
                         <p>One way to do it is to provide the offset vector (in this case - 1,1) as a uniform variable to
                         the shader and simply add it to the position of each processed vertex.
                         However, this breaks the method of multiplying a group of matrices into
@@ -137,12 +137,12 @@
                         matrix and find out the changes that will complete the right hand side
                         of the sum equation in each component (...+V1, ...+V2, ...+V3). Let's
                         see how the identity matrix looks like:<p>
-                        <img class="center" src="equation1.jpg">
+                        <img class="center" src="equation1.jpg" alt="Translation Transformation - figure 2">
                         <p>We want to modify the identity matrix such that the result will be:</p>
-                        <img class="center" src="equation2.jpg">
+                        <img class="center" src="equation2.jpg" alt="Translation Transformation - figure 3">
                         <p>There really isn't an easy way to do this if we stick to 3x3 matrix, but
                             if we change to a 4x4 matrix we can do the following:</p>
-                        <img class="center" src="equation3.png">
+                        <img class="center" src="equation3.png" alt="Translation Transformation - figure 4">
                         <p>Representing a 3-vector using a 4-vector like that is called homogenous
                         coordinates and is very popular and useful for 3D graphics. The fourth
                         component is called 'w'. In fact, the internal shader symbol

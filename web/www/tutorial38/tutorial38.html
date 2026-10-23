@@ -91,7 +91,7 @@
     </div>
 
     <a id="logo" class="small" href="../../index.html" title="Homepage">
-      <img src="../logo ldpi.png">
+      <img src="../logo ldpi.png" alt="OGLDEV home">
     </a>
   </header>
 
@@ -134,7 +134,7 @@
       <p>
       Here's an example of a bone structure created in blender:
       </p>
-      <img class="center" src="rigging.jpg"/>
+      <img class="center" src="rigging.jpg" alt="Skeletal Animation With Assimp - figure 1">
       <p>
       What we see above is actually an important part of the animation. The artist riggs together the bone structure and
       defines a set of key frames for each animation type ("walk", "run", "die", etc). The key frames contain the
@@ -163,7 +163,7 @@
       adjust the array size but for the Doom 3 model that is part of this tutorial demo four bones are enough. So our new
       vertex structure is going to look like this:
       </p>
-      <img class="center" src="vertex.jpg"/>
+      <img class="center" src="vertex.jpg" alt="Skeletal Animation With Assimp - figure 2">
       <p>
       The bone IDs are indices into an array of bone transformations. These tranformations will be applied on the position
       and normal before the WVP matrix (i.e. they transform the vertex from a "bone space" into local space). The weight
@@ -191,7 +191,7 @@
       <p>
       Let's start at the bone information at the vertex level. Here's the relevant pieces in Assimp data structures:
       </p>
-      <img class="center" src="assimp1.jpg"/>
+      <img class="center" src="assimp1.jpg" alt="Skeletal Animation With Assimp - figure 3">
       <p>
       As you probably recall from the tutorial on Assimp, everything is contained in the aiScene class (an object of
       which we get when we import the mesh file). The aiScene contains an array of aiMesh objects. An aiMesh is a part
@@ -216,7 +216,7 @@
       and generate the final transformations that we will load into the shader. The following picture displays the
       relevant data structures:
       </p>
-      <img class="center" src="assimp2.jpg"/>
+      <img class="center" src="assimp2.jpg" alt="Skeletal Animation With Assimp - figure 4">
       <p>
       Again, we start at the aiScene. The aiScene object contains a pointer to an object of the aiNode class
       which is the root of the a node hierarchy (in other words - a tree). Each node in the tree has a pointer
