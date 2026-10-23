@@ -166,14 +166,7 @@ private:
 
 	// GUI state
 	bool m_showGui = false;
-	glm::vec3 m_position = glm::vec3(0.0f);
-	glm::vec3 m_rotation = glm::vec3(0.0f);
-	float m_scale = 0.1f;
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
-	vec3 m_lightDir = vec3(0.0f, 0.14f, 1.0f);
-	float m_ambientIntensity = 0.1f;
-	float m_diffuseIntensity = 1.0f;
-	vec3 m_lightColor = vec3(1.0f, 1.0f, 1.0f);
 	std::string m_appName;
 	GameCallbacks* m_pGameCallbacks = NULL;
     std::vector<OgldevVK::LightSource> m_lights;

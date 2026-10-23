@@ -645,41 +645,56 @@ void PreBakedRenderer::UpdateGUI()
 
 	ImGui::NewFrame();
 
-	ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);
-
-	if (ImGui::CollapsingHeader("Position")) {
-		ImGui::DragFloat3("##Position", &m_position.x, 0.01f);
-		ImGui::SameLine();
-		if (ImGui::Button("Reset##Pos")) {
-			m_position = glm::vec3(0.0f);
-		}
-	}
-
-	if (ImGui::CollapsingHeader("Rotation")) {
-		ImGui::DragFloat3("##Rotation", &m_rotation.x, 1.0f); // Degrees
-		ImGui::SameLine();
-		if (ImGui::Button("Reset##Rot")) {
-			m_rotation = glm::vec3(0.0f);
-		}
-	}
+	ImGui::Begin("Vulkan Renderer", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
 	static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
 	for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
 		ImGui::RadioButton(lightingModeNames[i], (int*)&m_lightingMode, i);
 	}
 
-	ImGui::gizmo3D("##Dir1", m_lightDir, 200.0f, imguiGizmo::modeDirection);
+	static const char* LightTypeNames[] = { "Directional", "Point", "Spot" };   // match your LIGHT_TYPE_* order
 
-	ImGui::ColorEdit3("Light Color", (float*)&m_lightColor);
+	int NumLights = m_modelContext.m_pModel->GetNumLights();
 
-	ImGui::DragFloat("Ambient Intensity", &m_ambientIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
+	for (int i = 0; i < NumLights; i++) {
+		OgldevVK::LightSource& l = m_lights[i];
 
-	ImGui::DragFloat("Diffuse Intensity", &m_diffuseIntensity, 0.01f, 0.0f, 5.0f, "%.2f");
+		ImGui::PushID(i);   // the same widget labels repeat for each light
 
-	m_lights[0].Color = glm::vec3(m_lightColor.x, m_lightColor.y, m_lightColor.z);
-	m_lights[0].Direction = glm::vec3(m_lightDir.x, m_lightDir.y, m_lightDir.z);
-	m_lights[0].AmbientIntensity = m_ambientIntensity;
-	m_lights[0].DiffuseIntensity = m_diffuseIntensity;
+		char Label[64];
+		snprintf(Label, sizeof(Label), "Light %d (%s)", i, LightTypeNames[l.LightType]);
+
+		if (ImGui::CollapsingHeader(Label)) {
+			ImGui::ColorEdit3("Color", &l.Color.x);
+			ImGui::DragFloat("Ambient", &l.AmbientIntensity, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Diffuse", &l.DiffuseIntensity, 0.01f, 0.0f, 100.0f);
+
+			if (l.LightType != LIGHT_TYPE_DIR) {
+				ImGui::DragFloat3("Position", &l.WorldPos.x, 0.05f);
+				ImGui::DragFloat("Atten Constant", &l.Atten_Constant, 0.01f, 0.0f, 10.0f);
+				ImGui::DragFloat("Atten Linear", &l.Atten_Linear, 0.01f, 0.0f, 10.0f);
+				ImGui::DragFloat("Atten Exp", &l.Atten_Exp, 0.01f, 0.0f, 10.0f);
+			}
+
+			if (l.LightType != LIGHT_TYPE_POINT) {
+				if (ImGui::DragFloat3("Direction", &l.Direction.x, 0.01f)) {
+					if (glm::length(l.Direction) > 1e-4f) {
+						l.Direction = glm::normalize(l.Direction);
+					}
+				}
+			}
+
+			if (l.LightType == LIGHT_TYPE_SPOT) {
+				// Cutoff is stored as a cosine; edit it in degrees
+				float AngleDeg = glm::degrees(acosf(l.Cutoff));
+				if (ImGui::DragFloat("Cone Angle", &AngleDeg, 0.1f, 1.0f, 89.0f)) {
+					l.Cutoff = cosf(glm::radians(AngleDeg));
+				}
+			}
+		}
+
+		ImGui::PopID();
+	}
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
