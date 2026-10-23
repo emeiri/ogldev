@@ -72,6 +72,12 @@ layout(set = 1, binding = 4) readonly uniform UniformBuffer {
 
 layout(set = 1, binding = 5) uniform sampler2D ShadowMaps[MAX_NUM_LIGHTS];
 
+layout(set = 1, binding = 6) uniform LightMats {
+    ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+    mat4 LightVP[MAX_NUM_LIGHTS];
+} LightMatrices;
+
+
 bool gCellShadingEnabled = false;
 bool gEnableSpecularExponent = false;
 vec3 GeoNormal;

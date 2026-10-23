@@ -89,8 +89,10 @@ public:
 
 	static void UpdateUniformBuffers(VkDevice Device,
 									 const glm::vec3& CameraWorldPos,
+									 const Matrix4f& ViewMatrix,
 									 const glm::mat4& WVP,
 									 const glm::mat4& World,
+									 const PersProjInfo& PersProjInfo,
 									 const std::vector<glm::mat4>& SubmeshTransformations,
 								     int NumLights,
 									 const std::vector<LightSource>& Lights, 
@@ -127,7 +129,7 @@ private:
 
     struct UniformBufferLights {
         glm::ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
-        LightSource LightSources[MAX_NUM_LIGHTS];
+        glm::mat4 ViewProj[MAX_NUM_LIGHTS];
     };
 
 	int m_numImages = 0;

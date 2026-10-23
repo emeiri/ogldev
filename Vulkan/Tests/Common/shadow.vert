@@ -50,7 +50,6 @@ struct UniformData {
     mat4 WVP; 
     mat4 WorldTransform;
     mat4 NormalTransform;
-    mat4 LightVP[MAX_NUM_LIGHTS];
 };
 
 // Changed from uniform buffer to SSBO to support unlimited meshes
@@ -73,9 +72,9 @@ layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO {
 
 
 layout(set = 1, binding = 6) uniform LightMats {
+    ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
     mat4 LightVP[MAX_NUM_LIGHTS];
 } LightMatrices;
-
 
 void main() 
 {    

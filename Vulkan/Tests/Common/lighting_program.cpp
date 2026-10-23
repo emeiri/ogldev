@@ -19,6 +19,7 @@
 
 #include "ogldev_types.h"
 #include "ogldev_util.h"
+#include "ogldev_math_3d.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "lighting_program.h"
@@ -351,14 +352,16 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 										   const glm::vec3& CameraWorldPos,
+										   const Matrix4f& ViewMatrix,
                                            const glm::mat4& WVP, 
-                                           const glm::mat4& World,				
+                                           const glm::mat4& World,
+										   const PersProjInfo& PersProjInfo_,
                                            const std::vector<glm::mat4>& SubmeshTransformations,
 										   int NumLights,
 										   const std::vector<LightSource>& Lights,
                                            BufferAndMemory& UniformBufferVS,
                                            BufferAndMemory& UniformBufferFS,
-                                           BufferAndMemory& UniformBufferLights)
+                                           BufferAndMemory& UBOLights)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 
@@ -384,7 +387,58 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 		UboDataFS.LightSources[i] = Lights[i];
 	}
 
-	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));	
+	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));
+
+#if 0
+    const LightSource& Light = Lights[2];
+
+
+	OrthoProjInfo LightOrthoProjInfo;
+	Vector3f LightWorldPos;
+
+	CalcTightLightProjection(ViewMatrix,            // in
+							 Light.Direction,       // in
+							 PersProjInfo,          // in
+							 LightWorldPos,         // out
+							 LightOrthoProjInfo);   // out
+
+	Vector3f Up(0.0f, 1.0f, 0.0f);
+    Matrix4f LightViewMatrix;
+	LightViewMatrix.InitCameraTransform(LightWorldPos, Light.Direction, Up);	
+
+	OrthoProjInfo shadowOrthoProjInfo;
+	shadowOrthoProjInfo.l = -20.0f;
+	shadowOrthoProjInfo.r = 20.0f;
+	shadowOrthoProjInfo.t = 20.0f;
+	shadowOrthoProjInfo.b = -20.0f;
+	shadowOrthoProjInfo.n = -20.0f;
+	shadowOrthoProjInfo.f = 20.0f;
+
+    Matrix4f LightOrthoProjMatrix;
+	LightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
+
+    Matrix4f LightViewProjMatrix = LightOrthoProjMatrix * LightViewMatrix;
+#endif
+
+#define SHADOW_MAP_WIDTH 2560
+#define SHADOW_MAP_HEIGHT 1415
+
+	int LightIndex = 2;                                   // must match the shadow pass's push constant
+	const LightSource& Light = Lights[LightIndex];
+
+	glm::vec3 Dir = glm::normalize(Light.Direction);
+	glm::vec3 Up = (fabsf(Dir.y) > 0.99f) ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::mat4 View = glm::lookAtLH(Light.WorldPos, Light.WorldPos + Dir, Up);
+
+	float FOV = 2.0f * acosf(Light.Cutoff);               // Cutoff is cos(half-angle) -> full cone angle in radians
+	float Aspect = (float)SHADOW_MAP_WIDTH / (float)SHADOW_MAP_HEIGHT;
+	glm::mat4 Proj = glm::perspectiveLH_ZO(FOV, Aspect, 1.0f, 100.0f);
+
+	UniformBufferLights UBL = {};
+	UBL.Counts = glm::ivec4(NumLights, 0, 0, 0);
+	UBL.ViewProj[LightIndex] = Proj * View;
+
+    UBOLights.Update(Device, &UBL, sizeof(UBL));
 }
 
 

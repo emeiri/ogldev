@@ -132,9 +132,9 @@ void PreBakedRenderer::RenderScene()
 
 	int NumActiveLights = 1;
 
-    for (int LightIndex = 0; LightIndex < NumActiveLights; LightIndex++) {
-        SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][LightIndex]);
-    }
+   // for (int LightIndex = 0; LightIndex < NumActiveLights; LightIndex++) {
+        SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][2]);
+   // }
 
 /*	SubmissionCmdBufs.push_back(m_lightPassCmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
 
@@ -701,8 +701,10 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
       
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													m_pGameCamera->GetPosition(),
+												    m_pGameCamera->GetViewMatrix(),
 													WVP, 
 													World, 
+													m_pGameCamera->GetPersProjInfo(),
 													m_modelContext.m_pModel->GetTransformations(), 
 												    NumLights,
 												    m_lights,
