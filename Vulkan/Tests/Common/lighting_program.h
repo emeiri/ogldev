@@ -115,6 +115,27 @@ protected:
 
 private:
 
+    static void UpdateUniformBuffersVS(VkDevice Device,
+									   const glm::mat4& VP,
+									   const glm::mat4& World,
+									   const std::vector<glm::mat4>& SubmeshTransformations,
+									   BufferAndMemory& UniformBufferVS);
+
+    static void UpdateUniformBuffersFS(VkDevice Device,
+									   const glm::vec3& CameraWorldPos,
+									   int NumLights,
+									   const std::vector<LightSource>& Lights,
+									   BufferAndMemory& UniformBufferFS);
+
+    static void UpdateUniformBuffersLights(VkDevice Device,
+											int NumLights,
+											const std::vector<LightSource>& Lights,
+											const glm::mat4& VP,
+											const PersProjInfo& PersProjInfo,
+											BufferAndMemory& UBOLights,
+											uint ShadowMapWidth,
+											uint ShadowMapHeight);
+
 	struct UniformDataFS {
 		glm::ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
 		glm::vec4 CameraWorldPos;

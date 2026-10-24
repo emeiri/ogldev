@@ -364,9 +364,23 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 										   uint ShadowMapWidth,
 										   uint ShadowMapHeight)
 {
+    LightingProgram::UpdateUniformBuffersVS(Device, VP, World, SubmeshTransformations, UniformBufferVS);
+
+    LightingProgram::UpdateUniformBuffersFS(Device, CameraWorldPos, NumLights, Lights, UniformBufferFS);
+
+    LightingProgram::UpdateUniformBuffersLights(Device, NumLights, Lights, VP, PersProjInfo_, UBOLights, ShadowMapWidth, ShadowMapHeight);
+}
+
+
+void LightingProgram::UpdateUniformBuffersVS(VkDevice Device,
+											 const glm::mat4& VP,
+											 const glm::mat4& World,
+											 const std::vector<glm::mat4>& SubmeshTransformations,
+											 BufferAndMemory& UniformBufferVS)
+{
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 
-    glm::mat4 WVP = VP * World;
+	glm::mat4 WVP = VP * World;
 
 	for (int i = 0; i < SubmeshTransformations.size(); i++) {
 		UboDataVS[i].WVP = WVP * SubmeshTransformations[i];
@@ -374,12 +388,20 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 		glm::mat4 WorldTransform = World * SubmeshTransformations[i];
 		glm::mat3 NormalMatrix = glm::transpose(glm::inverse(glm::mat3(WorldTransform)));
 
-        UboDataVS[i].WorldTransform = WorldTransform;
+		UboDataVS[i].WorldTransform = WorldTransform;
 		UboDataVS[i].NormalTransform = glm::mat4(NormalMatrix);
 	}
 
 	UniformBufferVS.Update(Device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
+}
 
+
+void LightingProgram::UpdateUniformBuffersFS(VkDevice Device,
+    const glm::vec3& CameraWorldPos,
+    int NumLights,
+    const std::vector<LightSource>& Lights,
+    BufferAndMemory& UniformBufferFS)
+{
 	UniformDataFS UboDataFS = {
 		.Counts = glm::ivec4(NumLights, 0, 0, 0),       // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
 		.CameraWorldPos = glm::vec4(CameraWorldPos, 1.0f),
@@ -391,7 +413,18 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 	}
 
 	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));
+}
 
+
+void LightingProgram::UpdateUniformBuffersLights(VkDevice Device,
+												int NumLights,
+												const std::vector<LightSource>& Lights,
+												const glm::mat4& VP,
+												const PersProjInfo& PersProjInfo_,
+												BufferAndMemory& UBOLights,
+												uint ShadowMapWidth,
+												uint ShadowMapHeight)
+{
 	UniformBufferLights UBL = {};
 	UBL.Counts = glm::ivec4(NumLights, 0, 0, 0);
 
@@ -399,7 +432,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 		const LightSource& Light = Lights[i];
 
 		switch (Light.LightType) {
-        case LIGHT_TYPE_DIR:
+		case LIGHT_TYPE_DIR:
 			UBL.ViewProj[i] = CalcTightLightProjection(VP, Light.Direction, PersProjInfo_.zNear, PersProjInfo_.zFar, 40.0f);
 			break;
 
@@ -412,7 +445,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 			float FOV = 2.0f * acosf(Light.Cutoff);               // Cutoff is cos(half-angle) -> full cone angle in radians
 			float Aspect = (float)ShadowMapWidth / (float)ShadowMapHeight;
 			glm::mat4 Proj = glm::perspectiveLH_ZO(FOV, Aspect, 1.0f, 100.0f);
-			UBL.ViewProj[i] = Proj * View;			
+			UBL.ViewProj[i] = Proj * View;
 		}
 		break;
 
@@ -421,8 +454,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 		}
 	}
 
-    UBOLights.Update(Device, &UBL, sizeof(UBL));
+	UBOLights.Update(Device, &UBL, sizeof(UBL));
 }
-
 
 }
