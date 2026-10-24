@@ -997,6 +997,11 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
                               Vector3f& LightPosWorld,           // out
                               OrthoProjInfo& orthoProjInfo);     // out
 
+glm::mat4 CalcTightLightProjection(const glm::mat4& CameraVP, 
+                                   const glm::vec3& LightDir,
+                                   float zNear, float zFar, 
+                                   float ShadowDistance);
+
 int CalcNextPowerOfTwo(int x);
 
 bool IsPointInsideViewFrustum(const Vector3f& p, const Matrix4f& VP);

@@ -619,6 +619,61 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
 }
 
 
+// Fits an orthographic light frustum around the camera's view frustum.
+// CameraVP is the Vulkan camera matrix (perspectiveLH_ZO * view).
+glm::mat4 CalcTightLightProjection(const glm::mat4& CameraVP, const glm::vec3& LightDir,
+                                   float zNear, float zFar, float ShadowDistance)
+{
+    // Steps 1+2: camera frustum corners in world space.
+    // Vulkan NDC: x,y in [-1,1], z in [0,1]
+ // NDC z of the shadow distance (perspectiveLH_ZO)
+    float d = glm::min(ShadowDistance, zFar);
+    float MaxNdcZ = (zFar / (zFar - zNear)) * (1.0f - zNear / d);
+
+    glm::mat4 InvVP = glm::inverse(CameraVP);
+
+    glm::vec3 Corners[8];
+    int c = 0;
+    for (int x = 0; x < 2; x++) {
+        for (int y = 0; y < 2; y++) {
+            for (int z = 0; z < 2; z++) {
+                glm::vec4 p = InvVP * glm::vec4(x * 2.0f - 1.0f, y * 2.0f - 1.0f, z * MaxNdcZ, 1.0f);
+                Corners[c++] = glm::vec3(p) / p.w;
+            }
+        }
+    }
+
+    glm::vec3 Center(0.0f);
+    for (const glm::vec3& p : Corners) {
+        Center += p;
+    }
+    Center /= 8.0f;
+
+    // Step 3: light view, looking along the light direction from the frustum center
+    glm::vec3 Dir = glm::normalize(LightDir);
+    glm::vec3 Up = (fabsf(Dir.y) > 0.99f) ? glm::vec3(1.0f, 0.0f, 0.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 LightView = glm::lookAtLH(Center, Center + Dir, Up);
+
+    // Step 4: AABB of the frustum in light space
+    glm::vec3 Min(FLT_MAX);
+    glm::vec3 Max(-FLT_MAX);
+    for (const glm::vec3& p : Corners) {
+        glm::vec3 q = glm::vec3(LightView * glm::vec4(p, 1.0f));
+        Min = glm::min(Min, q);
+        Max = glm::max(Max, q);
+    }
+
+    // Pull the near plane back toward the light so that casters outside the
+    // camera frustum (e.g. above it) still land in the shadow map
+    const float CasterMargin = 50.0f;
+    Min.z -= CasterMargin;
+
+    glm::mat4 LightProj = glm::orthoLH_ZO(Min.x, Max.x, Min.y, Max.y, Min.z, Max.z);
+
+    return LightProj * LightView;
+}
+
+
 int CalcNextPowerOfTwo(int x)
 {
     int ret = 1;
