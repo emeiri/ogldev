@@ -438,6 +438,10 @@ vec4 GetTexColor()
 
     TexColor = TextureBindless2D(BaseColorTextureIndex, TexCoord);
 
+    if (TexColor.a < 0.5) {
+        discard;
+    }
+
     return TexColor;
 }
 
