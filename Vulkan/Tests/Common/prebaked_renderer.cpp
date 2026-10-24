@@ -667,9 +667,33 @@ void PreBakedRenderer::UpdateGUI()
 		snprintf(Label, sizeof(Label), "Light %d (%s)", i, LightTypeNames[l.LightType]);
 
 		if (ImGui::CollapsingHeader(Label)) {
+			bool Enabled = l.Config.x > 0.0f;
+			ImGui::Checkbox("Enabled", &Enabled);
+			if (Enabled) {
+				l.Config.x = 1.0f;
+			} else {
+				l.Config.x = 0.0f;
+			}
+
+			bool CastsShadows = l.Config.y > 0.0f;
+			ImGui::Checkbox("Casts Shadows", &CastsShadows);
+			if (CastsShadows) {
+				l.Config.y = 1.0f;
+			} else {
+				l.Config.y = 0.0f;
+			}
+
 			ImGui::ColorEdit3("Color", &l.Color.x);
 			ImGui::DragFloat("Ambient", &l.AmbientIntensity, 0.01f, 0.0f, 1.0f);
 			ImGui::DragFloat("Diffuse", &l.DiffuseIntensity, 0.01f, 0.0f, 100.0f);
+
+            float Bias = l.Config.z;
+            ImGui::DragFloat("Shadow Bias", &Bias, 0.0001f, 0.0f, 0.01f);
+            l.Config.z = Bias;
+
+            float FilterSize = l.Config.w;
+            ImGui::DragFloat("Shadow Filter Size", &FilterSize, 0.1f, 0.0f, 10.0f);
+            l.Config.w = FilterSize;
 
 			if (l.LightType != LIGHT_TYPE_DIR) {
 				ImGui::DragFloat3("Position", &l.WorldPos.x, 0.05f);

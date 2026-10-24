@@ -38,7 +38,7 @@ enum Binding {
 	NumBindings = 7
 };
 
-static_assert(sizeof(LightSource) == 64, "LightSource size must be 64 bytes");
+static_assert(sizeof(LightSource) == 80, "LightSource size must be 80 bytes");
 
 
 void LightingProgram::Init(VulkanCore& vkCore,

@@ -56,6 +56,8 @@ struct LightSource {
 	float Atten_Linear = 0.0f;					// offset 52
 	float Atten_Exp = 0.0f;						// offset 56
 	float Cutoff = 0.0f;						// offset 60
+	// x = Enabled, y = Casts shadows, z = bias, w = filter size
+	glm::vec4 Config = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);// offset 64
 };
 
 

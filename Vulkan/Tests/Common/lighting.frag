@@ -43,6 +43,7 @@ struct LightSource {
     float Atten_Linear;            // offset 52
     float Atten_Exp;               // offset 56
     float Cutoff;                  // offset 60
+    vec4 Config;				   // offset 64 x = Enabled, y = Casts shadows, z = bias, w = filter size
 };
 
 
@@ -82,6 +83,8 @@ layout(set = 1, binding = 6) uniform LightMats {
 bool gCellShadingEnabled = false;
 bool gEnableSpecularExponent = false;
 vec3 GeoNormal;
+float gShadowMapWidth = 2048.0;
+float gShadowMapHeight = 2048.0;
 
 // Light level of a fully shadowed pixel (ambient is added separately).
 const float kShadowFloor = 0.05;
@@ -150,18 +153,68 @@ vec3 CalcShadowCoords(int Index)
 
 float CalcShadowFactorBasic(int Index, vec3 LightDirection)
 {
+    float ShadowFactor = 1.0;
+
+    if (ubo.LightSources[Index].Config.y > 0.0) {
+        vec3 ShadowCoords = CalcShadowCoords(Index);
+
+        if (IsOutsideShadowMap(ShadowCoords)) {
+            return 1.0;
+        }
+
+        float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
+
+        float bias;
+    
+        float ConfiguredBias = ubo.LightSources[Index].Config.z;
+        if (ConfiguredBias > 0.0) {
+            bias = ConfiguredBias;
+        } else {
+            bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
+        }
+
+        ShadowFactor = (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
+    }
+
+    return ShadowFactor;
+}
+
+
+float CalcShadowFactorPCF(int Index, vec3 LightDirection)
+{
+    if (gShadowMapWidth == 0 || gShadowMapHeight == 0) {
+        return 1.0;
+    }
+
     vec3 ShadowCoords = CalcShadowCoords(Index);
 
     if (IsOutsideShadowMap(ShadowCoords)) {
         return 1.0;
     }
 
-    float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
+    float DiffuseFactor = clamp(dot(Normal, -LightDirection), 0.0, 1.0);
+    float bias = mix(0.001, 0.0, DiffuseFactor);
 
-    float bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
+    vec2 TexelSize = 1.0 / vec2(gShadowMapWidth, gShadowMapHeight);
 
-    return (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
+    float ShadowSum = 0.0;
+
+    int ShadowMapFilterSize = int(ubo.LightSources[Index].Config.w);
+
+    int HalfFilterSize = ShadowMapFilterSize / 2;
+
+    for (int y = -HalfFilterSize ; y < -HalfFilterSize + ShadowMapFilterSize ; y++) {
+        for (int x = -HalfFilterSize ; x < -HalfFilterSize + ShadowMapFilterSize ; x++) {
+            vec2 Offset = vec2(x, y) * TexelSize;
+            ShadowSum += ShadowTest(Index, ShadowCoords.xy + Offset, ShadowCoords.z, bias);
+        }
+    }
+
+    float Lit = ShadowSum / float(ShadowMapFilterSize * ShadowMapFilterSize);
+
+    return mix(kShadowFloor, 1.0, Lit);
 }
+
 
 // LightToPixel is the (unnormalized) vector from the light to the pixel.
 // Point lights use the cube map; spot and directional lights use the 2D map.
@@ -177,13 +230,14 @@ float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 
     vec3 LightDirection = normalize(LightToPixel);
 
+    int ShadowMapFilterSize = int(ubo.LightSources[Index].Config.w);
  //   if (gShadowMapRandomRadius > 0.0) {
   //      return CalcShadowFactorWithRandomSampling(LightDirection);
- //   } else if (gShadowMapFilterSize > 0) {
- //      return CalcShadowFactorPCF(LightDirection);
- //   } else {
+    if (ShadowMapFilterSize > 0) {
+       return CalcShadowFactorPCF(Index, LightDirection);
+    } else {
         return CalcShadowFactorBasic(Index, LightDirection);
-  //  }
+    }
 }
 
 
@@ -307,19 +361,21 @@ vec4 GetTotalLight()
     int NumLights = ubo.Counts.x;
 
     for (int i = 0 ; i < NumLights ; i++) {
-        switch (ubo.LightSources[i].LightType) {
+        if (ubo.LightSources[i].Config.x > 0.5) {
+            switch (ubo.LightSources[i].LightType) {
 
-            case LIGHT_TYPE_DIR:
-                TotalLight += CalcDirectionalLight(i);
-                break;
+                case LIGHT_TYPE_DIR:
+                    TotalLight += CalcDirectionalLight(i);
+                    break;
 
-            case LIGHT_TYPE_POINT:
-                TotalLight += CalcPointLight(i, true);
-                break;
+                case LIGHT_TYPE_POINT:
+                    TotalLight += CalcPointLight(i, true);
+                    break;
 
-            case LIGHT_TYPE_SPOT:
-                TotalLight += CalcSpotLight(i);
-                break;
+                case LIGHT_TYPE_SPOT:
+                    TotalLight += CalcSpotLight(i);
+                    break;
+            }
         }
     }
 
