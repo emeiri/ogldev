@@ -74,6 +74,12 @@ protected:
 		return PushConstantRanges;
 	}
 
+	virtual void GetViewportAndScissorSize(uint& Width, uint& Height)
+	{
+		Width = 0;
+		Height = 0;
+	}
+
 	VkDevice m_device = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSetLayout> m_descSetLayouts;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;

@@ -144,7 +144,6 @@ void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>
 }
 
 
-
 VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
 	                                        VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
 										    VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS)
@@ -176,8 +175,12 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 		.primitiveRestartEnable = VK_FALSE
 	};
 
-	int WindowWidth, WindowHeight;
-	glfwGetWindowSize(pWindow, &WindowWidth, &WindowHeight);
+	uint WindowWidth, WindowHeight;
+	GetViewportAndScissorSize(WindowWidth, WindowHeight);
+
+	if (WindowWidth == 0) {
+		glfwGetWindowSize(pWindow, (int*)&WindowWidth, (int*)&WindowHeight);
+	}
 
 	VkViewport VP = {
 		.x = 0.0f,
@@ -194,8 +197,8 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 			.y = 0,
 		},
 		.extent = {
-			.width = (u32)WindowWidth,
-			.height = (u32)WindowHeight
+			.width = WindowWidth,
+			.height = WindowHeight
 		}
 	};
 
