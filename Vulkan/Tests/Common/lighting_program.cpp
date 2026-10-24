@@ -352,7 +352,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 										   const glm::vec3& CameraWorldPos,
-                                           const glm::mat4& WVP, 
+                                           const glm::mat4& VP, 
                                            const glm::mat4& World,
 										   const PersProjInfo& PersProjInfo_,
                                            const std::vector<glm::mat4>& SubmeshTransformations,
@@ -363,6 +363,8 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
                                            BufferAndMemory& UBOLights)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
+
+    glm::mat4 WVP = VP * World;
 
 	for (int i = 0; i < SubmeshTransformations.size(); i++) {
 		UboDataVS[i].WVP = WVP * SubmeshTransformations[i];
@@ -399,6 +401,10 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 		const LightSource& Light = Lights[i];
 
 		switch (Light.LightType) {
+        case LIGHT_TYPE_DIR:
+			UBL.ViewProj[i] = CalcTightLightProjection(VP, Light.Direction, PersProjInfo_.zNear, PersProjInfo_.zFar, 40.0f);
+			break;
+
 		case LIGHT_TYPE_SPOT:
 		{
 			glm::vec3 Dir = glm::normalize(Light.Direction);

@@ -702,13 +702,11 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 
 	glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-	glm::mat4 WVP = VP * World;
-
 	int NumLights = m_modelContext.m_pModel->GetNumLights();
       
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													m_pGameCamera->GetPosition(),
-													WVP, 
+													VP, 
 													World, 
 													m_pGameCamera->GetPersProjInfo(),
 													m_modelContext.m_pModel->GetTransformations(), 
