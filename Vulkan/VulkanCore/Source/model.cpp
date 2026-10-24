@@ -38,6 +38,11 @@ struct SubmeshMetaData {
 	glm::vec4 Color;
 };
 
+struct GPUMaterial {
+	glm::ivec4 Indices = glm::ivec4(-1); // x = baseColor, y = normal, z = height, w = ao
+};
+
+
 #if defined(_MSC_VER)
 #pragma pack(pop)
 #endif
@@ -269,9 +274,6 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets[0]);
 }
 
-struct GPUMaterial {
-    glm::ivec4 Indices; // x = baseColor, y = normal, z = height, w = ao
-};
 
 void VkModel::UpdateModelDesc(ModelDesc& md)
 {

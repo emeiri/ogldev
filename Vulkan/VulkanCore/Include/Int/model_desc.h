@@ -36,8 +36,8 @@ struct SubmeshRanges {
 };
 
 struct TextureInfo {
-	VkSampler m_sampler;
-	VkImageView m_imageView;
+	VkSampler m_sampler = VK_NULL_HANDLE;
+	VkImageView m_imageView = VK_NULL_HANDLE;
 };
 
 struct ModelDesc {
