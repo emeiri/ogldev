@@ -66,14 +66,14 @@ public:
 	LightingProgram() {}
 
 	virtual void Init(VulkanCore& vkCore,
-        VkFormat ColorFormat,
-		VkDescriptorPool DescPool,
-		VkDescriptorSetLayout TextureDescSetLayout,
-		VkDescriptorSet TextureDescSet,
-		VkShaderModule vs,
-		VkShaderModule fs,
-		LIGHTING_MODE LightingMode);
-
+					  VkFormat ColorFormat,
+					  VkDescriptorPool DescPool,
+					  VkDescriptorSetLayout TextureDescSetLayout,
+					  VkDescriptorSet TextureDescSet,
+					  VkShaderModule vs,
+					  VkShaderModule fs,
+					  LIGHTING_MODE LightingMode);
+	
 	virtual void Destroy();
 
 	void Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet, u32 BaseTextureIndex);
@@ -89,7 +89,6 @@ public:
 
 	static void UpdateUniformBuffers(VkDevice Device,
 									 const glm::vec3& CameraWorldPos,
-									 const Matrix4f& ViewMatrix,
 									 const glm::mat4& WVP,
 									 const glm::mat4& World,
 									 const PersProjInfo& PersProjInfo,

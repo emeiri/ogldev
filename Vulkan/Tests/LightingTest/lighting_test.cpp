@@ -38,7 +38,7 @@ public:
 
     void Init()
     {
-        std::string AssetPath = "lighting_test.glb";
+        std::string AssetPath = "lighting_test_2_spots_sun.glb";
         m_renderer.Init(AssetPath);
     }
 

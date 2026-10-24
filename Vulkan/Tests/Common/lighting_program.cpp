@@ -42,13 +42,13 @@ static_assert(sizeof(LightSource) == 64, "LightSource size must be 64 bytes");
 
 
 void LightingProgram::Init(VulkanCore& vkCore,
-    VkFormat ColorFormat,
-	VkDescriptorPool DescPool,
-	VkDescriptorSetLayout TextureDescSetLayout,
-	VkDescriptorSet TextureDescSet,
-	VkShaderModule vs,
-	VkShaderModule fs,
-	LIGHTING_MODE LightingMode)
+						   VkFormat ColorFormat,
+						   VkDescriptorPool DescPool,
+						   VkDescriptorSetLayout TextureDescSetLayout,
+						   VkDescriptorSet TextureDescSet,
+						   VkShaderModule vs,
+						   VkShaderModule fs,
+						   LIGHTING_MODE LightingMode)
 {
 	m_textureDescSetLayout = TextureDescSetLayout;
 	m_textureDescSet = TextureDescSet;
@@ -352,7 +352,6 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 										   const glm::vec3& CameraWorldPos,
-										   const Matrix4f& ViewMatrix,
                                            const glm::mat4& WVP, 
                                            const glm::mat4& World,
 										   const PersProjInfo& PersProjInfo_,
@@ -389,36 +388,6 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 
 	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));
 
-#if 0
-    const LightSource& Light = Lights[2];
-
-
-	OrthoProjInfo LightOrthoProjInfo;
-	Vector3f LightWorldPos;
-
-	CalcTightLightProjection(ViewMatrix,            // in
-							 Light.Direction,       // in
-							 PersProjInfo,          // in
-							 LightWorldPos,         // out
-							 LightOrthoProjInfo);   // out
-
-	Vector3f Up(0.0f, 1.0f, 0.0f);
-    Matrix4f LightViewMatrix;
-	LightViewMatrix.InitCameraTransform(LightWorldPos, Light.Direction, Up);	
-
-	OrthoProjInfo shadowOrthoProjInfo;
-	shadowOrthoProjInfo.l = -20.0f;
-	shadowOrthoProjInfo.r = 20.0f;
-	shadowOrthoProjInfo.t = 20.0f;
-	shadowOrthoProjInfo.b = -20.0f;
-	shadowOrthoProjInfo.n = -20.0f;
-	shadowOrthoProjInfo.f = 20.0f;
-
-    Matrix4f LightOrthoProjMatrix;
-	LightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
-
-    Matrix4f LightViewProjMatrix = LightOrthoProjMatrix * LightViewMatrix;
-#endif
 
 #define SHADOW_MAP_WIDTH 2560
 #define SHADOW_MAP_HEIGHT 1415

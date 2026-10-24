@@ -708,7 +708,6 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
       
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													m_pGameCamera->GetPosition(),
-												    m_pGameCamera->GetViewMatrix(),
 													WVP, 
 													World, 
 													m_pGameCamera->GetPersProjInfo(),
