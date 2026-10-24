@@ -259,7 +259,7 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
 vec4 CalcDirectionalLight(int Index)
 {
     vec3 Direction = normalize(ubo.LightSources[Index].Direction);
-    float ShadowFactor = 1.0; //CalcShadowFactor(Direction, false);
+    float ShadowFactor = CalcShadowFactor(Index, Direction, false);
     return CalcLightInternal(Index, Direction, ShadowFactor);
 }
 
