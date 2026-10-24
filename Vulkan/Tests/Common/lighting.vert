@@ -71,6 +71,8 @@ layout(location = 1) flat out uint MaterialIndex;
 layout(location = 2) out vec3 WorldPos;
 layout(location = 3) out vec3 Normal;
 layout(location = 4) out vec4 Color;
+layout(location = 5) out vec3 Tangent;
+layout(location = 6) out vec3 Bitangent;
 
 void main() 
 {    
@@ -99,6 +101,10 @@ void main()
     mat4 WorldTransform = ubo.Data[DrawId].WorldTransform;
 
     WorldPos = vec3(WorldTransform * Pos4d);
+
+    Tangent = mat3(WorldTransform) * vec3(vtx.tangent_x, vtx.tangent_y, vtx.tangent_z);
+
+    Bitangent = mat3(WorldTransform) * vec3(vtx.bitangent_x, vtx.bitangent_y, vtx.bitangent_z);        
 
     Color = md.Color;
 

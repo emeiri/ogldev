@@ -58,6 +58,8 @@ layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 WorldPos;
 layout(location = 3) in vec3 Normal;
 layout(location = 4) in vec4 Color;
+layout(location = 5) in vec3 Tangent;
+layout(location = 6) in vec3 Bitangent;
 
 layout(location = 0) out vec4 OutColor;
 
@@ -504,4 +506,6 @@ void main()
         default:
             OutColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
+
+    //OutColor = vec4(normalize(Bitangent) * 0.5 + 0.5, 1);
 }
