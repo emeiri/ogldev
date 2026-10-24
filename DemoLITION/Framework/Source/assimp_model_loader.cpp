@@ -260,7 +260,12 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
     m_convertToLeftHanded = Flags.ConvertToLeftHanded;
 
     if (Flags.ConvertToLeftHanded) {
+#ifdef OGLDEV_VULKAN
+        // Same as aiProcess_ConvertToLeftHanded but without aiProcess_FlipUVs
+        LoadFlags |= aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder;
+#else
         LoadFlags |= aiProcess_ConvertToLeftHanded;
+#endif
     }
 
     Assimp::Importer Importer;

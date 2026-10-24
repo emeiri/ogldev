@@ -53,6 +53,7 @@ void CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
 {
     AssimpModelLoader Loader;
     Loader.Load(Filename, Flags, m_modelData);
+    m_convertedToLeftHanded = Flags.ConvertToLeftHanded;
 
 #ifndef OGLDEV_VULKAN
     std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
@@ -148,7 +149,8 @@ void CoreModel::CalculateMeshTransformations()
         glm::mat4 MeshTransformGLM = glm::transpose(MeshTransform);
 
         glm::mat4 ZFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f));
-        glm::mat4 LeftHandedMatrixGLM = ZFlip * MeshTransformGLM * ZFlip;
+        // If assimp already converted the scene (vertices and nodes) to left handed don't do it again
+        glm::mat4 LeftHandedMatrixGLM = m_convertedToLeftHanded ? MeshTransformGLM : ZFlip * MeshTransformGLM * ZFlip;
 
         for (int j = 0; j < Node.m_meshes.size(); j++) {
             int MeshIndex = Node.m_meshes[j];
