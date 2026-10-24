@@ -244,6 +244,37 @@ float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
     }
 }
 
+// ---------------------------------------------------------------------------
+// Normal mapping
+// ---------------------------------------------------------------------------
+
+vec3 CalcBumpedNormal()
+{
+    int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.y;
+
+    if (NormalTextureIndex < 0) {
+        return GeoNormal;
+    }
+
+    // Step #1: re-normalize the tangent space base vectors after interpolation
+    vec3 N = GeoNormal;
+    vec3 T = normalize(Tangent - dot(Tangent, N) * N);
+    vec3 B = cross(N, T) * (dot(cross(N, T), Bitangent) < 0.0 ? -1.0 : 1.0);
+
+    // Step #2: Sample a normal from the normal map
+    vec3 BumpMapNormal = TextureBindless2D(NormalTextureIndex, TexCoord).xyz;
+
+    // Step #3: transform from [0,1] to [-1,1]
+    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
+
+    mat3 TBN = mat3(T, B, N);
+
+    // Step #4: transform from tangent space to world space
+    vec3 NewNormal = normalize(TBN * BumpMapNormal);
+
+    return NewNormal;                                                                       
+}
+
 
 // ---------------------------------------------------------------------------
 // Lighting
@@ -257,7 +288,9 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
                         ubo.LightSources[Index].AmbientIntensity *
                         GetMaterialAmbientColor();
 
-    float DiffuseFactor = dot(GeoNormal, -LightDirection);
+    vec3 N = CalcBumpedNormal();
+
+    float DiffuseFactor = dot(N, -LightDirection);
 
     vec4 DiffuseColor = vec4(0, 0, 0, 0);
     vec4 SpecularColor = vec4(0, 0, 0, 0);
@@ -385,36 +418,6 @@ vec4 GetTotalLight()
 }
 
 
-// ---------------------------------------------------------------------------
-// Normal mapping
-// ---------------------------------------------------------------------------
-
-/*vec3 CalcBumpedNormal()
-{
-    // Step #1: Sample a normal from the normal map
-    vec3 BumpMapNormal = textureGrad(materials[MaterialIndex].NormalMap, TexCoord, TexDx, TexDy).xyz;
-
-    // Step #2: transform from [0,1] to [-1,1]
-    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
-
-    // Step #3: re-normalize the tangent space base vectors after interpolation
-    vec3 Normal = GeoNormal;
-    vec3 Tangent = normalize(Tangent0);
-    vec3 Bitangent = normalize(Bitangent0);
-
-    // Improvement: re-orthogonalize the TBN base vectors using the Gram-Schmidt process:
-    //              (in this case the bitangent is calculated on the fly so we don't need
-    //              to put it in the vertex buffer)
-    // Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
-    // Bitangent = cross(Tangent, Normal);
-
-    mat3 TBN = mat3(Tangent, Bitangent, Normal);
-
-    // Step #4: transform from tangent space to world space
-    vec3 NewNormal = normalize(TBN * BumpMapNormal);
-
-    return NewNormal;                                                                       
-}*/
 // ---------------------------------------------------------------------------
 // Texture / reflection / refraction
 // ---------------------------------------------------------------------------
