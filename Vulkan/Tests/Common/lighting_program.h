@@ -97,7 +97,9 @@ public:
 									 const std::vector<LightSource>& Lights, 
 									 BufferAndMemory& UniformBufferVS,
 									 BufferAndMemory& UniformBufferFS,
-									 BufferAndMemory& UniformBufferLights);
+									 BufferAndMemory& UniformBufferLights,
+									 uint ShadowMapWidth,
+									 uint ShadowMapHeight);
 
 	static size_t GetUniformBufferSizeVS(size_t NumSubmeshes) { return NumSubmeshes * sizeof(UniformDataVS); }
 

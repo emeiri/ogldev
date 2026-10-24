@@ -1508,7 +1508,7 @@ void VulkanCore::BeginDynamicRenderingSwapChain(VkCommandBuffer CmdBuf, int Imag
 
 
 void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkClearValue* pClearColor,
-									   VkImageView DepthView, VkClearValue* pDepthValue)
+									   VkImageView DepthView, VkClearValue* pDepthValue, const VkExtent2D* pRenderExtent)
 {
 	VkRenderingAttachmentInfoKHR ColorAttachment = {
 		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
@@ -1548,9 +1548,13 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView Image
 		}
 	}
 
+	VkRect2D RenderArea;
+    RenderArea.offset = { 0, 0 };
+    RenderArea.extent = pRenderExtent ? *pRenderExtent : GetSwapChainExtent();
+
 	VkRenderingInfoKHR RenderingInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
-		.renderArea = { {0, 0}, {(u32)GetSwapChainExtent().width, (u32)GetSwapChainExtent().height} },
+		.renderArea = RenderArea,
 		.layerCount = 1,
 		.viewMask = 0,
 		.colorAttachmentCount = UseColor ? 1u : 0u,

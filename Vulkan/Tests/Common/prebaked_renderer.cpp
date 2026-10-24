@@ -30,6 +30,8 @@
 #include "ogldev_vulkan_shader.h"
 
 #define MAX_TEXTURES 4096
+#define SHADOW_MAP_WIDTH 2048
+#define SHADOW_MAP_HEIGHT 2048
 
 #define BIG_TEXTURE_ARRAY_BINDING 0
 
@@ -312,8 +314,6 @@ void PreBakedRenderer::CreateShadowMaps()
 {
 	m_vkCore.CreateCommandBuffers(1, &m_utilCmdBuf);
 
-	VkExtent2D SwapChainExtent = m_vkCore.GetSwapChainExtent();
-
     m_shadowMaps.resize(m_numImages);
 
 	VkImageUsageFlags DepthUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -322,7 +322,7 @@ void PreBakedRenderer::CreateShadowMaps()
     for (int Image = 0; Image < m_numImages; Image++) {
         m_shadowMaps[Image].resize(MAX_NUM_LIGHTS);
         for (int l = 0; l < MAX_NUM_LIGHTS; l++) {
-            m_vkCore.CreateTexture(m_shadowMaps[Image][l], SwapChainExtent.width, SwapChainExtent.height,
+            m_vkCore.CreateTexture(m_shadowMaps[Image][l], SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT,
 								   DepthUsage, DepthFormat, false);
             OgldevVK::BeginCommandBuffer(m_utilCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -330,8 +330,10 @@ void PreBakedRenderer::CreateShadowMaps()
 				.depthStencil = {.depth = 1.0f, .stencil = 0 }
 			};
 
+			VkExtent2D RenderExtent = { SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT };
+
             m_vkCore.BeginDynamicRendering(m_utilCmdBuf, NULL, NULL, 
-										   m_shadowMaps[Image][l].m_view, &DepthValue);
+										   m_shadowMaps[Image][l].m_view, &DepthValue, &RenderExtent);
 			vkCmdEndRendering(m_utilCmdBuf);
 			m_shadowMaps[Image][l].TransitionLayout(m_utilCmdBuf, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 			vkEndCommandBuffer(m_utilCmdBuf);
@@ -431,7 +433,7 @@ void PreBakedRenderer::CreatePipelines()
 				            m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 	}
 
-    m_shadowProgram.Init(m_vkCore, m_descPool, m_pipelines[0].GetDescSetLayouts());
+    m_shadowProgram.Init(m_vkCore, m_descPool, m_pipelines[0].GetDescSetLayouts(), SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
 }
 
 
@@ -508,8 +510,12 @@ void PreBakedRenderer::RecordShadowPassCommandBuffers()
             VkClearValue DepthValue = {
                 .depthStencil = {.depth = 1.0f, .stencil = 0 }
             };
-            m_vkCore.BeginDynamicRendering(CmdBuf, NULL, NULL, ShadowMap.m_view, &DepthValue);
-            m_shadowProgram.Bind(ImageIndex, 
+
+            VkExtent2D RenderExtent = { SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT };
+            
+			m_vkCore.BeginDynamicRendering(CmdBuf, NULL, NULL, ShadowMap.m_view, &DepthValue, &RenderExtent);
+            
+			m_shadowProgram.Bind(ImageIndex, 
 								 CmdBuf, 
 								 m_modelContext.m_descSets[ImageIndex], 
 								 m_bigTextureArray.GetDescSet(), LightIndex);
@@ -714,5 +720,7 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 												    m_lights,
 													m_modelContext.m_uniformBuffersVS[ImageIndex],
 													m_modelContext.m_uniformBuffersFS[ImageIndex],
-													m_uniformBuffersLights[ImageIndex]);
+													m_uniformBuffersLights[ImageIndex],
+													SHADOW_MAP_WIDTH,
+													SHADOW_MAP_HEIGHT);
 }

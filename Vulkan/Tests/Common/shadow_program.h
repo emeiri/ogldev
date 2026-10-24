@@ -44,7 +44,8 @@ public:
 	ShadowProgram() {}
 
 	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool,
-				      const std::vector<VkDescriptorSetLayout>& LightingDescSetLayouts);
+				      const std::vector<VkDescriptorSetLayout>& LightingDescSetLayouts,
+					  uint ShadowMapWidth, uint ShadowMapHeight);
 
 	virtual void Destroy();
 
@@ -64,6 +65,13 @@ protected:
 
 	virtual std::vector<VkPushConstantRange> GetPushConstantRange();
 
+	virtual void GetViewportAndScissorSize(uint& Width, uint& Height)
+	{
+		Width = m_shadowMapWidth;
+		Height = m_shadowMapHeight;
+	}
+
+
 private:
 
 	struct UniformDataFS {
@@ -79,6 +87,8 @@ private:
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
     std::vector<VkDescriptorSetLayout> m_lightingDescSetLayouts;
+	uint m_shadowMapWidth = 0;
+	uint m_shadowMapHeight = 0;
 };
 
 }

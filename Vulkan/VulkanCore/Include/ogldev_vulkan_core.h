@@ -116,7 +116,7 @@ public:
 										VkClearValue* pClearColor, VkClearValue* pDepthValue);
 
     void BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkClearValue* pClearColor, 
-							   VkImageView DepthView, VkClearValue* pDepthValue);
+							   VkImageView DepthView, VkClearValue* pDepthValue, const VkExtent2D* pRenderExtent = NULL);
 
 	VkFormat GetSwapChainFormat() const { return m_swapChainSurfaceFormat.format; }
 

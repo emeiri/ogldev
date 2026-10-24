@@ -360,7 +360,9 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 										   const std::vector<LightSource>& Lights,
                                            BufferAndMemory& UniformBufferVS,
                                            BufferAndMemory& UniformBufferFS,
-                                           BufferAndMemory& UBOLights)
+                                           BufferAndMemory& UBOLights,
+										   uint ShadowMapWidth,
+										   uint ShadowMapHeight)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 
@@ -390,10 +392,6 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 
 	UniformBufferFS.Update(Device, &UboDataFS, sizeof(UboDataFS));
 
-
-#define SHADOW_MAP_WIDTH 2560
-#define SHADOW_MAP_HEIGHT 1415
-
 	UniformBufferLights UBL = {};
 	UBL.Counts = glm::ivec4(NumLights, 0, 0, 0);
 
@@ -412,7 +410,7 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
 			glm::mat4 View = glm::lookAtLH(Light.WorldPos, Light.WorldPos + Dir, Up);
 
 			float FOV = 2.0f * acosf(Light.Cutoff);               // Cutoff is cos(half-angle) -> full cone angle in radians
-			float Aspect = (float)SHADOW_MAP_WIDTH / (float)SHADOW_MAP_HEIGHT;
+			float Aspect = (float)ShadowMapWidth / (float)ShadowMapHeight;
 			glm::mat4 Proj = glm::perspectiveLH_ZO(FOV, Aspect, 1.0f, 100.0f);
 			UBL.ViewProj[i] = Proj * View;			
 		}

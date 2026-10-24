@@ -38,10 +38,13 @@ enum Binding {
 
 
 void ShadowProgram::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, 
-					     const std::vector<VkDescriptorSetLayout>& DescSetLayouts)
+					     const std::vector<VkDescriptorSetLayout>& DescSetLayouts,
+						 uint ShadowMapWidth, uint ShadowMapHeight)
 {
     m_numImages = vkCore.GetNumImages();
     m_lightingDescSetLayouts = DescSetLayouts;
+	m_shadowMapWidth = ShadowMapWidth;
+	m_shadowMapHeight = ShadowMapHeight;
 
 	m_vs = OgldevVK::CreateShaderModuleFromText(vkCore.GetDevice(), "../Common/shadow.vert");
 
