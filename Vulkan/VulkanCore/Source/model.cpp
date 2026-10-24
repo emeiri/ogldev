@@ -288,20 +288,31 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 	}
 
 	if (m_isDescriptorIndexing) {
-		md.m_materials.resize(m_Materials.size());
 
-        std::vector<GPUMaterial> GPU_Materials(m_Materials.size());
+		std::vector<GPUMaterial> GPU_Materials(m_Materials.size());
 
 		for (int MaterialIndex = 0; MaterialIndex < m_Materials.size(); MaterialIndex++) {
 			if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
 				Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
-				md.m_materials[MaterialIndex].m_sampler = pDiffuse->m_sampler;
-				md.m_materials[MaterialIndex].m_imageView = pDiffuse->m_view;
 
-                GPU_Materials[MaterialIndex].Indices.x = MaterialIndex; // baseColor
+                TextureInfo ti;
+                ti.m_sampler = pDiffuse->m_sampler;
+                ti.m_imageView = pDiffuse->m_view;
+                md.m_materials.push_back(ti);
+				
+                int TextureIndex = (int)md.m_materials.size() - 1;
+                GPU_Materials[MaterialIndex].Indices.x = TextureIndex; // baseColor
 			} else {
 				printf("No diffuse texture in material %d\n", MaterialIndex);
 				exit(0);
+			}
+
+			if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]) {
+				Texture* pNormal = m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL];
+				md.m_materials.push_back({ pNormal->m_sampler, pNormal->m_view });
+
+				int TextureIndex = (int)md.m_materials.size() - 1;
+				GPU_Materials[MaterialIndex].Indices.y = TextureIndex; // normal
 			}
 		}
 
