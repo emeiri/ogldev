@@ -65,8 +65,11 @@ void VulkanTexture::Load(unsigned int BufferSize, void* pData, bool IsRGB)
 
 	int Width = 0;
 	int Height = 0;
-	int BPP = 0;    
-	
+	int BPP = 0;
+
+	// Assimp flips the V coordinate to the OpenGL convention so flip the image to match (same as CreateTexture)
+	stbi_set_flip_vertically_on_load(1);
+
     stbi_uc* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &Width, &Height, &BPP, STBI_rgb_alpha);
 
 	assert(pImageData);
