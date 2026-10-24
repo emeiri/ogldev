@@ -352,7 +352,9 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 	std::vector<OgldevVK::ModelDesc> ModelDescs(1);
 		
 	m_modelContext.m_pModel->Init(&m_vkCore, true, false);
-	m_modelContext.m_pModel->LoadAssimpModel(AssetPath);
+	ModelLoadFlags Flags;
+	Flags.ConvertToLeftHanded = true;
+	m_modelContext.m_pModel->LoadAssimpModel(AssetPath, Flags);
     CreateUniformBuffers(0);
     CreateDescriptorSets(0, ModelDescs[0]);
 
