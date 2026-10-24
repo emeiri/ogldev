@@ -838,12 +838,12 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 	// Step 1: create a buffer
 	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &Buf.m_buffer);
 	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
-	printf("Buffer created\n");
+	//printf("Buffer created\n");
 
 	// Step 2: get the buffer memory requirements
 	VkMemoryRequirements MemReqs = { 0 };
 	vkGetBufferMemoryRequirements(m_device, Buf.m_buffer, &MemReqs);
-	printf("Buffer requires %d bytes\n", (int)MemReqs.size);
+	//printf("Buffer requires %d bytes\n", (int)MemReqs.size);
 
 	Buf.m_allocationSize = MemReqs.size;
 
@@ -922,7 +922,7 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	// Step #3: release the image pixels. We don't need them after this point
 	stbi_image_free(pPixels);
 
-	printf("Texture from '%s' created\n", pFilename);
+	//printf("Texture from '%s' created\n", pFilename);
 }
 
 
@@ -990,7 +990,7 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
     float MaxAnisotropy = m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy;
 	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
 
-	printf("Texture from data created\n");
+	//printf("Texture from data created\n");
 }
 
 

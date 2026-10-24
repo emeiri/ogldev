@@ -47,7 +47,6 @@ struct LightSource {
 };
 
 
-
 layout(push_constant) uniform Constants {
     uint BaseTextureIndex; 
 } push;
@@ -59,7 +58,6 @@ layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 WorldPos;
 layout(location = 3) in vec3 Normal;
 layout(location = 4) in vec4 Color;
-
 
 layout(location = 0) out vec4 OutColor;
 
@@ -79,6 +77,13 @@ layout(set = 1, binding = 6) uniform LightMats {
     mat4 LightVP[MAX_NUM_LIGHTS];
 } LightMatrices;
 
+struct MaterialData { 
+    ivec4 Indices; // .x = BaseColorIndex, .y = NormalMapIndex, .z = SpecularExponentMapIndex, .w = Reserved
+};
+
+layout(std430, set = 1, binding = 7) readonly buffer MaterialSSBO { 
+    MaterialData materials[]; 
+} MaterialBuf;
 
 bool gCellShadingEnabled = false;
 bool gEnableSpecularExponent = false;
@@ -94,9 +99,9 @@ const float kShadowFloor = 0.05;
 // ---------------------------------------------------------------------------
 
 
-vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
+vec4 TextureBindless2D(uint TextureIndex, vec2 uv) 
 {
-    uint Index = push.BaseTextureIndex + MaterialIndex;
+    uint Index = push.BaseTextureIndex + TextureIndex;
     return texture(Textures[nonuniformEXT(Index)], uv);
 }
 
@@ -220,9 +225,6 @@ float CalcShadowFactorPCF(int Index, vec3 LightDirection)
 // Point lights use the cube map; spot and directional lights use the 2D map.
 float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 {
-  //  if (!gShadowsEnabled) {
-   //     return 1.0;
-  //  }
 
   //  if (IsPoint) {
   //      return CalcShadowFactorPointLight(LightToPixel);
@@ -244,8 +246,6 @@ float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 // ---------------------------------------------------------------------------
 // Lighting
 // ---------------------------------------------------------------------------
-
-
 
 vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
 {
@@ -384,6 +384,36 @@ vec4 GetTotalLight()
 
 
 // ---------------------------------------------------------------------------
+// Normal mapping
+// ---------------------------------------------------------------------------
+
+/*vec3 CalcBumpedNormal()
+{
+    // Step #1: Sample a normal from the normal map
+    vec3 BumpMapNormal = textureGrad(materials[MaterialIndex].NormalMap, TexCoord, TexDx, TexDy).xyz;
+
+    // Step #2: transform from [0,1] to [-1,1]
+    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
+
+    // Step #3: re-normalize the tangent space base vectors after interpolation
+    vec3 Normal = GeoNormal;
+    vec3 Tangent = normalize(Tangent0);
+    vec3 Bitangent = normalize(Bitangent0);
+
+    // Improvement: re-orthogonalize the TBN base vectors using the Gram-Schmidt process:
+    //              (in this case the bitangent is calculated on the fly so we don't need
+    //              to put it in the vertex buffer)
+    // Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
+    // Bitangent = cross(Tangent, Normal);
+
+    mat3 TBN = mat3(Tangent, Bitangent, Normal);
+
+    // Step #4: transform from tangent space to world space
+    vec3 NewNormal = normalize(TBN * BumpMapNormal);
+
+    return NewNormal;                                                                       
+}*/
+// ---------------------------------------------------------------------------
 // Texture / reflection / refraction
 // ---------------------------------------------------------------------------
 
@@ -395,15 +425,13 @@ vec4 GetTexColor()
     //    vec3 CameraToPixel = normalize(WorldPos - ubo.CameraWorldPos.xyz);
     //    vec3 ReflectionDir = normalize(reflect(CameraToPixel, GeoNormal));   // reflect() needs a unit normal
     //    TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
-    //} else if (gIsIndirectRender) {
-    //    TexColor = textureGrad(materials[MaterialIndex].DiffuseMap, TexCoord, TexDx, TexDy);
-    //} else if (gHasSampler) {
-    //    TexColor = textureGrad(gSampler, TexCoord, TexDx, TexDy);
     //} else {
    //     TexColor = vec4(1.0, 0.0, 0.0, 1.0);
     //}
 
-    TexColor = TextureBindless2D(MaterialIndex, TexCoord);
+    int BaseColorTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.x;
+
+    TexColor = TextureBindless2D(BaseColorTextureIndex, TexCoord);
 
     return TexColor;
 }

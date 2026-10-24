@@ -35,7 +35,8 @@ enum Binding {
 	BindingUniformFS = 4,
 	BindingShadowMapFS = 5,
 	BindingLightVP = 6,
-	NumBindings = 7
+	BindingMaterialData = 7,
+	NumBindings = 8
 };
 
 static_assert(sizeof(LightSource) == 80, "LightSource size must be 80 bytes");
@@ -159,6 +160,12 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
+		}, {
+			.binding = BindingMaterialData, // 7
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
 		}
 	};
 
@@ -240,6 +247,12 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 	
 	VkDescriptorBufferInfo MetaDataBufferInfo = {
 		.buffer = ModelDesc.m_metaData,
+		.offset = 0,
+		.range = VK_WHOLE_SIZE
+	};
+
+	VkDescriptorBufferInfo MaterialDataBufferInfo = {
+        .buffer = ModelDesc.m_materialsData,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};
@@ -340,6 +353,19 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.pBufferInfo = &BufferInfoUniformsLights[i]
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = BindingMaterialData,	// 7
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pBufferInfo = &MaterialDataBufferInfo
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());

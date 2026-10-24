@@ -51,6 +51,9 @@ void VkModel::Destroy()
 	m_ib.Destroy(m_pVulkanCore->GetDevice());
 	m_metaData.Destroy(m_pVulkanCore->GetDevice());
 	m_indirectBuffer.Destroy(m_pVulkanCore->GetDevice());
+	if (m_materialsBuffer.m_buffer != VK_NULL_HANDLE) {
+		m_materialsBuffer.Destroy(m_pVulkanCore->GetDevice());
+	}
 
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
 		m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
@@ -266,12 +269,15 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets[0]);
 }
 
+struct GPUMaterial {
+    glm::ivec4 Indices; // x = baseColor, y = normal, z = height, w = ao
+};
 
 void VkModel::UpdateModelDesc(ModelDesc& md)
 {
 	md.m_vb = m_vb.m_buffer;
 	md.m_ib = m_ib.m_buffer;
-	md.m_metaData = m_metaData.m_buffer;
+	md.m_metaData = m_metaData.m_buffer;    
 
 	md.m_uniforms.resize(m_pVulkanCore->GetNumImages());
 
@@ -284,16 +290,25 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 	if (m_isDescriptorIndexing) {
 		md.m_materials.resize(m_Materials.size());
 
+        std::vector<GPUMaterial> GPU_Materials(m_Materials.size());
+
 		for (int MaterialIndex = 0; MaterialIndex < m_Materials.size(); MaterialIndex++) {
 			if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
 				Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
 				md.m_materials[MaterialIndex].m_sampler = pDiffuse->m_sampler;
 				md.m_materials[MaterialIndex].m_imageView = pDiffuse->m_view;
+
+                GPU_Materials[MaterialIndex].Indices.x = MaterialIndex; // baseColor
 			} else {
 				printf("No diffuse texture in material %d\n", MaterialIndex);
 				exit(0);
 			}
 		}
+
+        if (m_materialsBuffer.m_buffer == VK_NULL_HANDLE) {
+			m_materialsBuffer = m_pVulkanCore->CreateSSBO(GPU_Materials.data(), ARRAY_SIZE_IN_BYTES(GPU_Materials));
+			md.m_materialsData = m_materialsBuffer.m_buffer;
+        }		
 	} else {
 		md.m_materials.resize(m_modelData.m_meshes.size());
 	}
