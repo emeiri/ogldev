@@ -60,15 +60,10 @@ struct MetaData {
     uint VertexOffset; 
     vec4 Color;
 };
+
 layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO { 
     MetaData metas[]; 
 } MetaBuf;
-
-
-layout(set = 1, binding = 6) uniform LightMats {
-    ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
-    mat4 LightVP[MAX_NUM_LIGHTS];
-} LightMatrices;
 
 
 layout(location = 0) out vec2 TexCoord;
