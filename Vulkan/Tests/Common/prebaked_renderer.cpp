@@ -671,11 +671,9 @@ void PreBakedRenderer::UpdateGUI()
 			}
 
 			if (l.LightType != LIGHT_TYPE_POINT) {
-				if (ImGui::DragFloat3("Direction", &l.Direction.x, 0.01f)) {
-					if (glm::length(l.Direction) > 1e-4f) {
-						l.Direction = glm::normalize(l.Direction);
-					}
-				}
+                vec3 LightDir(-l.Direction.x, -l.Direction.y, l.Direction.z);
+				ImGui::gizmo3D("##Dir1", LightDir, 200.0f, imguiGizmo::modeDirection);
+                l.Direction = glm::vec3(-LightDir.x, -LightDir.y, LightDir.z);
 			}
 
 			if (l.LightType == LIGHT_TYPE_SPOT) {
