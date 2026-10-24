@@ -74,7 +74,9 @@ void VulkanTexture::Load(unsigned int BufferSize, void* pData, bool IsRGB)
 
 	assert(pImageData);
 
-	m_pVulkanCore->Create2DTextureFromData(pImageData, Width, Height, *this);
+	VkFormat Format = IsRGB ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
+
+	m_pVulkanCore->Create2DTextureFromData(pImageData, Width, Height, Format, *this);
 
 	stbi_image_free(pImageData);
 }
@@ -84,7 +86,9 @@ void VulkanTexture::Load(const std::string& Filename, bool IsRGB)
 {
 	assert(m_pVulkanCore);
 
-	m_pVulkanCore->CreateTexture(Filename.c_str(), *this);
+	VkFormat Format = IsRGB ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
+
+	m_pVulkanCore->CreateTexture(Filename.c_str(), *this, Format);
 }
 
 

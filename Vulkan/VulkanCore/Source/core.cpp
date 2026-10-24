@@ -891,7 +891,7 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 }
 
 
-void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
+void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex, VkFormat Format)
 {
 	int ImageWidth = 0;
 	int ImageHeight = 0;
@@ -916,7 +916,6 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	}
 
 	// Step #2: create the image object and populate it with pixels
-	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
 	CreateTextureFromData(pPixels, ImageWidth, ImageHeight, Format, false, Tex);
 
 	// Step #3: release the image pixels. We don't need them after this point
@@ -965,9 +964,8 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 }
 
 
-void VulkanCore::Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
+void VulkanCore::Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VkFormat Format, VulkanTexture& Tex)
 {
-	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
 	CreateTextureFromData(pPixels, ImageWidth, ImageHeight, Format, false, Tex);
 }
 

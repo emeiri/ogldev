@@ -104,11 +104,11 @@ public:
 
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 
-	void CreateTexture(const char* pFilename, VulkanTexture& Tex);
+	void CreateTexture(const char* pFilename, VulkanTexture& Tex, VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB);
 
 	void CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImageUsageFlags Usage, VkFormat Format, bool EnableAnisotropy);
 
-	void Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
+	void Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VkFormat Format, VulkanTexture& Tex);
 
 	void CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex);
 
