@@ -82,7 +82,7 @@ layout(set = 1, binding = 6) uniform LightMats {
 struct MaterialData { 
     ivec4 Indices; // .x = BaseColorIndex, .y = NormalMapIndex, .z = metallic roughness, .w = AO
     ivec4 Indices2; // .x = Emissive, .y = clear coat, .z = clear coat roughness, .w = clear coat thickness
-    vec4 BaseColorFactor;
+    vec4 m_baseColorFactor;
     vec4 m_matallicRoughnessNormalAOFactor;
     vec4 m_emmisiveFactorAlphaCutoff;
     vec4 m_clearCoatTransmissionThinkness;
