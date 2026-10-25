@@ -65,7 +65,9 @@ public:
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
-	void UpdateModelDesc(ModelDesc& md);	
+    // IsPBR is mostly for backwards compatibility with tutorials which lack the material SSBO
+	// and access the texture array directly with the material index.
+	void UpdateModelDesc(ModelDesc& md, bool IsPBR);
 
 protected:
 

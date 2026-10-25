@@ -307,7 +307,7 @@ private:
 
 		OgldevVK::ModelDesc md;
 
-		m_model.UpdateModelDesc(md);
+		m_model.UpdateModelDesc(md, false);
 
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 			m_pipelines[i].Init(m_vkCore, m_descPool, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);

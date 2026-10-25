@@ -252,7 +252,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 
 	ModelDesc md;
 
-	UpdateModelDesc(md);
+	UpdateModelDesc(md, false);
 
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets);
 }
@@ -267,7 +267,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 
 	ModelDesc md;
 
-	UpdateModelDesc(md);
+	UpdateModelDesc(md, false);
 
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets, m_texturesDescriptorSet);
 }
@@ -282,13 +282,13 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 
 	ModelDesc md;
 
-	UpdateModelDesc(md);
+	UpdateModelDesc(md, false);
 
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets[0]);
 }
 
 
-void VkModel::UpdateModelDesc(ModelDesc& md)
+void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
 {
 	md.m_vb = m_vb.m_buffer;
 	md.m_ib = m_ib.m_buffer;
@@ -321,6 +321,10 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 				printf("No diffuse texture in material %d\n", MaterialIndex);
 				exit(0);
 			}
+
+            if (!IsPBR) {
+                continue;
+            }
 
 			if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]) {
 				Texture* pNormal = m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL];

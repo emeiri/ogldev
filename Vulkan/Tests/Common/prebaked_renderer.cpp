@@ -484,7 +484,7 @@ void PreBakedRenderer::CreateUniformBuffers(int MeshIndex)
 
 void PreBakedRenderer::CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& md)
 {		
-	m_modelContext.m_pModel->UpdateModelDesc(md);
+	m_modelContext.m_pModel->UpdateModelDesc(md, true);
 
     // We don't care which pipeline we use to create the desc sets
 	m_pipelines[0].AllocDescSets(m_modelContext.m_descSets);

@@ -448,7 +448,7 @@ private:
 
 	void CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& md)
 	{		
-		m_modelContexts[MeshIndex].m_pModel->UpdateModelDesc(md);
+		m_modelContexts[MeshIndex].m_pModel->UpdateModelDesc(md, false);
 
         // We don't care which pipeline we use to create the desc sets
 		m_pipelines[0].AllocDescSets(m_modelContexts[MeshIndex].m_descSets);
