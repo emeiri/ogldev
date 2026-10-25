@@ -21,6 +21,7 @@
   <ItemGroup>
     <None Include="..\..\..\..\Vulkan\Tests\Common\lighting.frag" />
     <None Include="..\..\..\..\Vulkan\Tests\Common\lighting.vert" />
+    <None Include="..\..\..\..\Vulkan\Tests\Common\lighting_pbr.frag" />
     <None Include="..\..\..\..\Vulkan\Tests\Common\shadow.frag" />
     <None Include="..\..\..\..\Vulkan\Tests\Common\shadow.vert" />
   </ItemGroup>
