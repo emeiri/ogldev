@@ -120,7 +120,7 @@ private:
 
 	void RecordShadowPassCommandBuffers();
 
-	void RecordCommandBuffersInternal(int LightingMode, std::vector<VkCommandBuffer>& CmdBufs);
+	void RecordCommandBuffersInternal(int LightingMode, bool IsPBR, std::vector<VkCommandBuffer>& CmdBufs);
 
 	void RecordFallbackCopyCommandBuffers();
 
@@ -146,16 +146,19 @@ private:
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersLights;
 	int m_numImages = 0;
 	struct MeshCmdBufs {
-		std::vector<VkCommandBuffer> BaseMeshDraw; // Size: m_numImages
+		std::vector<VkCommandBuffer> m_cbs; // Size: m_numImages
 	};
 	std::vector<MeshCmdBufs> m_lightPassCmdBufs;	// dim: lighting modes
+	std::vector<MeshCmdBufs> m_pbrLightPassCmdBufs;	// dim: lighting modes
     std::vector< std::vector<VkCommandBuffer> > m_shadowPassCmdBufs; // outer dim: m_numImages, inner dim: MAX_NUM_LIGHTS
 	std::vector<VkCommandBuffer> m_swapChainColorToPresentCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
     VkCommandBuffer m_utilCmdBuf = VK_NULL_HANDLE;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
+	VkShaderModule m_pbrFs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
+	OgldevVK::LightingProgram m_pbrPipelines[OgldevVK::NUM_LIGHTING_MODES];
     OgldevVK::ShadowProgram m_shadowProgram;
 	ModelContext m_modelContext;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
@@ -166,6 +169,7 @@ private:
 
 	// GUI state
 	bool m_showGui = false;
+    bool m_isPBR = false;
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
 	std::string m_appName;
 	GameCallbacks* m_pGameCallbacks = NULL;

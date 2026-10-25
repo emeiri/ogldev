@@ -60,7 +60,11 @@ PreBakedRenderer::~PreBakedRenderer()
 	m_imGUIRenderer.Destroy();
 
     for (MeshCmdBufs& v : m_lightPassCmdBufs) {
-		m_vkCore.FreeCommandBuffers((u32)v.BaseMeshDraw.size(), v.BaseMeshDraw.data());
+		m_vkCore.FreeCommandBuffers((u32)v.m_cbs.size(), v.m_cbs.data());
+	}
+
+    for (MeshCmdBufs& v : m_pbrLightPassCmdBufs) {
+		m_vkCore.FreeCommandBuffers((u32)v.m_cbs.size(), v.m_cbs.data());
 	}
 
     for (std::vector<VkCommandBuffer>& v : m_shadowPassCmdBufs) {
@@ -75,6 +79,10 @@ PreBakedRenderer::~PreBakedRenderer()
 	for (OgldevVK::LightingProgram& p : m_pipelines) {
 		p.Destroy();
 	}
+
+    for (OgldevVK::LightingProgram& p : m_pbrPipelines) {
+        p.Destroy();
+    }
 
     m_shadowProgram.Destroy();
         
@@ -138,7 +146,8 @@ void PreBakedRenderer::RenderScene()
         SubmissionCmdBufs.push_back(m_shadowPassCmdBufs[ImageIndex][LightIndex]);
     }
 
-	SubmissionCmdBufs.push_back(m_lightPassCmdBufs[m_lightingMode].BaseMeshDraw[ImageIndex]);
+	SubmissionCmdBufs.push_back(m_isPBR ? m_pbrLightPassCmdBufs[m_lightingMode].m_cbs[ImageIndex] : 
+										  m_lightPassCmdBufs[m_lightingMode].m_cbs[ImageIndex]);
 
 	SubmissionCmdBufs.push_back(m_fallbackCopyCmdBufs[ImageIndex]);
 
@@ -255,8 +264,15 @@ void PreBakedRenderer::CreateCommandBuffers()
 	m_lightPassCmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
 
 	for (MeshCmdBufs& v : m_lightPassCmdBufs) {
-		v.BaseMeshDraw.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, v.BaseMeshDraw.data());
+		v.m_cbs.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, v.m_cbs.data());
+	}
+
+	m_pbrLightPassCmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
+
+	for (MeshCmdBufs& v : m_pbrLightPassCmdBufs) {
+		v.m_cbs.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, v.m_cbs.data());
 	}
 
 	m_shadowPassCmdBufs.resize(m_numImages);
@@ -425,6 +441,8 @@ void PreBakedRenderer::CreateShaders()
 	m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "../Common/lighting.vert");
 
 	m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "../Common/lighting.frag");
+
+	m_pbrFs = OgldevVK::CreateShaderModuleFromText(m_device, "../Common/lighting_pbr.frag");
 }
 
 
@@ -433,6 +451,9 @@ void PreBakedRenderer::CreatePipelines()
 	for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 		m_pipelines[i].Init(m_vkCore, OffscreenColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
 				            m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+		
+		m_pbrPipelines[i].Init(m_vkCore, OffscreenColorFormat, m_descPool, m_bigTextureArray.GetDescSetLayout(),
+			                   m_bigTextureArray.GetDescSet(), m_vs, m_pbrFs, (OgldevVK::LIGHTING_MODE)i);
 	}
 
     m_shadowProgram.Init(m_vkCore, m_descPool, m_pipelines[0].GetDescSetLayouts(), SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
@@ -477,10 +498,10 @@ void PreBakedRenderer::CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& 
 
 void PreBakedRenderer::RecordCommandBuffers()
 {
-	// 1. Bake the baseline mesh draw calls (No conditional post-process paths inside here anymore!)
+	// Bake the baseline mesh draw calls (No conditional post-process paths inside here anymore!)
 	for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
-		// Note: RecordCommandBuffersInternal now only takes 3 parameters
-		RecordCommandBuffersInternal(LightMode, m_lightPassCmdBufs[LightMode].BaseMeshDraw);
+		RecordCommandBuffersInternal(LightMode, false, m_lightPassCmdBufs[LightMode].m_cbs);
+		RecordCommandBuffersInternal(LightMode, true, m_pbrLightPassCmdBufs[LightMode].m_cbs);
 	}
 
     RecordShadowPassCommandBuffers();
@@ -533,7 +554,7 @@ void PreBakedRenderer::RecordShadowPassCommandBuffers()
 }
 
 
-void PreBakedRenderer::RecordCommandBuffersInternal(int LightingMode, std::vector<VkCommandBuffer>& CmdBufs)
+void PreBakedRenderer::RecordCommandBuffersInternal(int LightingMode, bool IsPBR, std::vector<VkCommandBuffer>& CmdBufs)
 {
 	VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 
@@ -554,7 +575,11 @@ void PreBakedRenderer::RecordCommandBuffersInternal(int LightingMode, std::vecto
 
 		// Draw Geometry
 		BeginRendering(CmdBuf, OffscreenColorImage.m_view, OffscreenDepthImage.m_view);
-		m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContext.m_descSets[i], m_modelContext.m_baseTextureIndex);
+        if (IsPBR) {
+            m_pbrPipelines[LightingMode].Bind(i, CmdBuf, m_modelContext.m_descSets[i], m_modelContext.m_baseTextureIndex);
+		} else {
+			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContext.m_descSets[i], m_modelContext.m_baseTextureIndex);
+		}
 		m_modelContext.m_pModel->RecordCommandBufferIndirect(CmdBuf);
 		vkCmdEndRendering(CmdBuf);
 
@@ -648,6 +673,8 @@ void PreBakedRenderer::UpdateGUI()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Vulkan Renderer", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::Checkbox("Use PBR Shader", &m_isPBR);
 
 	static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
 	for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
