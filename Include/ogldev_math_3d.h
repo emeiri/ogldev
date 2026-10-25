@@ -416,12 +416,16 @@ struct Vector4f
         return !(*this == r);
     }
 
-
-
     const float* data() const
     {
         const float* p = &x;
         return p;
+    }
+
+    glm::vec4 ToGLM() const
+    {
+        glm::vec4 ret(x, y, z, w);
+        return ret;
     }
 };
 
