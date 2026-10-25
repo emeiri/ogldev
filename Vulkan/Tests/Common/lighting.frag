@@ -332,15 +332,13 @@ vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
       //  }
     }
 
-  //  if (gHasNormalMap) {
-        // Fade out light on faces that point away from the light according to the
-        // geometric normal. Clamped: a negative value used to subtract light.
-   //     float OriginalDiffuse = max(dot(GeoNormal, -LightDirection), 0.0);
-  //      DiffuseColor *= OriginalDiffuse;
-   // }
+    // Geometric horizon: keep full light on front faces, fade quickly to 0 at the terminator.
+    // Prevents bumped normals from picking up light on faces that point away from it.
+    float Horizon = smoothstep(0.0, 0.1, dot(GeoNormal, -LightDirection));
+    DiffuseColor  *= Horizon;
+    SpecularColor *= Horizon;
 
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
-   //return AmbientColor;
 }
 
 
