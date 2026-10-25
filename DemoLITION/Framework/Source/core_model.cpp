@@ -24,6 +24,23 @@
 //#define DEBUG_TEXTURES
 //#define DEBUG_SCENE_HIERARCHY
 
+
+const char* TextureTypeToName[] = {
+    "TEX_TYPE_BASE",      // Base color / diffuse / albedo
+    "TEX_TYPE_SPECULAR",
+    "TEX_TYPE_NORMAL",
+    "TEX_TYPE_METALNESS",
+    "TEX_TYPE_EMISSIVE",
+    "TEX_TYPE_NORMAL_CAMERA",
+    "TEX_TYPE_EMISSION_COLOR",
+    "TEX_TYPE_ROUGHNESS",
+    "TEX_TYPE_AMBIENT_OCCLUSION",
+    "TEX_TYPE_CLEARCOAT",
+    "TEX_TYPE_CLEARCOAT_ROUGHNESS",
+    "TEX_TYPE_CLEARCOAT_NORMAL"
+};
+
+
 bool CoreModel::IsPBR() const
 {
     bool ret = false;
@@ -163,6 +180,8 @@ void CoreModel::CalculateMeshTransformations()
 
 void CoreModel::InitMaterials()
 {
+    printf("Loading %d materials\n", (int)m_modelData.m_materials.size());
+
     for (int MaterialIndex = 0; MaterialIndex < m_modelData.m_materials.size(); MaterialIndex++) {
 
         for (int TexType = 0; TexType < TEX_TYPE_NUM; TexType++) {
@@ -193,7 +212,7 @@ void CoreModel::InitMaterials()
 void CoreModel::LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB) 
 {
 #ifdef DEBUG_MATERIALS
-    printf("Loaded embedded texture type '%s'\n", paiTexture->achFormatHint);
+    printf("Material %d: Loading embedded texture type %s\n", MaterialIndex, TextureTypeToName[TexType]);
 #endif
     // Raw assignment compiles successfully again
     m_Materials[MaterialIndex].pTextures[TexType] = AllocTexture2D();
@@ -205,14 +224,12 @@ void CoreModel::LoadTextureEmbedded(int MaterialIndex, TEXTURE_TYPE TexType, boo
 
 void CoreModel::LoadTextureFromFile(const std::string& Path, int MaterialIndex, TEXTURE_TYPE TexType, bool IsSRGB) 
 {
+#ifdef DEBUG_MATERIALS
+    printf("Material %d: Loading texture type %s from '%s'\n", MaterialIndex, TextureTypeToName[TexType], Path.c_str());
+#endif
     m_Materials[MaterialIndex].pTextures[TexType] = AllocTexture2D();
     m_Materials[MaterialIndex].pTextures[TexType]->Load(Path.c_str(), IsSRGB);
-
-#ifdef DEBUG_MATERIALS
-    printf("Loaded texture type %d from '%s'\n", TexType, Path.c_str());
-#endif
 }
-
 
 
 glm::mat4& CoreModel::GetNodeTransformationGLM(const char* pNodeName)
