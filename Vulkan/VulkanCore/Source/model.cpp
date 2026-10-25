@@ -329,6 +329,52 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 				int TextureIndex = (int)md.m_materials.size() - 1;
 				GPU_Materials[MaterialIndex].m_normalTexIndex = TextureIndex; // normal
 			}
+
+			if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_METALNESS]) {
+				Texture* pMetalness = m_Materials[MaterialIndex].pTextures[TEX_TYPE_METALNESS];
+				md.m_materials.push_back({ pMetalness->m_sampler, pMetalness->m_view });
+
+				int TextureIndex = (int)md.m_materials.size() - 1;
+				GPU_Materials[MaterialIndex].m_metallicRoughnessTexIndex = TextureIndex; // metalness
+			} else if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]) {
+				assert(0 && "Metalness and roughness textures must be combined into a single metallic-roughness texture for PBR.");
+				Texture* pRoughness = m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS];
+				md.m_materials.push_back({ pRoughness->m_sampler, pRoughness->m_view });
+				int TextureIndex = (int)md.m_materials.size() - 1;
+				GPU_Materials[MaterialIndex].m_metallicRoughnessTexIndex = TextureIndex; // roughness
+			}
+
+            if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_AMBIENT_OCCLUSION]) {
+                Texture* pAO = m_Materials[MaterialIndex].pTextures[TEX_TYPE_AMBIENT_OCCLUSION];
+                md.m_materials.push_back({ pAO->m_sampler, pAO->m_view });
+                int TextureIndex = (int)md.m_materials.size() - 1;
+                GPU_Materials[MaterialIndex].m_aoTexIndex = TextureIndex; // ao
+            }
+
+            if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]) {
+                Texture* pEmissive = m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE];
+                md.m_materials.push_back({ pEmissive->m_sampler, pEmissive->m_view });
+                int TextureIndex = (int)md.m_materials.size() - 1;
+                GPU_Materials[MaterialIndex].m_emissionTexIndex = TextureIndex; // emission
+            }
+
+            const Vector4f& BaseColor = m_Materials[MaterialIndex].m_pMaterialData->m_baseColor;
+            GPU_Materials[MaterialIndex].m_baseColorFactor = BaseColor.ToGLM();
+
+            const Vector4f& mrno = m_Materials[MaterialIndex].m_pMaterialData->m_metallicRoughnessNormalOcclusion;
+            GPU_Materials[MaterialIndex].m_matallicRoughnessNormalAOFactor = mrno.ToGLM();
+
+            const Vector4f& Emissive = m_Materials[MaterialIndex].m_pMaterialData->m_emissiveColor;
+            GPU_Materials[MaterialIndex].m_emmisiveFactorAlphaCutoff = Emissive.ToGLM();
+
+            const Vector4f& ClearCoat = m_Materials[MaterialIndex].m_pMaterialData->m_clearCoatTransmissionThickness;
+            GPU_Materials[MaterialIndex].m_clearCoatTransmissionThinkness = ClearCoat.ToGLM();
+
+            GPU_Materials[MaterialIndex].m_typeIORAlpha = glm::uvec4(
+                m_Materials[MaterialIndex].m_pMaterialData->m_materialType,
+                glm::floatBitsToUint(m_Materials[MaterialIndex].m_pMaterialData->m_ior),
+                m_Materials[MaterialIndex].m_pMaterialData->m_alphaTest,
+                0);
 		}
 
         if (m_materialsBuffer.m_buffer == VK_NULL_HANDLE) {
