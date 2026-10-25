@@ -39,9 +39,22 @@ struct SubmeshMetaData {
 };
 
 struct GPUMaterial {
-	glm::ivec4 Indices = glm::ivec4(-1); // x = baseColor, y = normal, z = height, w = ao
+    i32 m_baseColorTexIndex = -1;
+    i32 m_normalTexIndex = -1;
+    i32 m_metallicRoughnessTexIndex = -1;
+    i32 m_aoTexIndex = -1;
+    i32 m_emissionTexIndex = -1;
+    i32 m_clearCoatTexIndex = -1;
+    i32 m_clearCoatRoughnessTexIndex = -1;
+    i32 m_clearCoatNormalTexIndex = -1;
+    glm::vec4 m_baseColorFactor = glm::vec4(1.0f);
+    glm::vec4 m_matallicRoughnessNormalAOFactor = glm::vec4(1.0f);
+    glm::vec4 m_emmisiveFactorAlphaCutoff = glm::vec4(1.0f);
+    glm::vec4 m_clearCoatTransmissionThinkness = glm::vec4(1.0f);
+    glm::uvec4 m_typeIORAlpha = glm::uvec4(0); // x. material type, y. floatBitsToUint(IOR), z. alpha mode, w. unused
 };
 
+static_assert(sizeof(GPUMaterial) % 16 == 0, "Align GPUMaterial to 16 bytes for safety.");
 
 #if defined(_MSC_VER)
 #pragma pack(pop)
@@ -303,7 +316,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
                 md.m_materials.push_back(ti);
 				
                 int TextureIndex = (int)md.m_materials.size() - 1;
-                GPU_Materials[MaterialIndex].Indices.x = TextureIndex; // baseColor
+                GPU_Materials[MaterialIndex].m_baseColorTexIndex = TextureIndex; // baseColor
 			} else {
 				printf("No diffuse texture in material %d\n", MaterialIndex);
 				exit(0);
@@ -314,7 +327,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 				md.m_materials.push_back({ pNormal->m_sampler, pNormal->m_view });
 
 				int TextureIndex = (int)md.m_materials.size() - 1;
-				GPU_Materials[MaterialIndex].Indices.y = TextureIndex; // normal
+				GPU_Materials[MaterialIndex].m_normalTexIndex = TextureIndex; // normal
 			}
 		}
 
