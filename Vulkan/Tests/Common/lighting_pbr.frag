@@ -139,14 +139,16 @@ layout(std430, set = 1, binding = 7) readonly buffer MaterialSSBO {
     MaterialData materials[]; 
 } MaterialBuf;
 
-bool gCellShadingEnabled = false;
-bool gEnableSpecularExponent = false;
 vec3 GeoNormal;
+PBRInfo pbrInputs;
 float gShadowMapWidth = 2048.0;
 float gShadowMapHeight = 2048.0;
 
 // Light level of a fully shadowed pixel (ambient is added separately).
-const float kShadowFloor = 0.05;
+const float kShadowFloor = 0.0;
+const float M_PI = 3.141592653589793;
+
+vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection, vec3 lightColor);
 
 // ---------------------------------------------------------------------------
 // Material
@@ -157,24 +159,6 @@ vec4 TextureBindless2D(uint TextureIndex, vec2 uv)
 {
     uint Index = push.BaseTextureIndex + TextureIndex;
     return texture(Textures[nonuniformEXT(Index)], uv);
-}
-
-
-vec4 GetMaterialAmbientColor()  
-{ 
-    return vec4(1.0); 
-}
-
-
-vec4 GetMaterialDiffuseColor()  
-{ 
-    return vec4(1.0); 
-}
-
-
-vec4 GetMaterialSpecularColor() 
-{ 
-    return vec4(ubo.Material.x); 
 }
 
 
@@ -334,70 +318,22 @@ vec3 CalcBumpedNormal()
 // Lighting
 // ---------------------------------------------------------------------------
 
-vec4 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
+vec3 CalcLightInternal(int Index, vec3 LightDirection, float ShadowFactor)
 {
-    LightDirection = normalize(LightDirection);
+    vec3 L = -LightDirection;  // Vector from light to surface point
 
-    vec4 AmbientColor = vec4(ubo.LightSources[Index].Color, 1.0f) *
-                        ubo.LightSources[Index].AmbientIntensity *
-                        GetMaterialAmbientColor();
+    vec3 Radiance = ubo.LightSources[Index].Color * ubo.LightSources[Index].DiffuseIntensity;
 
-    vec3 N = CalcBumpedNormal();
+    vec3 LightContribution = calculatePBRLightContribution(pbrInputs, L, Radiance);
 
-    float DiffuseFactor = dot(N, -LightDirection);
+    float Horizon = smoothstep(0.0, 0.1, dot(GeoNormal, L));
 
-    vec4 DiffuseColor = vec4(0, 0, 0, 0);
-    vec4 SpecularColor = vec4(0, 0, 0, 0);
-    vec4 RimColor = vec4(0, 0, 0, 0);
-
-    if (DiffuseFactor > 0) {
-     //   if (gCellShadingEnabled) {
-     //       DiffuseFactor = ceil(DiffuseFactor * toon_color_levels) * toon_scale_factor;
-    //    }
-
-        DiffuseColor = vec4(ubo.LightSources[Index].Color, 1.0f) *
-                       ubo.LightSources[Index].DiffuseIntensity *
-                       GetMaterialDiffuseColor() *
-                       DiffuseFactor;
-
-        vec3 PixelToCamera = normalize(ubo.CameraWorldPos.xyz - WorldPos);
-        vec3 LightReflect = normalize(reflect(LightDirection, Normal));
-        float SpecularFactor = dot(PixelToCamera, LightReflect);
-
-        if (!gCellShadingEnabled && (SpecularFactor > 0)) {
-            float SpecularExponent = 128.0;
-
-            if (gEnableSpecularExponent) {
-                // Inside a divergent branch: explicit gradients keep the LOD well defined.
-             //   SpecularExponent = textureGrad(gSamplerSpecularExponent, TexCoord, TexDx, TexDy).r * 255.0;
-            //    SpecularExponent = max(SpecularExponent, 1.0);   // pow(x, 0) == 1 gave full-power specular
-            }
-
-            SpecularFactor = pow(SpecularFactor, SpecularExponent);
-            SpecularColor = vec4(ubo.LightSources[Index].Color, 1.0f) *
-                                 ubo.LightSources[Index].DiffuseIntensity * // using the diffuse intensity for diffuse/specular
-                                 GetMaterialSpecularColor() *
-                                 SpecularFactor;
-        }
-
-     //   if (gRimLightEnabled) {
-      //     float RimFactor = CalcRimLightFactor(PixelToCamera, Normal);
-      //     RimColor = DiffuseColor * RimFactor;
-      //  }
-    }
-
-    // Geometric horizon: keep full light on front faces, fade quickly to 0 at the terminator.
-    // Prevents bumped normals from picking up light on faces that point away from it.
-    float Horizon = smoothstep(0.0, 0.1, dot(GeoNormal, -LightDirection));
-    DiffuseColor  *= Horizon;
-    SpecularColor *= Horizon;
-
-    return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
+    return LightContribution * ShadowFactor * Horizon;
 }
 
 
 
-vec4 CalcDirectionalLight(int Index)
+vec3 CalcDirectionalLight(int Index)
 {
     vec3 Direction = normalize(ubo.LightSources[Index].Direction);
     float ShadowFactor = CalcShadowFactor(Index, Direction, false);
@@ -405,31 +341,29 @@ vec4 CalcDirectionalLight(int Index)
 }
 
 
-vec4 CalcPointLight(int Index, bool IsPoint)
+vec3 CalcPointLight(int Index, bool IsPoint)
 {
     vec3 LightWorldDir = WorldPos - ubo.LightSources[Index].WorldPos;   // deliberately not normalized yet
     float ShadowFactor = CalcShadowFactor(Index, LightWorldDir, IsPoint);
 
     float Distance = length(LightWorldDir);
     LightWorldDir = LightWorldDir / max(Distance, 1e-6);
-    vec4 Color = CalcLightInternal(Index, LightWorldDir, ShadowFactor);
+    vec3 Color = CalcLightInternal(Index, LightWorldDir, ShadowFactor);
 
-    // Note: dividing by (1 + attenuation) is non-standard; with Atten_Constant = 1 the
-    // light is already halved at distance 0. Kept as-is to preserve the current look.
     float Attenuation =  ubo.LightSources[Index].Atten_Constant +
                          ubo.LightSources[Index].Atten_Linear * Distance +
                          ubo.LightSources[Index].Atten_Exp * Distance * Distance;
 
-    return Color / (1.0 + Attenuation);
+    return Color / max(Attenuation, 1e-4);
 }
 
 
-vec4 CalcSpotLight(int Index)
+vec3 CalcSpotLight(int Index)
 {
     vec3 PixelToLight = normalize(ubo.LightSources[Index].WorldPos - WorldPos);
     float SpotFactor = dot(PixelToLight, -normalize(ubo.LightSources[Index].Direction));
 
-    vec4 Color = vec4(0);
+    vec3 Color = vec3(0);
 
     if (SpotFactor > ubo.LightSources[Index].Cutoff) {
         Color = CalcPointLight(Index, false);
@@ -441,9 +375,9 @@ vec4 CalcSpotLight(int Index)
 }
 
 
-vec4 GetTotalLight()
+vec3 GetTotalLight()
 {
-    vec4 TotalLight = vec4(0.0);
+    vec3 TotalLight = vec3(0.0);
 
     int NumLights = ubo.Counts.x;
 
@@ -546,7 +480,7 @@ vec4 sampleMetallicRoughness(InputAttributes tc)
 
 // Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
 // http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf
-/*vec3 diffuseBurley(PBRInfo pbrInputs) 
+vec3 diffuseBurley(PBRInfo pbrInputs) 
 {
     float f90 = 2.0 * pbrInputs.LdotH * pbrInputs.LdotH * pbrInputs.alphaRoughness - 0.5;
 
@@ -586,7 +520,7 @@ float microfacetDistribution(PBRInfo pbrInputs)
     float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
     return roughnessSq / (M_PI * f * f);
 }
-*/
+
 
 
 PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSample) 
@@ -638,70 +572,45 @@ PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSam
     return pbrInputs;
 }
 
-/*
+
 vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection, vec3 lightColor) 
 {
     vec3 n = pbrInputs.n;
     vec3 v = pbrInputs.v;
-    vec3 l = normalize(LightDirection);  // Vector from surface point to light
+    vec3 l = LightDirection;  // Vector from surface point to light
     vec3 h = normalize(l+v);             // Half vector between both l and v
 
+    float NdotLRaw = dot(n, l);
+
+    if (NdotLRaw <= 0.0) {
+        return vec3(0);
+    }
+
     float NdotV = pbrInputs.NdotV;
-    float NdotL = clamp(dot(n, l), 0.001, 1.0);
+    float NdotL = max(NdotLRaw, 0.001);
     float NdotH = clamp(dot(n, h), 0.0, 1.0);
     float LdotH = clamp(dot(l, h), 0.0, 1.0);
     float VdotH = clamp(dot(v, h), 0.0, 1.0);
 
     vec3 color = vec3(0);
 
-    if (NdotL > 0.0 || NdotV > 0.0) {
-      pbrInputs.NdotL = NdotL;
-      pbrInputs.NdotH = NdotH;
-      pbrInputs.LdotH = LdotH;
-      pbrInputs.VdotH = VdotH;
+    pbrInputs.NdotL = NdotL;
+    pbrInputs.NdotH = NdotH;
+    pbrInputs.LdotH = LdotH;
+    pbrInputs.VdotH = VdotH;
 
-      // Calculate the shading terms for the microfacet specular shading model
-      vec3 F = specularReflection(pbrInputs);
-      float G = geometricOcclusion(pbrInputs);
-      float D = microfacetDistribution(pbrInputs);
+    // Calculate the shading terms for the microfacet specular shading model
+    vec3 F = specularReflection(pbrInputs);
+    float G = geometricOcclusion(pbrInputs);
+    float D = microfacetDistribution(pbrInputs);
 
-      // Calculation of analytical lighting contribution
-      vec3 diffuseContrib = (1.0 - F) * diffuseBurley(pbrInputs);
-      vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);
-      // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
-      color = NdotL * lightColor * (diffuseContrib + specContrib);
-    }
+    // Calculation of analytical lighting contribution
+    vec3 diffuseContrib = (1.0 - F) * diffuseBurley(pbrInputs);
+    vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);
+    // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
+    color = NdotL * lightColor * (diffuseContrib + specContrib);
 
     return color;
-}
-
-*/
-
-vec4 CalcPhongLighting(vec4 BaseColor)
-{
-    vec4 TotalLight = GetTotalLight();
-
-    vec4 TexColor = BaseColor;
-
-    // gColorMod and gColorAdd are used to enhance the color in youtube thumbnails.
-    // They are not an integral part of the lighting equation.
-    //TexColor = TexColor * gColorMod + gColorAdd;
-
-    vec4 FinalColor = TexColor * TotalLight;
-
-    //if (gRefRefractEnabled) {
-    //    FinalColor = ApplyRefRefract(FinalColor, Normal);
-    //}
-
-    // The light alphas add up (ambient uses 1.0 per light), so take alpha from the texture.
-    FinalColor.a = TexColor.a;
-
-    // HDR tone mapping / gamma correction: do these as the very last step, ideally via an
-    // sRGB framebuffer (GL_FRAMEBUFFER_SRGB) and sRGB textures instead of by hand.
-    // FinalColor.rgb = FinalColor.rgb / (FinalColor.rgb + vec3(1.0));
-    // FinalColor.rgb = pow(FinalColor.rgb, vec3(1.0/2.2));
-
-    return FinalColor;
 }
 
 
@@ -727,7 +636,7 @@ void main()
     vec4 TexColor = GetTexColor();
     vec4 BaseColor = TexColor * Color;    
     
-    PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
+    pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
 
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
@@ -743,9 +652,18 @@ void main()
             break;
 
         case LIGHTING_MODE_FULL:
-            vec4 Color = CalcPhongLighting(BaseColor);
+          // Placeholder ambient until IBL (step 6)
+            vec3 Ambient = vec3(0.0);
+            for (int i = 0; i < ubo.Counts.x; i++) {
+                if (ubo.LightSources[i].Config.x > 0.5) {
+                    Ambient += ubo.LightSources[i].Color * ubo.LightSources[i].AmbientIntensity;
+                }
+            }
 
-            OutColor = Color;
+            Ambient *= pbrInputs.baseDiffuseColor * AmbientOcclusion.r;
+
+            vec3 Color = Ambient + GetTotalLight();
+            OutColor = vec4(Color, AlbedoColor.a);
 
             break;
 
