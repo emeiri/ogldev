@@ -662,7 +662,7 @@ void main()
 
             Ambient *= pbrInputs.baseDiffuseColor * AmbientOcclusion.r;
 
-            vec3 Color = Ambient + GetTotalLight();
+            vec3 Color = Ambient + GetTotalLight() + EmissiveColor.rgb;
             OutColor = vec4(Color, AlbedoColor.a);
 
             break;
