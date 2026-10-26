@@ -459,6 +459,8 @@ void GLModel::BindTextures(int MaterialIndex)
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]->Bind(EMISSIVE_TEXTURE_UNIT);
+    } else if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSION_COLOR]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSION_COLOR]->Bind(EMISSIVE_TEXTURE_UNIT);
     } else {
         BindWhiteTexture(EMISSIVE_TEXTURE_UNIT);
     }

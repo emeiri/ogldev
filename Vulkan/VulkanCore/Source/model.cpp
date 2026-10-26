@@ -360,6 +360,11 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
                 md.m_materials.push_back({ pEmissive->m_sampler, pEmissive->m_view });
                 int TextureIndex = (int)md.m_materials.size() - 1;
                 GPU_Materials[MaterialIndex].m_emissionTexIndex = TextureIndex; // emission
+            } else if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSION_COLOR]) {
+                Texture* pEmissionColor = m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSION_COLOR];
+                md.m_materials.push_back({ pEmissionColor->m_sampler, pEmissionColor->m_view });
+                int TextureIndex = (int)md.m_materials.size() - 1;
+                GPU_Materials[MaterialIndex].m_emissionTexIndex = TextureIndex; // emission color
             }
 
             const Vector4f& BaseColor = m_Materials[MaterialIndex].m_pMaterialData->m_baseColor;
