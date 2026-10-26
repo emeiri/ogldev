@@ -63,6 +63,51 @@ layout(location = 6) in vec3 Bitangent;
 
 layout(location = 0) out vec4 OutColor;
 
+// Encapsulate the various inputs used by the various functions in the shading equation
+// We store values in this struct to simplify the integration of alternative implementations
+// of the shading terms, outlined in the Readme.MD Appendix.
+struct PBRInfo {
+    // geometry properties
+    float NdotL;                  // cos angle between normal and light direction
+    float NdotV;                  // cos angle between normal and view direction
+    float NdotH;                  // cos angle between normal and half vector
+    float LdotH;                  // cos angle between light direction and half vector
+    float VdotH;                  // cos angle between view direction and half vector
+
+    // Normal
+    vec3 n;              // Shading normal
+    vec3 ng;            // Geometry normal
+    vec3 t;              // Geometry tangent
+    vec3 b;              // Geometry bitangent
+
+    vec3 v;                       // vector from surface point to camera
+
+    // material properties
+    float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)
+    vec3 reflectance0;            // full reflectance color (normal incidence angle)
+    vec3 reflectance90;           // reflectance color at grazing angle
+    float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
+    vec3 baseDiffuseColor;            // color contribution from diffuse lighting
+    vec3 baseSpecularColor;           // color contribution from specular lighting
+
+    vec3 clearCoatF0;
+    vec3 clearCoatF90;
+    float clearCoatFactor;
+    vec3 clearCoatNormal;
+
+    float ior;
+
+    vec3 FssEss;
+    float brdf_scale;
+    float brdf_bias;
+};
+
+
+struct InputAttributes {
+    vec2 uv[2];
+};
+
+
 layout(set = 0, binding = 0) uniform sampler2D Textures[];
 
 layout(set = 1, binding = 4) readonly uniform UniformBuffer { 
@@ -83,10 +128,10 @@ struct MaterialData {
     ivec4 Indices; // .x = BaseColorIndex, .y = NormalMapIndex, .z = metallic roughness, .w = AO
     ivec4 Indices2; // .x = Emissive, .y = clear coat, .z = clear coat roughness, .w = clear coat thickness
     vec4 m_baseColorFactor;
-    vec4 m_matallicRoughnessNormalAOFactor;
+    vec4 m_metallicRoughnessNormalOcclusion;
     vec4 m_emmisiveFactorAlphaCutoff;
     vec4 m_clearCoatTransmissionThinkness;
-    uvec4 m_typeIORAlpha; // x. material type, y. floatBitsToUint(IOR), z. alpha mode, w. unused
+    vec4 m_typeIORAlpha; // x. material type, y. IOR, z. alpha mode, w. unused
 };
 
 layout(std430, set = 1, binding = 7) readonly buffer MaterialSSBO { 
@@ -450,6 +495,95 @@ vec4 GetTexColor()
 }
 
 
+vec4 sampleAO(InputAttributes tc) 
+{
+    int AOTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.w;
+
+    return TextureBindless2D(AOTextureIndex, tc.uv[0]);
+}
+
+
+vec4 SampleEmissive(InputAttributes tc) 
+{
+    int EmissiveTextureIndex = MaterialBuf.materials[MaterialIndex].Indices2.x;
+
+    vec4 EmmisiveFactorAlphaCutoff = vec4(MaterialBuf.materials[MaterialIndex].m_emmisiveFactorAlphaCutoff.xyz, 1.0f);
+
+    return TextureBindless2D(EmissiveTextureIndex, tc.uv[0]) * EmmisiveFactorAlphaCutoff;
+}
+
+
+vec4 sampleAlbedo(InputAttributes tc) 
+{
+    int BaseTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.x;
+    vec4 BaseColorFactor = MaterialBuf.materials[MaterialIndex].m_baseColorFactor;
+    return TextureBindless2D(BaseTextureIndex, tc.uv[0]) * BaseColorFactor;
+}
+
+
+vec4 sampleMetallicRoughness(InputAttributes tc) 
+{
+    int MRTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.z;
+    return TextureBindless2D(MRTextureIndex, tc.uv[0]);
+}
+
+
+vec4 sampleNormal(InputAttributes tc) 
+{
+    int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.y;
+    return TextureBindless2D(NormalTextureIndex, tc.uv[0]);
+}
+
+
+PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSample) 
+{
+    PBRInfo pbrInputs;
+    pbrInputs.ior = MaterialBuf.materials[MaterialIndex].m_typeIORAlpha.y;
+  
+    // Roughness is stored in the 'g' channel, MetallicFactor is stored in the 'b' channel.
+    // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+    
+    float MetallicFactor = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.x * mrSample.b;
+    MetallicFactor = clamp(MetallicFactor, 0.0, 1.0);
+
+    float PerceptualRoughness = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.y;
+    PerceptualRoughness = mrSample.g * PerceptualRoughness;
+    const float c_MinRoughness = 0.04;
+    PerceptualRoughness = clamp(PerceptualRoughness, c_MinRoughness, 1.0);
+
+    // Roughness is authored as perceptual roughness; as is convention,
+    // convert to material roughness by squaring the perceptual roughness [2].
+    float alphaRoughness = PerceptualRoughness * PerceptualRoughness;
+
+    vec3 f0 = vec3(0.04);
+    vec3 baseDiffuseColor = mix(albedo.rgb, vec3(0), MetallicFactor); 
+    vec3 baseSpecularColor = mix(f0, albedo.rgb, MetallicFactor);
+
+    float reflectance = max(max(baseSpecularColor.r, baseSpecularColor.g), baseSpecularColor.b);
+
+    float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
+    vec3 specularEnvironmentR0 = baseSpecularColor.rgb;
+    vec3 specularEnvironmentR90 = vec3(reflectance90);
+
+    vec3 v = normalize(ubo.CameraWorldPos.xyz - WorldPos);
+
+    pbrInputs.NdotV = clamp(abs(dot(normal, v)), 0.001, 1.0);
+    pbrInputs.perceptualRoughness = PerceptualRoughness;
+    pbrInputs.reflectance0 = specularEnvironmentR0;
+    pbrInputs.reflectance90 = specularEnvironmentR90;
+    pbrInputs.alphaRoughness = alphaRoughness;
+    pbrInputs.baseDiffuseColor = baseDiffuseColor;
+    pbrInputs.baseSpecularColor = baseSpecularColor;
+    pbrInputs.n = normal;
+    pbrInputs.v = v;
+
+   // pbrInputs.FssEss = CalcSchlickFresnel(pbrInputs);
+
+    return pbrInputs;
+}
+
+
+
 vec4 CalcPhongLighting(vec4 BaseColor)
 {
     vec4 TotalLight = GetTotalLight();
@@ -484,15 +618,28 @@ vec4 CalcPhongLighting(vec4 BaseColor)
 
 void main() 
 {
+    InputAttributes tc;
+    tc.uv[0] = TexCoord;
+    //tc.uv[1] = TexCoord1;
+
     GeoNormal = normalize(Normal);
-
-    vec4 TexColor = GetTexColor();
-
-    vec4 BaseColor = TexColor * Color;
 
     vec3 LightColor = ubo.LightSources[0].Color;
     float AmbientIntensity = ubo.LightSources[0].AmbientIntensity;
     float DiffuseIntensity = ubo.LightSources[0].DiffuseIntensity;
+    
+    vec4 AmbientOcclusion = sampleAO(tc);
+    vec4 EmissiveColor = SampleEmissive(tc);
+    vec4 AlbedoColor = sampleAlbedo(tc);
+    vec4 mrSample = sampleMetallicRoughness(tc);
+    //vec3 normalSample = sampleNormal(tc).xyz;
+
+    vec4 TexColor = GetTexColor();
+    vec4 BaseColor = TexColor * Color;
+
+    vec3 N = CalcBumpedNormal();
+    
+    PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
 
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
@@ -527,4 +674,10 @@ void main()
     //OutColor = vec4(TexColor.rgb, 1.0);
 
     //OutColor = vec4(CalcBumpedNormal(), 1.0);
+
+    OutColor = vec4(vec3(pbrInputs.perceptualRoughness), 1.0);   // gradient on MetalRoughSpheres
+//    OutColor = vec4(vec3(MetallicFactor), 1.0);                  // (expose it via pbrInputs or recompute)
+    OutColor = vec4(pbrInputs.reflectance0, 1.0);                // 0.04 grey for non-metals, albedo for metals
+    OutColor = vec4(pbrInputs.n * 0.5 + 0.5, 1.0);               // must show the bump detail
+
 }

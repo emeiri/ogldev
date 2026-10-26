@@ -48,10 +48,10 @@ struct GPUMaterial {
     i32 m_clearCoatRoughnessTexIndex = -1;
     i32 m_clearCoatNormalTexIndex = -1;
     glm::vec4 m_baseColorFactor = glm::vec4(1.0f);
-    glm::vec4 m_matallicRoughnessNormalAOFactor = glm::vec4(1.0f);
+    glm::vec4 m_metallicRoughnessNormalOcclusion = glm::vec4(1.0f);
     glm::vec4 m_emmisiveFactorAlphaCutoff = glm::vec4(1.0f);
     glm::vec4 m_clearCoatTransmissionThinkness = glm::vec4(1.0f);
-    glm::uvec4 m_typeIORAlpha = glm::uvec4(0); // x. material type, y. floatBitsToUint(IOR), z. alpha mode, w. unused
+    glm::vec4 m_typeIORAlpha = glm::vec4(0); // x. material type, y. IOR, z. alpha mode, w. unused
 };
 
 static_assert(sizeof(GPUMaterial) % 16 == 0, "Align GPUMaterial to 16 bytes for safety.");
@@ -366,7 +366,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
             GPU_Materials[MaterialIndex].m_baseColorFactor = BaseColor.ToGLM();
 
             const Vector4f& mrno = m_Materials[MaterialIndex].m_pMaterialData->m_metallicRoughnessNormalOcclusion;
-            GPU_Materials[MaterialIndex].m_matallicRoughnessNormalAOFactor = mrno.ToGLM();
+            GPU_Materials[MaterialIndex].m_metallicRoughnessNormalOcclusion = mrno.ToGLM();
 
             const Vector4f& Emissive = m_Materials[MaterialIndex].m_pMaterialData->m_emissiveColor;
             GPU_Materials[MaterialIndex].m_emmisiveFactorAlphaCutoff = Emissive.ToGLM();
@@ -374,9 +374,9 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
             const Vector4f& ClearCoat = m_Materials[MaterialIndex].m_pMaterialData->m_clearCoatTransmissionThickness;
             GPU_Materials[MaterialIndex].m_clearCoatTransmissionThinkness = ClearCoat.ToGLM();
 
-            GPU_Materials[MaterialIndex].m_typeIORAlpha = glm::uvec4(
+            GPU_Materials[MaterialIndex].m_typeIORAlpha = glm::vec4(
                 m_Materials[MaterialIndex].m_pMaterialData->m_materialType,
-                glm::floatBitsToUint(m_Materials[MaterialIndex].m_pMaterialData->m_ior),
+                m_Materials[MaterialIndex].m_pMaterialData->m_ior,
                 m_Materials[MaterialIndex].m_pMaterialData->m_alphaTest,
                 0);
 		}
