@@ -21,26 +21,6 @@
 
 #extension GL_ARB_bindless_texture : require
 
-in vec2 TexCoord0;
-in vec2 TexCoord1;
-in vec3 Normal0;
-in vec3 WorldPos0;
-in vec4 LightSpacePos0;
-in vec3 Tangent0;
-in vec3 Bitangent0;
-in flat int MaterialIndex;
-in vec4 Color0;
-
-out vec4 out_FragColor;
-
-vec2 TexCoord;
-
-#define MAX_NUM_LIGHTS 4
-
-#define LIGHT_TYPE_DIR   0
-#define LIGHT_TYPE_POINT 1
-#define LIGHT_TYPE_SPOT  2
-
 #define RENDER_MODE_FULL 0
 #define RENDER_MODE_TEXTURE_ONLY 1
 #define RENDER_MODE_LIGHTING_ONLY 2
@@ -50,6 +30,12 @@ vec2 TexCoord;
 #define RENDER_MODE_WHITE 6
 #define RENDER_MODE_PBR_DIFFUSE_CONTRIB 7
 #define RENDER_MODE_PBR_F 8
+
+#define MAX_NUM_LIGHTS 4
+
+#define LIGHT_TYPE_DIR   0
+#define LIGHT_TYPE_POINT 1
+#define LIGHT_TYPE_SPOT  2
 
 #define MaterialType_Invalid            0
 #define MaterialType_MetallicRoughness  0x1
@@ -74,6 +60,19 @@ struct LightSource {
     float Cutoff;                  // offset 60
 };
 
+in vec2 TexCoord0;
+in vec2 TexCoord1;
+in vec3 Normal0;
+in vec3 WorldPos0;
+in vec4 LightSpacePos0;
+in vec3 Tangent0;
+in vec3 Bitangent0;
+in flat int MaterialIndex;
+in vec4 Color0;
+
+out vec4 out_FragColor;
+
+vec2 TexCoord;
 
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
@@ -114,6 +113,10 @@ struct PBRInfo {
     float brdf_bias;
 };
 
+
+struct InputAttributes {
+    vec2 uv[2];
+};
 
 layout(std140, binding = 1) uniform LightUBO {
     LightSource Lights[MAX_NUM_LIGHTS];
@@ -244,11 +247,6 @@ void perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv, inout PBRInfo pbr
 
     pbrInputs.n = normalize(TBN * N_mapped);
 }
-
-
-struct InputAttributes {
-    vec2 uv[2];
-};
 
 
 struct ClearCoat {
@@ -402,7 +400,8 @@ float GetClearcoatRoughnessFactor(InputAttributes tc, MetallicRoughnessDataGPU m
 }
 
 
-vec4 sampleAO(InputAttributes tc, MetallicRoughnessDataGPU mat) {
+vec4 sampleAO(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
     return texture(mat.occlusionTextureSampler, tc.uv[mat.occlusionTextureUV]);
 }
 
@@ -417,11 +416,13 @@ vec4 sampleAlbedo(InputAttributes tc, MetallicRoughnessDataGPU mat)
   return texture(mat.baseColorTextureSampler, tc.uv[mat.baseColorTextureUV]) * mat.baseColorFactor;
 }
 
-vec4 sampleMetallicRoughness(InputAttributes tc, MetallicRoughnessDataGPU mat) {
+vec4 sampleMetallicRoughness(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
   return texture(mat.metallicRoughnessTextureSampler, tc.uv[mat.metallicRoughnessTextureUV]);
 }
 
-vec4 sampleNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) {
+vec4 sampleNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
   return texture(mat.normalTextureSampler, tc.uv[mat.normalTextureUV]);
 }
 
