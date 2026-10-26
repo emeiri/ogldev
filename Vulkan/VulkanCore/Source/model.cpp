@@ -49,12 +49,12 @@ struct GPUMaterial {
     i32 m_clearCoatNormalTexIndex = -1;
     glm::vec4 m_baseColorFactor = glm::vec4(1.0f);
     glm::vec4 m_metallicRoughnessNormalOcclusion = glm::vec4(1.0f);
-    glm::vec4 m_emmisiveFactorAlphaCutoff = glm::vec4(1.0f);
+    glm::vec4 m_emmisiveFactorAlphaCutoff = glm::vec4(0.0f);
     glm::vec4 m_clearCoatTransmissionThinkness = glm::vec4(1.0f);
     glm::vec4 m_typeIORAlpha = glm::vec4(0); // x. material type, y. IOR, z. alpha mode, w. unused
 };
 
-static_assert(sizeof(GPUMaterial) % 16 == 0, "Align GPUMaterial to 16 bytes for safety.");
+static_assert(sizeof(GPUMaterial) == 112, "Align GPUMaterial to 16 bytes for safety.");
 
 #if defined(_MSC_VER)
 #pragma pack(pop)
@@ -382,9 +382,10 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
 		}
 
         if (m_materialsBuffer.m_buffer == VK_NULL_HANDLE) {
-			m_materialsBuffer = m_pVulkanCore->CreateSSBO(GPU_Materials.data(), ARRAY_SIZE_IN_BYTES(GPU_Materials));
-			md.m_materialsData = m_materialsBuffer.m_buffer;
+			m_materialsBuffer = m_pVulkanCore->CreateSSBO(GPU_Materials.data(), ARRAY_SIZE_IN_BYTES(GPU_Materials));			
         }		
+
+		md.m_materialsData = m_materialsBuffer.m_buffer;
 	} else {
 		md.m_materials.resize(m_modelData.m_meshes.size());
 	}

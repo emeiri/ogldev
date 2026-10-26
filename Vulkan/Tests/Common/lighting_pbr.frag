@@ -89,6 +89,7 @@ struct PBRInfo {
     float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
     vec3 baseDiffuseColor;            // color contribution from diffuse lighting
     vec3 baseSpecularColor;           // color contribution from specular lighting
+    float MetallicFactor;              // metallic factor, as authored by the model creator (input to shader)
 
     vec3 clearCoatF0;
     vec3 clearCoatF90;
@@ -211,29 +212,25 @@ vec3 CalcShadowCoords(int Index)
 
 float CalcShadowFactorBasic(int Index, vec3 LightDirection)
 {
-    float ShadowFactor = 1.0;
+    vec3 ShadowCoords = CalcShadowCoords(Index);
 
-    if (ubo.LightSources[Index].Config.y > 0.0) {
-        vec3 ShadowCoords = CalcShadowCoords(Index);
-
-        if (IsOutsideShadowMap(ShadowCoords)) {
-            return 1.0;
-        }
-
-        float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
-
-        float bias;
-    
-        float ConfiguredBias = ubo.LightSources[Index].Config.z;
-        if (ConfiguredBias > 0.0) {
-            bias = ConfiguredBias;
-        } else {
-            bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
-        }
-
-        ShadowFactor = (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
+    if (IsOutsideShadowMap(ShadowCoords)) {
+        return 1.0;
     }
 
+    float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
+
+    float bias;
+    
+    float ConfiguredBias = ubo.LightSources[Index].Config.z;
+    if (ConfiguredBias > 0.0) {
+        bias = ConfiguredBias;
+    } else {
+        bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
+    }
+
+    float ShadowFactor = (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
+    
     return ShadowFactor;
 }
 
@@ -250,7 +247,7 @@ float CalcShadowFactorPCF(int Index, vec3 LightDirection)
         return 1.0;
     }
 
-    float DiffuseFactor = clamp(dot(Normal, -LightDirection), 0.0, 1.0);
+    float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
     float bias = mix(0.001, 0.0, DiffuseFactor);
 
     vec2 TexelSize = 1.0 / vec2(gShadowMapWidth, gShadowMapHeight);
@@ -278,21 +275,27 @@ float CalcShadowFactorPCF(int Index, vec3 LightDirection)
 // Point lights use the cube map; spot and directional lights use the 2D map.
 float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 {
+    float ShadowFactor = 1.0;
 
-  //  if (IsPoint) {
-  //      return CalcShadowFactorPointLight(LightToPixel);
-  //  }
+    if (ubo.LightSources[Index].Config.y > 0.0) {
 
-    vec3 LightDirection = normalize(LightToPixel);
+      //  if (IsPoint) {
+      //      ShadowFactor = CalcShadowFactorPointLight(LightToPixel);
+      //  }
 
-    int ShadowMapFilterSize = int(ubo.LightSources[Index].Config.w);
- //   if (gShadowMapRandomRadius > 0.0) {
-  //      return CalcShadowFactorWithRandomSampling(LightDirection);
-    if (ShadowMapFilterSize > 0) {
-       return CalcShadowFactorPCF(Index, LightDirection);
-    } else {
-        return CalcShadowFactorBasic(Index, LightDirection);
+        vec3 LightDirection = normalize(LightToPixel);
+
+        int ShadowMapFilterSize = int(ubo.LightSources[Index].Config.w);
+     //   if (gShadowMapRandomRadius > 0.0) {
+      //      ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection);
+        if (ShadowMapFilterSize > 0) {
+           ShadowFactor = CalcShadowFactorPCF(Index, LightDirection);
+        } else {
+            ShadowFactor = CalcShadowFactorBasic(Index, LightDirection);
+        }
     }
+
+    return ShadowFactor;
 }
 
 // ---------------------------------------------------------------------------
@@ -499,7 +502,11 @@ vec4 sampleAO(InputAttributes tc)
 {
     int AOTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.w;
 
-    return TextureBindless2D(AOTextureIndex, tc.uv[0]);
+    if (AOTextureIndex >= 0) {
+        return TextureBindless2D(AOTextureIndex, tc.uv[0]);
+    } else {
+        return vec4(1.0);
+    }    
 }
 
 
@@ -507,9 +514,13 @@ vec4 SampleEmissive(InputAttributes tc)
 {
     int EmissiveTextureIndex = MaterialBuf.materials[MaterialIndex].Indices2.x;
 
-    vec4 EmmisiveFactorAlphaCutoff = vec4(MaterialBuf.materials[MaterialIndex].m_emmisiveFactorAlphaCutoff.xyz, 1.0f);
+    vec4 EmissiveFactor = vec4(MaterialBuf.materials[MaterialIndex].m_emmisiveFactorAlphaCutoff.xyz, 1.0f);
 
-    return TextureBindless2D(EmissiveTextureIndex, tc.uv[0]) * EmmisiveFactorAlphaCutoff;
+    if (EmissiveTextureIndex >= 0) {        
+        return TextureBindless2D(EmissiveTextureIndex, tc.uv[0]) * EmissiveFactor;
+    } else {
+        return EmissiveFactor;
+    }
 }
 
 
@@ -524,15 +535,58 @@ vec4 sampleAlbedo(InputAttributes tc)
 vec4 sampleMetallicRoughness(InputAttributes tc) 
 {
     int MRTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.z;
-    return TextureBindless2D(MRTextureIndex, tc.uv[0]);
+
+    if (MRTextureIndex >= 0) {
+        return TextureBindless2D(MRTextureIndex, tc.uv[0]);
+    } else {
+        return vec4(1.0);
+    }
 }
 
 
-vec4 sampleNormal(InputAttributes tc) 
+// Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
+// http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf
+/*vec3 diffuseBurley(PBRInfo pbrInputs) 
 {
-    int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.y;
-    return TextureBindless2D(NormalTextureIndex, tc.uv[0]);
+    float f90 = 2.0 * pbrInputs.LdotH * pbrInputs.LdotH * pbrInputs.alphaRoughness - 0.5;
+
+    return (pbrInputs.baseDiffuseColor / M_PI) * (1.0 + f90 * pow((1.0 - pbrInputs.NdotL), 5.0)) * 
+                                                 (1.0 + f90 * pow((1.0 - pbrInputs.NdotV), 5.0));
 }
+
+// The following equation models the Fresnel reflectance term of the spec equation (aka F())
+// Implementation of fresnel from [4], Equation 15
+vec3 specularReflection(PBRInfo pbrInputs) 
+{
+    return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * 
+           pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
+}
+
+// This calculates the specular geometric attenuation (aka G()),
+// where rougher material will reflect less light back to the viewer.
+// This implementation is based on [1] Equation 4, and we adopt their modifications to
+// alphaRoughness as input as originally proposed in [2].
+float geometricOcclusion(PBRInfo pbrInputs) 
+{
+    float NdotL = pbrInputs.NdotL;
+    float NdotV = pbrInputs.NdotV;
+    float rSqr = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
+
+    float attenuationL = 2.0 * NdotL / (NdotL + sqrt(rSqr + (1.0 - rSqr) * (NdotL * NdotL)));
+    float attenuationV = 2.0 * NdotV / (NdotV + sqrt(rSqr + (1.0 - rSqr) * (NdotV * NdotV)));
+    return attenuationL * attenuationV;
+}
+
+// The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
+// Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz
+// Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
+float microfacetDistribution(PBRInfo pbrInputs) 
+{
+    float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
+    float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
+    return roughnessSq / (M_PI * f * f);
+}
+*/
 
 
 PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSample) 
@@ -576,13 +630,52 @@ PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSam
     pbrInputs.baseSpecularColor = baseSpecularColor;
     pbrInputs.n = normal;
     pbrInputs.v = v;
+    pbrInputs.MetallicFactor = MetallicFactor;
+    pbrInputs.clearCoatFactor = 0.0;
 
    // pbrInputs.FssEss = CalcSchlickFresnel(pbrInputs);
 
     return pbrInputs;
 }
 
+/*
+vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection, vec3 lightColor) 
+{
+    vec3 n = pbrInputs.n;
+    vec3 v = pbrInputs.v;
+    vec3 l = normalize(LightDirection);  // Vector from surface point to light
+    vec3 h = normalize(l+v);             // Half vector between both l and v
 
+    float NdotV = pbrInputs.NdotV;
+    float NdotL = clamp(dot(n, l), 0.001, 1.0);
+    float NdotH = clamp(dot(n, h), 0.0, 1.0);
+    float LdotH = clamp(dot(l, h), 0.0, 1.0);
+    float VdotH = clamp(dot(v, h), 0.0, 1.0);
+
+    vec3 color = vec3(0);
+
+    if (NdotL > 0.0 || NdotV > 0.0) {
+      pbrInputs.NdotL = NdotL;
+      pbrInputs.NdotH = NdotH;
+      pbrInputs.LdotH = LdotH;
+      pbrInputs.VdotH = VdotH;
+
+      // Calculate the shading terms for the microfacet specular shading model
+      vec3 F = specularReflection(pbrInputs);
+      float G = geometricOcclusion(pbrInputs);
+      float D = microfacetDistribution(pbrInputs);
+
+      // Calculation of analytical lighting contribution
+      vec3 diffuseContrib = (1.0 - F) * diffuseBurley(pbrInputs);
+      vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);
+      // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
+      color = NdotL * lightColor * (diffuseContrib + specContrib);
+    }
+
+    return color;
+}
+
+*/
 
 vec4 CalcPhongLighting(vec4 BaseColor)
 {
@@ -623,21 +716,16 @@ void main()
     //tc.uv[1] = TexCoord1;
 
     GeoNormal = normalize(Normal);
-
-    vec3 LightColor = ubo.LightSources[0].Color;
-    float AmbientIntensity = ubo.LightSources[0].AmbientIntensity;
-    float DiffuseIntensity = ubo.LightSources[0].DiffuseIntensity;
-    
+   
     vec4 AmbientOcclusion = sampleAO(tc);
     vec4 EmissiveColor = SampleEmissive(tc);
     vec4 AlbedoColor = sampleAlbedo(tc);
     vec4 mrSample = sampleMetallicRoughness(tc);
-    //vec3 normalSample = sampleNormal(tc).xyz;
-
-    vec4 TexColor = GetTexColor();
-    vec4 BaseColor = TexColor * Color;
 
     vec3 N = CalcBumpedNormal();
+
+    vec4 TexColor = GetTexColor();
+    vec4 BaseColor = TexColor * Color;    
     
     PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
 
@@ -651,7 +739,7 @@ void main()
             break;
 
         case LIGHTING_MODE_AMBIENT_ONLY:
-            OutColor = vec4(BaseColor.rgb * LightColor * AmbientIntensity, BaseColor.a);
+        //    OutColor = vec4(BaseColor.rgb * LightColor * AmbientIntensity, BaseColor.a);
             break;
 
         case LIGHTING_MODE_FULL:
@@ -667,17 +755,25 @@ void main()
 
     //OutColor = vec4(normalize(Bitangent) * 0.5 + 0.5, 1);
 
-    //int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.y;
+    //int BaseColorTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.x;
+    //OutColor = TextureBindless2D(BaseColorTextureIndex, TexCoord) * Color * MaterialBuf.materials[MaterialIndex].m_baseColorFactor;
 
-   // TexColor = TextureBindless2D(NormalTextureIndex, TexCoord);
+    //int MetallicTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.z;
+    //OutColor = vec4(TextureBindless2D(MetallicTextureIndex, TexCoord).y);
+
+    //int AOTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.w;
+    //OutColor = TextureBindless2D(AOTextureIndex, TexCoord);
+
+//    int EmmisiveTextureIndex = MaterialBuf.materials[MaterialIndex].Indices2.x;
+  //  OutColor = TextureBindless2D(EmmisiveTextureIndex, TexCoord);
 
     //OutColor = vec4(TexColor.rgb, 1.0);
 
     //OutColor = vec4(CalcBumpedNormal(), 1.0);
 
-    OutColor = vec4(vec3(pbrInputs.perceptualRoughness), 1.0);   // gradient on MetalRoughSpheres
-//    OutColor = vec4(vec3(MetallicFactor), 1.0);                  // (expose it via pbrInputs or recompute)
-    OutColor = vec4(pbrInputs.reflectance0, 1.0);                // 0.04 grey for non-metals, albedo for metals
-    OutColor = vec4(pbrInputs.n * 0.5 + 0.5, 1.0);               // must show the bump detail
+    //OutColor = vec4(vec3(pbrInputs.perceptualRoughness), 1.0);   // gradient on MetalRoughSpheres
+  //  OutColor = vec4(vec3(pbrInputs.MetallicFactor), 1.0);                  // (expose it via pbrInputs or recompute)
+  //  OutColor = vec4(pbrInputs.reflectance0, 1.0);                // 0.04 grey for non-metals, albedo for metals
+   // OutColor = vec4(pbrInputs.n * 0.5 + 0.5, 1.0);               // must show the bump detail
 
 }

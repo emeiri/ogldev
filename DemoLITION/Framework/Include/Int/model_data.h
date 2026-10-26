@@ -186,11 +186,11 @@ struct MaterialData {
     std::string m_name;
     bool m_isPBR = false;
     int m_materialType = MaterialType_Invalid;
-    Vector4f m_ambientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f m_diffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f m_specularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f m_baseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f m_emissiveColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f m_ambientColor = Vector4f(0.0f);
+    Vector4f m_diffuseColor = Vector4f(0.0f);
+    Vector4f m_specularColor = Vector4f(0.0f);
+    Vector4f m_baseColor = Vector4f(1.0f);
+    Vector4f m_emissiveColor = Vector4f(0.0f);
     Vector4f m_metallicRoughnessNormalOcclusion = Vector4f(1.0f);
     Vector4f m_clearCoatTransmissionThickness = Vector4f(1.0f);
     float m_transparencyFactor = 1.0f;
