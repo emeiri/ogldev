@@ -488,13 +488,11 @@ vec4 sampleMetallicRoughness(InputAttributes tc)
     }
 }
 
-/*
+
 // Based on: https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/main/source/Renderer/shaders/pbr.frag
 vec3 getIBLRadianceLambertian(PBRInfo pbrInputs) 
 {
-    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
-
-    vec3 Irradiance = texture(envMap.envMapTextureIrradianceSampler, pbrInputs.n).rgb;
+    vec3 Irradiance = texture(IrradianceMap, pbrInputs.n).rgb;
 
     // Multiple scattering, from Fdez-Aguera
     float Ems = (1.0 - (pbrInputs.brdf_scale + pbrInputs.brdf_bias));
@@ -510,6 +508,7 @@ vec3 getIBLRadianceLambertian(PBRInfo pbrInputs)
 // Calculation of the lighting contribution from an optional Image Based Light source.
 // Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
 // See our README.md on Environment Maps [3] for additional discussion.
+/*
 vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0) 
 {
     EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());       
@@ -788,7 +787,7 @@ void main()
 //OutColor = vec4(ToneMapACES(textureLod(EnvMap, R, 8.0).rgb * ubo.Config.y), 1.0);   // 0, 4, 8
  //OutColor = vec4(ToneMapACES(texture(IrradianceMap, pbrInputs.n).rgb * ubo.Config.y), 1.0);
 
- OutColor = vec4(pbrInputs.brdf_scale, pbrInputs.brdf_bias, 0.0, 1.0);
-
+ //OutColor = vec4(pbrInputs.brdf_scale, pbrInputs.brdf_bias, 0.0, 1.0);
+  OutColor = vec4(ToneMapACES(getIBLRadianceLambertian(pbrInputs) * ubo.Config.y), 1.0);
 
 }
