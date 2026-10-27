@@ -998,6 +998,8 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 {
 	int Width, Height;
 
+	stbi_set_flip_vertically_on_load(0);
+
 	const unsigned char* pImg = stbi_load(pFilename, &Width, &Height, NULL, STBI_rgb_alpha);
 
 	if (!pImg) {

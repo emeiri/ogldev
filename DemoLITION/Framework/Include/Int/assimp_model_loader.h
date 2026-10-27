@@ -109,7 +109,6 @@ private:
     std::string m_filename;
     const aiScene* m_pScene = NULL;
     ModelData* m_pModelData = NULL;
-    bool m_flipTexCoordV = false;
     bool m_convertToLeftHanded = false;
 };
 

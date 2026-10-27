@@ -248,23 +248,13 @@ void AssimpModelLoader::Load(const std::string& Filename, const ModelLoadFlags& 
 
     assert(OutModelData.m_meshes.empty());
 
-#ifndef OGLDEV_VULKAN
-    std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
-    FileExt = ToLower(FileExt);
-    m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");
-#endif
-
     uint LoadFlags = DEMOLITION_ASSIMP_LOAD_FLAGS;
 
     m_convertToLeftHanded = Flags.ConvertToLeftHanded;
 
     if (Flags.ConvertToLeftHanded) {
-#ifdef OGLDEV_VULKAN
         // Same as aiProcess_ConvertToLeftHanded but without aiProcess_FlipUVs
         LoadFlags |= aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder;
-#else
-        LoadFlags |= aiProcess_ConvertToLeftHanded;
-#endif
     }
 
     Assimp::Importer Importer;
@@ -393,18 +383,15 @@ void AssimpModelLoader::InitSingleMesh(std::vector<VertexType>& Vertices, uint M
         }
 
         v.TexCoords0 = paiMesh->HasTextureCoords(0) ? Vector2f(paiMesh->mTextureCoords[0][i].x, paiMesh->mTextureCoords[0][i].y) :
-            Vector2f(0.0f);
+                                                      Vector2f(0.0f);
         v.TexCoords1 = paiMesh->HasTextureCoords(1) ? Vector2f(paiMesh->mTextureCoords[1][i].x, paiMesh->mTextureCoords[1][i].y) :
-            Vector2f(0.0f);
-        if (m_flipTexCoordV) {
-            v.TexCoords0.y = 1.0f - v.TexCoords0.y;
-            v.TexCoords1.y = 1.0f - v.TexCoords1.y;
-        }
+                                                      Vector2f(0.0f);
 
         v.Tangent = paiMesh->mTangents ? Vector3f(paiMesh->mTangents[i].x, paiMesh->mTangents[i].y, paiMesh->mTangents[i].z) :
-            Vector3f(0.0f);
+                                         Vector3f(0.0f);
         v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) :
-            Vector3f(0.0f);
+                                             Vector3f(0.0f);
+                                             
         if (paiMesh->mColors[0]) {
             const aiColor4D& Color = paiMesh->mColors[0][i];
             v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);

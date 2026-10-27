@@ -58,6 +58,8 @@ Texture::Texture(GLenum TextureTarget, GLTextureConfig* pConfig)
 
 void Texture::Load(u32 BufferSize, const void* pData, bool IsSRGB)
 {
+    stbi_set_flip_vertically_on_load(1);
+    
     void* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
 
     LoadInternal(pImageData, IsSRGB);
