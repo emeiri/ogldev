@@ -309,6 +309,8 @@ vec3 CalcBumpedNormal()
     // Step #3: transform from [0,1] to [-1,1]
     BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
 
+    BumpMapNormal.xy *= MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.z;
+
     mat3 TBN = mat3(T, B, N);
 
     // Step #4: transform from tangent space to world space
