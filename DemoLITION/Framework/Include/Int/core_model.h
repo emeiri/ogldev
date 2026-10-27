@@ -213,7 +213,6 @@ private:
     std::vector<Matrix4f> m_transformations;
     std::vector<glm::mat4> m_transformationsGLM;
     float m_textureScale = 1.0f;
-    bool m_flipTexCoordV = false;
     bool m_convertedToLeftHanded = false;
 
     /////////////////////////////////////
