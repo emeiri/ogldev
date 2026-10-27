@@ -382,7 +382,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
             GPU_Materials[MaterialIndex].m_typeIORAlpha = glm::vec4(
                 m_Materials[MaterialIndex].m_pMaterialData->m_materialType,
                 m_Materials[MaterialIndex].m_pMaterialData->m_ior,
-                m_Materials[MaterialIndex].m_pMaterialData->m_alphaTest,
+                m_Materials[MaterialIndex].m_pMaterialData->m_alphaMode,
                 0);
 		}
 

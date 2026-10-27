@@ -182,6 +182,13 @@ enum TEXTURE_TYPE {
 };
 
 
+enum ALPHA_MODE {
+    ALPHA_MODE_OPAQUE = 0,
+    ALPHA_MODE_MASK = 1,
+    ALPHA_MODE_BLEND = 2
+};
+
+
 struct MaterialData {
     std::string m_name;
     bool m_isPBR = false;
@@ -194,7 +201,7 @@ struct MaterialData {
     Vector4f m_metallicRoughnessNormalOcclusion = Vector4f(1.0f);
     Vector4f m_clearCoatTransmissionThickness = Vector4f(1.0f);
     float m_transparencyFactor = 1.0f;
-    float m_alphaTest = 0.0f;
+    ALPHA_MODE m_alphaMode = ALPHA_MODE_OPAQUE;
     float m_ior = 1.5f;
     TextureSource m_textures[TEX_TYPE_NUM];
 };

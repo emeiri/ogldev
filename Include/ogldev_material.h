@@ -70,7 +70,6 @@ class Material {
     Texture* pTextures[TEX_TYPE_NUM] = { 0 };
 
     float m_transparencyFactor = 1.0f;
-    float m_alphaTest = 0.0f;
     u32 m_flags = 0;
 
     ~Material()

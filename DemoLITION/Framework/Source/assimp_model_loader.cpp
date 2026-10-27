@@ -37,7 +37,6 @@
 //#define DEBUG_TEXTURES
 //#define DEBUG_BONES
 
-
 // config flags
 static bool UseMeshOptimizer = false;
 static bool MissingTextureDetection = false;
@@ -1084,10 +1083,18 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
         MyMaterial.m_transparencyFactor = std::clamp(Opacity, 0.0f, 1.0f);
         if (MyMaterial.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
             MyMaterial.m_transparencyFactor = 0.0f;
-        }
-
-        MyMaterial.m_alphaTest = 0.5f;
+        }        
     }
+
+    aiString AlphaMode;
+    if (pMaterial->Get(AI_MATKEY_GLTF_ALPHAMODE, AlphaMode) == AI_SUCCESS) {
+        if (strcmp(AlphaMode.C_Str(), "MASK") == 0) {
+            MyMaterial.m_alphaMode = ALPHA_MODE_MASK;
+        } else if (strcmp(AlphaMode.C_Str(), "BLEND") == 0) {
+            MyMaterial.m_alphaMode = ALPHA_MODE_BLEND;
+        }
+    }   // default: ALPHA_MODE_OPAQUE (0)
+
 
     ProcessClearCoat(pMaterial, MyMaterial);
         

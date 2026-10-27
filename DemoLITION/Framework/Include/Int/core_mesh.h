@@ -136,7 +136,6 @@ struct MeshMaterial {
     glm::vec4 m_baseColorFactor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     float m_roughness = 1.0f;
     float m_transparencyFactor = 1.0f;
-    float m_alphaTest = 0.0f;
     float m_metallicFactor = 0.0f;
     // index into MeshData::textureFiles
     int m_baseColorTexture = -1;

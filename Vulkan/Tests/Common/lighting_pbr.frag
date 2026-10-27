@@ -32,6 +32,10 @@
 #define LIGHT_TYPE_POINT 1
 #define LIGHT_TYPE_SPOT  2
 
+#define ALPHA_MODE_OPAQUE 0
+#define ALPHA_MODE_MASK   1
+#define ALPHA_MODE_BLEND  2
+
 struct LightSource {
     vec3 Color;                    // offset 0
     int LightType;                 // offset 12
@@ -408,30 +412,6 @@ vec3 GetTotalLight()
 // Texture / reflection / refraction
 // ---------------------------------------------------------------------------
 
-vec4 GetTexColor()
-{
-    vec4 TexColor;
-
-    //if (gIsCubemapping) {
-    //    vec3 CameraToPixel = normalize(WorldPos - ubo.CameraWorldPos.xyz);
-    //    vec3 ReflectionDir = normalize(reflect(CameraToPixel, GeoNormal));   // reflect() needs a unit normal
-    //    TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
-    //} else {
-   //     TexColor = vec4(1.0, 0.0, 0.0, 1.0);
-    //}
-
-    int BaseColorTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.x;
-
-    TexColor = TextureBindless2D(BaseColorTextureIndex, TexCoord);
-
-    if (TexColor.a < 0.5) {
-        discard;
-    }
-
-    return TexColor;
-}
-
-
 vec4 sampleAO(InputAttributes tc) 
 {
     int AOTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.w;
@@ -630,17 +610,20 @@ void main()
     vec4 EmissiveColor = SampleEmissive(tc);
     vec4 AlbedoColor = sampleAlbedo(tc);
     vec4 mrSample = sampleMetallicRoughness(tc);
-
     vec3 N = CalcBumpedNormal();
 
-    vec4 TexColor = GetTexColor();
-    vec4 BaseColor = TexColor * Color;    
-    
+    int AlphaMode = int(MaterialBuf.materials[MaterialIndex].m_typeIORAlpha.z);
+    float AlphaCutoff = MaterialBuf.materials[MaterialIndex].m_emmisiveFactorAlphaCutoff.w;
+
+    if ((AlphaMode == ALPHA_MODE_MASK) && (AlbedoColor.a < AlphaCutoff)) {
+        discard;
+    }    
+   
     pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
 
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
-            OutColor = BaseColor;
+            OutColor = AlbedoColor;
             break;
 
         case LIGHTING_MODE_NORMALS:
@@ -648,7 +631,7 @@ void main()
             break;
 
         case LIGHTING_MODE_AMBIENT_ONLY:
-        //    OutColor = vec4(BaseColor.rgb * LightColor * AmbientIntensity, BaseColor.a);
+        //    OutColor = vec4(AlbedoColor.rgb * LightColor * AmbientIntensity, AlbedoColor.a);
             break;
 
         case LIGHTING_MODE_FULL:
@@ -684,8 +667,6 @@ void main()
 
 //    int EmmisiveTextureIndex = MaterialBuf.materials[MaterialIndex].Indices2.x;
   //  OutColor = TextureBindless2D(EmmisiveTextureIndex, TexCoord);
-
-    //OutColor = vec4(TexColor.rgb, 1.0);
 
     //OutColor = vec4(CalcBumpedNormal(), 1.0);
 
