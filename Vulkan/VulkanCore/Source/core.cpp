@@ -18,6 +18,8 @@
 #include <vector>
 #include <assert.h>
 
+#include <gli/gli.hpp>
+
 #include "3rdparty/stb_image.h"
 
 #include "ogldev_ect_cubemap.h"
@@ -1029,6 +1031,88 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 }
 
 
+void VulkanCore::CreateTextureFromKTX(const char* pFilename, VulkanTexture& Tex)
+{
+	const char* pExt = strrchr(pFilename, '.');
+
+	bool IsKTX = pExt && !strcmp(pExt, ".ktx");
+
+	if (!IsKTX) {
+		printf("'%s' is not a KTX file\n", pFilename);
+		assert(0);
+	}
+
+	gli::texture t = gli::load(pFilename);
+	if (t.empty()) {
+		printf("Empty texture '%s'\n", pFilename);
+		assert(0);
+	}
+
+    VkFormat Format = VK_FORMAT_UNDEFINED;
+
+	switch (t.format()) {
+	case gli::FORMAT_RGBA32_SFLOAT_PACK32:
+		Format = VK_FORMAT_R32G32B32A32_SFLOAT;
+		break;
+
+	case gli::FORMAT_RGBA16_SFLOAT_PACK16:
+		Format = VK_FORMAT_R16G16B16A16_SFLOAT;
+		break;
+
+	case gli::FORMAT_RG16_SFLOAT_PACK16:
+		Format = VK_FORMAT_R16G16_SFLOAT;
+		break;
+
+	default:
+		printf("Unsupported KTX format %d\n", t.format());
+		assert(0);
+	}
+
+	bool IsCubemap = t.faces() == 6;
+
+    int MipLevels = (int)t.levels();
+
+    gli::image::extent_type Extent = t.extent(0);
+
+    CreateImage(Tex, Extent.x, Extent.y, Format,
+				VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, IsCubemap, MipLevels);
+
+    std::vector<VkBufferImageCopy> Regions;
+
+	for (u32 Face = 0; Face < t.faces(); Face++) {
+		for (u32 Level = 0; Level < t.levels(); Level++) {
+			gli::extent3d Ext = t.extent(Level);
+			VkBufferImageCopy r = {
+				.bufferOffset = (VkDeviceSize)((const char*)t.data(0, Face, Level) - (const char*)t.data()),
+				.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, Level, Face, 1 },
+				.imageExtent = { (u32)Ext.x, (u32)Ext.y, 1 },
+			};
+			Regions.push_back(r);
+		}
+	}
+
+	UpdateTextureImageAllLevels(Tex, Format, (int)t.faces(), (u32)t.levels(), t.data(), t.size(), Regions);
+
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, VK_IMAGE_ASPECT_COLOR_BIT, IsCubemap, MipLevels);
+
+	VkFilter MinFilter = VK_FILTER_LINEAR;
+	VkFilter MaxFilter = VK_FILTER_LINEAR;
+    VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+	float MaxAnisotropy = m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy;
+
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
+
+	VkFormatProperties Props = m_physDevices.Selected().GetFormatProperties(Format);
+	if (!(Props.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
+		printf("Warning: '%s' format %d doesn't support linear filtering\n", pFilename, Format);
+	}
+
+	printf("KTX '%s' loaded: %dx%d, %d levels, %d faces, format %d\n",
+		   pFilename, Extent.x, Extent.y, (int)t.levels(), (int)t.faces(), Format);
+}
+
+
 void VulkanTexture::Destroy(VkDevice Device)
 {
 	if (m_sampler) {
@@ -1167,6 +1251,34 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 	StagingTex.Destroy(m_device);
 }
+
+
+// All levels/faces come from the caller; no mip generation.
+void VulkanCore::UpdateTextureImageAllLevels(VulkanTexture& Tex, VkFormat TexFormat,
+											 int LayerCount, u32 MipLevels,
+											 const void* pData, VkDeviceSize DataSize,
+											 const std::vector<VkBufferImageCopy>& Regions)
+{
+	BufferAndMemory StagingTex = CreateBuffer(DataSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+								 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	StagingTex.Update(m_device, pData, DataSize);
+
+	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_UNDEFINED,
+		                  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, MipLevels);
+
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	vkCmdCopyBufferToImage(m_copyCmdBuf, StagingTex.m_buffer, Tex.m_image,
+		                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, (u32)Regions.size(), Regions.data());
+	SubmitCopyCommand();
+
+	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		                  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
+
+	StagingTex.Destroy(m_device);
+}
+
 
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 

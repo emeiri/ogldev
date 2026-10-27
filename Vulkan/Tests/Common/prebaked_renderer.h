@@ -108,6 +108,8 @@ private:
 
 	void CreateMesh(const std::string& AssetPath);
 
+	void LoadPBRTextures();
+
 	void CreateShaders();
 
 	void CreatePipelines();
@@ -166,10 +168,13 @@ private:
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
 	OgldevVK::BigTextureArray m_bigTextureArray;
+	OgldevVK::VulkanTexture m_brdfLUT;
+	OgldevVK::VulkanTexture m_irradianceMap;
+	OgldevVK::VulkanTexture m_envMap;        // prefiltered specular
 
 	// GUI state
 	bool m_showGui = false;
-    bool m_isPBR = false;
+    bool m_isPBR = true;
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
 	std::string m_appName;
 	GameCallbacks* m_pGameCallbacks = NULL;

@@ -57,6 +57,10 @@ PreBakedRenderer::~PreBakedRenderer()
 		vkDeviceWaitIdle(m_vkCore.GetDevice());
 	}
 
+	m_brdfLUT.Destroy(m_device);
+	m_irradianceMap.Destroy(m_device);
+	m_envMap.Destroy(m_device);
+
 	m_imGUIRenderer.Destroy();
 
     for (MeshCmdBufs& v : m_lightPassCmdBufs) {
@@ -116,6 +120,7 @@ void PreBakedRenderer::Init(const std::string& AssetPath)
 	m_device = m_vkCore.GetDevice();
 	m_numImages = m_vkCore.GetNumImages();
 	m_pQueue = m_vkCore.GetQueue();
+    LoadPBRTextures();
 	CreateShaders();
 	CreateDescriptorPool();
 	InitBigTextureArray();
@@ -434,6 +439,17 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 		};
 	}
 }
+
+
+void PreBakedRenderer::LoadPBRTextures()
+{
+    m_vkCore.CreateTextureFromKTX("../../../Content/textures/brdfLUT.ktx", m_brdfLUT);
+
+	m_vkCore.CreateTextureFromKTX("../../../Content/textures/piazza_bologni_1k_irradiance.ktx", m_irradianceMap);
+
+	m_vkCore.CreateTextureFromKTX("../../../Content/textures/piazza_bologni_1k_prefilter.ktx", m_envMap);
+}
+
 
 
 void PreBakedRenderer::CreateShaders()
