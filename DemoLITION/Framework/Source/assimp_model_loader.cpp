@@ -1083,7 +1083,10 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
         MyMaterial.m_transparencyFactor = std::clamp(Opacity, 0.0f, 1.0f);
         if (MyMaterial.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
             MyMaterial.m_transparencyFactor = 0.0f;
-        }        
+        }     
+
+        // Non-glTF heuristic - treat as a cut-out material (instead of the old alpha test)
+        MyMaterial.m_alphaMode = ALPHA_MODE_MASK;
     }
 
     aiString AlphaMode;
@@ -1092,8 +1095,10 @@ void AssimpModelLoader::LoadColors(const aiMaterial* pMaterial, MaterialData& My
             MyMaterial.m_alphaMode = ALPHA_MODE_MASK;
         } else if (strcmp(AlphaMode.C_Str(), "BLEND") == 0) {
             MyMaterial.m_alphaMode = ALPHA_MODE_BLEND;
+        } else {
+            MyMaterial.m_alphaMode = ALPHA_MODE_OPAQUE;     // default
         }
-    }   // default: ALPHA_MODE_OPAQUE (0)
+    } 
 
 
     ProcessClearCoat(pMaterial, MyMaterial);
