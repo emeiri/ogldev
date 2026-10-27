@@ -629,15 +629,20 @@ vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection,
     vec3 l = normalize(LightDirection);  // Vector from surface point to light
     vec3 h = normalize(l+v);             // Half vector between both l and v
 
+    float NdotLRaw = dot(n, l);
+
+    if (NdotLRaw <= 0.0) {
+        return vec3(0);
+    }
+
     float NdotV = pbrInputs.NdotV;
-    float NdotL = clamp(dot(n, l), 0.001, 1.0);
+    float NdotL = max(NdotLRaw, 0.001);
     float NdotH = clamp(dot(n, h), 0.0, 1.0);
     float LdotH = clamp(dot(l, h), 0.0, 1.0);
     float VdotH = clamp(dot(v, h), 0.0, 1.0);
 
     vec3 color = vec3(0);
 
-    if (NdotL > 0.0 || NdotV > 0.0) {
       pbrInputs.NdotL = NdotL;
       pbrInputs.NdotH = NdotH;
       pbrInputs.LdotH = LdotH;
@@ -653,7 +658,6 @@ vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection,
       vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);
       // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
       color = NdotL * lightColor * (diffuseContrib + specContrib);
-    }
 
     return color;
 }
