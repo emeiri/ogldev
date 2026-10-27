@@ -205,7 +205,7 @@ float CalcShadowFactorPCF(int Index, vec3 LightDirection)
         return 1.0;
     }
 
-    float DiffuseFactor = clamp(dot(Normal, -LightDirection), 0.0, 1.0);
+    float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
     float bias = mix(0.001, 0.0, DiffuseFactor);
 
     vec2 TexelSize = 1.0 / vec2(gShadowMapWidth, gShadowMapHeight);
