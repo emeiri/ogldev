@@ -140,6 +140,11 @@ layout(std430, set = 1, binding = 7) readonly buffer MaterialSSBO {
     MaterialData materials[]; 
 } MaterialBuf;
 
+layout(set = 1, binding = 8)  uniform samplerCube EnvMap;        // prefiltered specular
+layout(set = 1, binding = 9)  uniform samplerCube IrradianceMap;
+layout(set = 1, binding = 10) uniform sampler2D   BRDF_LUT;
+
+
 vec3 GeoNormal;
 PBRInfo pbrInputs;
 float gShadowMapWidth = 2048.0;
@@ -695,4 +700,5 @@ void main()
   //  OutColor = vec4(pbrInputs.reflectance0, 1.0);                // 0.04 grey for non-metals, albedo for metals
    // OutColor = vec4(pbrInputs.n * 0.5 + 0.5, 1.0);               // must show the bump detail
 
+   OutColor = vec4(texture(BRDF_LUT, gl_FragCoord.xy / vec2(2560.0, 1440.0)).rg, 0.0, 1.0);
 }

@@ -36,7 +36,10 @@ enum Binding {
 	BindingShadowMapFS = 5,
 	BindingLightVP = 6,
 	BindingMaterialData = 7,
-	NumBindings = 8
+    BindingEnvMap = 8,
+    BindingIrradianceMap = 9,
+    BindingBRDF_LUT = 10,
+	NumBindings = 11
 };
 
 static_assert(sizeof(LightSource) == 80, "LightSource size must be 80 bytes");
@@ -119,7 +122,7 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 {
 	std::vector<VkDescriptorSetLayoutBinding> Bindings{
 		{.
-		     binding = BindingVB,	// 0
+			 binding = BindingVB,	// 0
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -137,25 +140,25 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-            .binding = BindingMetaData, // 3
+			.binding = BindingMetaData, // 3
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-            .binding = BindingUniformFS, // 4
+			.binding = BindingUniformFS, // 4
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-            .binding = BindingShadowMapFS,	// 5
+			.binding = BindingShadowMapFS,	// 5
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = MAX_NUM_LIGHTS,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-            .binding = BindingLightVP, // 6
+			.binding = BindingLightVP, // 6
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -163,6 +166,24 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 		}, {
 			.binding = BindingMaterialData, // 7
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		}, {
+			.binding = BindingEnvMap, // 8
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		}, {
+			.binding = BindingIrradianceMap, // 9
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		}, {
+			.binding = BindingBRDF_LUT, // 10
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
@@ -192,11 +213,14 @@ std::vector<VkPushConstantRange> LightingProgram::GetPushConstantRange()
 
 
 void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
-										   std::vector<VkDescriptorSet>& DescSets,
-										   std::vector<BufferAndMemory>& UniformBuffersVS,
-										   std::vector<BufferAndMemory>& UniformBuffersFS,
-										   std::vector<BufferAndMemory>& UniformBuffersLights,
-										   std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps)
+										   const std::vector<VkDescriptorSet>& DescSets,
+										   const std::vector<BufferAndMemory>& UniformBuffersVS,
+										   const std::vector<BufferAndMemory>& UniformBuffersFS,
+										   const std::vector<BufferAndMemory>& UniformBuffersLights,
+										   const std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps,
+										   const VulkanTexture& EnvMap,
+										   const VulkanTexture& IrradianceMap,
+										   const VulkanTexture& BRDF_LUT)
 {
 	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescSets.size());
 
@@ -257,12 +281,30 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		.range = VK_WHOLE_SIZE
 	};
 
+    VkDescriptorImageInfo EnvMapImageInfo = {
+        .sampler = EnvMap.m_sampler,
+        .imageView = EnvMap.m_view,
+        .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    };
+
+    VkDescriptorImageInfo IrradianceMapImageInfo = {
+        .sampler = IrradianceMap.m_sampler,
+        .imageView = IrradianceMap.m_view,
+        .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    };
+
+    VkDescriptorImageInfo BRDF_LUTImageInfo = {
+        .sampler = BRDF_LUT.m_sampler,
+        .imageView = BRDF_LUT.m_view,
+        .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    };
+
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescSets.size() * NumBindings);
 
 	u32 WdsIndex = 0;
 
 	for (int i = 0; i < (int)DescSets.size(); i++) {
-		VkDescriptorSet& DstSet = DescSets[i];
+		const VkDescriptorSet& DstSet = DescSets[i];
 
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -370,6 +412,46 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 		assert(WdsIndex < WriteDescriptorSet.size());
 		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = BindingEnvMap,	// 8
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = &EnvMapImageInfo
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = BindingIrradianceMap,	// 9
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = &IrradianceMapImageInfo
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = BindingBRDF_LUT,	// 10
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = &BRDF_LUTImageInfo
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
 	}
 
 	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);

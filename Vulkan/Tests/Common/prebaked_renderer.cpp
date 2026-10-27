@@ -508,7 +508,10 @@ void PreBakedRenderer::CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& 
 											m_modelContext.m_uniformBuffersVS, 
 											m_modelContext.m_uniformBuffersFS,
 									        m_uniformBuffersLightTransforms,
-									        m_shadowMaps);
+									        m_shadowMaps,
+									        m_envMap,
+									        m_irradianceMap,
+									        m_brdfLUT);
 }
 
 

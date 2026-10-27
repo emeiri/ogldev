@@ -83,11 +83,14 @@ public:
     void AllocDescSets(std::vector<VkDescriptorSet>& DescSets);
 
 	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
-							  std::vector<VkDescriptorSet>& DescSets,
-							  std::vector<BufferAndMemory>& UniformBuffersVS,
-							  std::vector<BufferAndMemory>& UniformBuffersFS,
-							  std::vector<BufferAndMemory>& UniformBuffersLights,
-							  std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps);
+							  const std::vector<VkDescriptorSet>& DescSets,
+							  const std::vector<BufferAndMemory>& UniformBuffersVS,
+							  const std::vector<BufferAndMemory>& UniformBuffersFS,
+							  const std::vector<BufferAndMemory>& UniformBuffersLights,
+							  const std::vector< std::vector<OgldevVK::VulkanTexture>>& ShadowMaps,
+							  const VulkanTexture& EnvMap,
+							  const VulkanTexture& IrradianceMap,
+							  const VulkanTexture& BRDF_LUT);
 
 	static void UpdateUniformBuffers(VkDevice Device,
 									 const glm::vec3& CameraWorldPos,
