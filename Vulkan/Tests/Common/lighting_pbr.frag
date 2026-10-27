@@ -50,23 +50,6 @@ struct LightSource {
     vec4 Config;				   // offset 64 x = Enabled, y = Casts shadows, z = bias, w = filter size
 };
 
-
-layout(push_constant) uniform Constants {
-    uint BaseTextureIndex; 
-} push;
-
-layout(constant_id = 0) const uint LIGHTING_MODE = LIGHTING_MODE_FULL;
-
-layout(location = 0) in vec2 TexCoord;
-layout(location = 1) flat in uint MaterialIndex;
-layout(location = 2) in vec3 WorldPos;
-layout(location = 3) in vec3 Normal;
-layout(location = 4) in vec4 VertexColor;
-layout(location = 5) in vec3 Tangent;
-layout(location = 6) in vec3 Bitangent;
-
-layout(location = 0) out vec4 OutColor;
-
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
 // of the shading terms, outlined in the Readme.MD Appendix.
@@ -107,11 +90,36 @@ struct PBRInfo {
     float brdf_bias;
 };
 
-
 struct InputAttributes {
     vec2 uv[2];
 };
 
+struct MaterialData { 
+    ivec4 Indices; // .x = BaseColorIndex, .y = NormalMapIndex, .z = metallic roughness, .w = AO
+    ivec4 Indices2; // .x = Emissive, .y = clear coat, .z = clear coat roughness, .w = clear coat thickness
+    vec4 m_baseColorFactor;
+    vec4 m_metallicRoughnessNormalOcclusion;
+    vec4 m_emmisiveFactorAlphaCutoff;
+    vec4 m_clearCoatTransmissionThinkness;
+    vec4 m_typeIORAlpha; // x. material type, y. IOR, z. alpha mode, w. unused
+};
+
+
+layout(push_constant) uniform Constants {
+    uint BaseTextureIndex; 
+} push;
+
+layout(constant_id = 0) const uint LIGHTING_MODE = LIGHTING_MODE_FULL;
+
+layout(location = 0) in vec2 TexCoord;
+layout(location = 1) flat in uint MaterialIndex;
+layout(location = 2) in vec3 WorldPos;
+layout(location = 3) in vec3 Normal;
+layout(location = 4) in vec4 VertexColor;
+layout(location = 5) in vec3 Tangent;
+layout(location = 6) in vec3 Bitangent;
+
+layout(location = 0) out vec4 OutColor;
 
 layout(set = 0, binding = 0) uniform sampler2D Textures[];
 
@@ -127,16 +135,6 @@ layout(set = 1, binding = 5) uniform sampler2D ShadowMaps[MAX_NUM_LIGHTS];
 layout(set = 1, binding = 6) uniform LightTransforms {
     mat4 LightVP[MAX_NUM_LIGHTS];
 } LightMatrices;
-
-struct MaterialData { 
-    ivec4 Indices; // .x = BaseColorIndex, .y = NormalMapIndex, .z = metallic roughness, .w = AO
-    ivec4 Indices2; // .x = Emissive, .y = clear coat, .z = clear coat roughness, .w = clear coat thickness
-    vec4 m_baseColorFactor;
-    vec4 m_metallicRoughnessNormalOcclusion;
-    vec4 m_emmisiveFactorAlphaCutoff;
-    vec4 m_clearCoatTransmissionThinkness;
-    vec4 m_typeIORAlpha; // x. material type, y. IOR, z. alpha mode, w. unused
-};
 
 layout(std430, set = 1, binding = 7) readonly buffer MaterialSSBO { 
     MaterialData materials[]; 
