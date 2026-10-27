@@ -316,11 +316,20 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
                 md.m_materials.push_back(ti);
 				
                 int TextureIndex = (int)md.m_materials.size() - 1;
-                GPU_Materials[MaterialIndex].m_baseColorTexIndex = TextureIndex; // baseColor
+                GPU_Materials[MaterialIndex].m_baseColorTexIndex = TextureIndex;
 			} else {
 				printf("No diffuse texture in material %d\n", MaterialIndex);
 				exit(0);
 			}
+
+			const Vector4f& BaseColor = m_Materials[MaterialIndex].m_pMaterialData->m_baseColor;
+			GPU_Materials[MaterialIndex].m_baseColorFactor = BaseColor.ToGLM();
+
+			GPU_Materials[MaterialIndex].m_typeIORAlpha = glm::vec4(
+				m_Materials[MaterialIndex].m_pMaterialData->m_materialType,
+				m_Materials[MaterialIndex].m_pMaterialData->m_ior,
+				m_Materials[MaterialIndex].m_pMaterialData->m_alphaMode,
+				0);
 
             if (!IsPBR) {
                 continue;
@@ -367,9 +376,6 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
                 GPU_Materials[MaterialIndex].m_emissionTexIndex = TextureIndex; // emission color
             }
 
-            const Vector4f& BaseColor = m_Materials[MaterialIndex].m_pMaterialData->m_baseColor;
-            GPU_Materials[MaterialIndex].m_baseColorFactor = BaseColor.ToGLM();
-
             const Vector4f& mrno = m_Materials[MaterialIndex].m_pMaterialData->m_metallicRoughnessNormalOcclusion;
             GPU_Materials[MaterialIndex].m_metallicRoughnessNormalOcclusion = mrno.ToGLM();
 
@@ -378,12 +384,6 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
 
             const Vector4f& ClearCoat = m_Materials[MaterialIndex].m_pMaterialData->m_clearCoatTransmissionThickness;
             GPU_Materials[MaterialIndex].m_clearCoatTransmissionThinkness = ClearCoat.ToGLM();
-
-            GPU_Materials[MaterialIndex].m_typeIORAlpha = glm::vec4(
-                m_Materials[MaterialIndex].m_pMaterialData->m_materialType,
-                m_Materials[MaterialIndex].m_pMaterialData->m_ior,
-                m_Materials[MaterialIndex].m_pMaterialData->m_alphaMode,
-                0);
 		}
 
         if (m_materialsBuffer.m_buffer == VK_NULL_HANDLE) {
