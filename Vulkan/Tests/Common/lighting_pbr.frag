@@ -50,6 +50,7 @@ struct LightSource {
     vec4 Config;				   // offset 64 x = Enabled, y = Casts shadows, z = bias, w = filter size
 };
 
+
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
 // of the shading terms, outlined in the Readme.MD Appendix.
@@ -89,6 +90,7 @@ struct PBRInfo {
     float brdf_scale;
     float brdf_bias;
 };
+
 
 struct InputAttributes {
     vec2 uv[2];
@@ -168,6 +170,12 @@ vec3 ToneMapACES(vec3 x)
 }
 
 
+float ClampedDot(vec3 x, vec3 y) 
+{
+    return clamp(dot(x, y), 0.0, 1.0);
+}
+
+
 // ---------------------------------------------------------------------------
 // Material
 // ---------------------------------------------------------------------------
@@ -178,6 +186,13 @@ vec4 TextureBindless2D(uint TextureIndex, vec2 uv)
     uint Index = push.BaseTextureIndex + TextureIndex;
     return texture(Textures[nonuniformEXT(Index)], uv);
 }
+
+
+vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH) 
+{
+    return f0 + (f90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -473,6 +488,53 @@ vec4 sampleMetallicRoughness(InputAttributes tc)
     }
 }
 
+/*
+// Based on: https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/main/source/Renderer/shaders/pbr.frag
+vec3 getIBLRadianceLambertian(PBRInfo pbrInputs) 
+{
+    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
+
+    vec3 Irradiance = texture(envMap.envMapTextureIrradianceSampler, pbrInputs.n).rgb;
+
+    // Multiple scattering, from Fdez-Aguera
+    float Ems = (1.0 - (pbrInputs.brdf_scale + pbrInputs.brdf_bias));
+    vec3 F_avg = (pbrInputs.reflectance0 + (1.0 - pbrInputs.reflectance0) / 21.0);
+    vec3 FmsEms = F_avg * Ems * pbrInputs.FssEss / (1.0 - F_avg * Ems);
+    // we use +FmsEms as indicated by the formula in the blog post 
+    // (might be a typo in the implementation)
+    vec3 k_D = pbrInputs.baseDiffuseColor * (1.0 - pbrInputs.FssEss + FmsEms); 
+
+    return (FmsEms + k_D) * Irradiance;
+}
+
+// Calculation of the lighting contribution from an optional Image Based Light source.
+// Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
+// See our README.md on Environment Maps [3] for additional discussion.
+vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0) 
+{
+    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());       
+    float mipCount = float(textureQueryLevels(envMap.envMapTextureSampler));
+    float lod = roughness * (mipCount - 1);
+    vec3 reflection = normalize(reflect(-v, n));
+    
+    // HDR envmaps are already linear
+    vec3 specularLight = sampleEnvMapLod(reflection.xyz, lod, envMap).rgb;
+
+    float NdotV = ClampedDot(n, v);
+    // brdfLUT.ktx stores roughness flipped: row y = roughness 1 - y (see brdf_lut.cs)
+    vec2 brdfSamplePoint = clamp(vec2(NdotV, 1.0 - roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
+    vec3 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
+
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
+    vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
+    vec3 k_S = F0 + Fr * pow(1.0 - NdotV, 5.0);
+    vec3 FssEss = k_S * f_ab.x + f_ab.y;
+
+    return specularLight * FssEss;
+}
+*/
+
 
 // Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
 // http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf
@@ -517,6 +579,23 @@ float microfacetDistribution(PBRInfo pbrInputs)
     return roughnessSq / (M_PI * f * f);
 }
 
+
+vec3 CalcSchlickFresnel(inout PBRInfo pbrInputs)
+{
+    vec2 brdfSamplePoint = vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness);
+    brdfSamplePoint = clamp(brdfSamplePoint, vec2(0.0, 0.0), vec2(1.0, 1.0));
+    vec2 brdf = texture(BRDF_LUT, brdfSamplePoint).rg;
+    pbrInputs.brdf_scale = brdf.x;
+    pbrInputs.brdf_bias = brdf.y;
+
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Carmelo Fdez-Aguera
+    vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
+    vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
+    vec3 FssEss = k_S * pbrInputs.brdf_scale + pbrInputs.brdf_bias;
+
+    return FssEss;
+}
 
 
 PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSample) 
@@ -563,7 +642,7 @@ PBRInfo CalculatePBRInputsMetallicRoughness(vec4 albedo, vec3 normal, vec4 mrSam
     pbrInputs.MetallicFactor = MetallicFactor;
     pbrInputs.clearCoatFactor = 0.0;
 
-   // pbrInputs.FssEss = CalcSchlickFresnel(pbrInputs);
+    pbrInputs.FssEss = CalcSchlickFresnel(pbrInputs);
 
     return pbrInputs;
 }
@@ -700,5 +779,16 @@ void main()
   //  OutColor = vec4(pbrInputs.reflectance0, 1.0);                // 0.04 grey for non-metals, albedo for metals
    // OutColor = vec4(pbrInputs.n * 0.5 + 0.5, 1.0);               // must show the bump detail
 
-   OutColor = vec4(texture(BRDF_LUT, gl_FragCoord.xy / vec2(2560.0, 1440.0)).rg, 0.0, 1.0);
+ //  OutColor = vec4(texture(BRDF_LUT, gl_FragCoord.xy / vec2(2560.0, 1440.0)).rg, 0.0, 1.0);
+
+// vec3 R = reflect(-pbrInputs.v, GeoNormal);
+//OutColor = vec4(ToneMapACES(textureLod(EnvMap, R, 0.0).rgb * ubo.Config.y), 1.0);
+
+//vec3 R = reflect(-pbrInputs.v, pbrInputs.n);
+//OutColor = vec4(ToneMapACES(textureLod(EnvMap, R, 8.0).rgb * ubo.Config.y), 1.0);   // 0, 4, 8
+ //OutColor = vec4(ToneMapACES(texture(IrradianceMap, pbrInputs.n).rgb * ubo.Config.y), 1.0);
+
+ OutColor = vec4(pbrInputs.brdf_scale, pbrInputs.brdf_bias, 0.0, 1.0);
+
+
 }
