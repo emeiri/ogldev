@@ -65,7 +65,7 @@ layout(location = 0) out vec4 OutColor;
 
 layout(set = 0, binding = 0) uniform sampler2D Textures[];
 
-layout(set = 1, binding = 4) readonly uniform UniformBuffer { 
+layout(set = 1, binding = 4) uniform UniformBuffer { 
     ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
     vec4 CameraWorldPos;
     vec4 Material;            // .x = specular intensity
