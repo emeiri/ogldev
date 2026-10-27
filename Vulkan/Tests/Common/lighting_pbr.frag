@@ -508,31 +508,23 @@ vec3 getIBLRadianceLambertian(PBRInfo pbrInputs)
 // Calculation of the lighting contribution from an optional Image Based Light source.
 // Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
 // See our README.md on Environment Maps [3] for additional discussion.
-/*
 vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0) 
 {
-    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());       
-    float mipCount = float(textureQueryLevels(envMap.envMapTextureSampler));
+    float mipCount = float(textureQueryLevels(EnvMap));
+
     float lod = roughness * (mipCount - 1);
     vec3 reflection = normalize(reflect(-v, n));
     
     // HDR envmaps are already linear
-    vec3 specularLight = sampleEnvMapLod(reflection.xyz, lod, envMap).rgb;
+    vec3 specularLight = textureLod(EnvMap, reflection.xyz, lod).rgb;
 
     float NdotV = ClampedDot(n, v);
     // brdfLUT.ktx stores roughness flipped: row y = roughness 1 - y (see brdf_lut.cs)
     vec2 brdfSamplePoint = clamp(vec2(NdotV, 1.0 - roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
-    vec3 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
+    vec3 f_ab = vec3(texture(BRDF_LUT, brdfSamplePoint).rg, 0.0);
 
-    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
-    // Roughness dependent fresnel, from Fdez-Aguera
-    vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
-    vec3 k_S = F0 + Fr * pow(1.0 - NdotV, 5.0);
-    vec3 FssEss = k_S * f_ab.x + f_ab.y;
-
-    return specularLight * FssEss;
+    return specularLight * pbrInputs.FssEss;
 }
-*/
 
 
 // Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
@@ -788,6 +780,8 @@ void main()
  //OutColor = vec4(ToneMapACES(texture(IrradianceMap, pbrInputs.n).rgb * ubo.Config.y), 1.0);
 
  //OutColor = vec4(pbrInputs.brdf_scale, pbrInputs.brdf_bias, 0.0, 1.0);
-  OutColor = vec4(ToneMapACES(getIBLRadianceLambertian(pbrInputs) * ubo.Config.y), 1.0);
+  //OutColor = vec4(ToneMapACES(getIBLRadianceLambertian(pbrInputs) * ubo.Config.y), 1.0);
 
+
+  OutColor = vec4(ToneMapACES(getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0) * ubo.Config.y), 1.0);
 }
