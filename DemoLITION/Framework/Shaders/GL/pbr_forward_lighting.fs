@@ -86,7 +86,7 @@ struct PBRInfo {
     float VdotH;                  // cos angle between view direction and half vector
 
     // Normal
-    vec3 n;              // Sahding normal
+    vec3 n;              // Shading normal
     vec3 ng;            // Geometry normal
     vec3 t;              // Geometry tangent
     vec3 b;              // Geometry bitangent
@@ -100,6 +100,7 @@ struct PBRInfo {
     float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
     vec3 baseDiffuseColor;            // color contribution from diffuse lighting
     vec3 baseSpecularColor;           // color contribution from specular lighting
+    float MetallicFactor;              // metallic factor, as authored by the model creator (input to shader)
 
     vec3 clearCoatF0;
     vec3 clearCoatF90;
@@ -505,6 +506,7 @@ vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0)
     return specularLight * FssEss;
 }
 
+
 // Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
 // http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf
 vec3 diffuseBurley(PBRInfo pbrInputs) 
@@ -611,6 +613,8 @@ PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat,
     pbrInputs.baseSpecularColor = baseSpecularColor;
     pbrInputs.n = normal;
     pbrInputs.v = v;
+    pbrInputs.MetallicFactor = MetallicFactor;
+    pbrInputs.clearCoatFactor = 0.0;
 
     pbrInputs.FssEss = CalcSchlickFresnel(pbrInputs);
 
@@ -672,6 +676,10 @@ vec3 CalcClearCoat(inout PBRInfo pbrInputs, MetallicRoughnessDataGPU mat, InputA
     return ClearCoatContrib;
 }
 
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 
 void main()
 {
