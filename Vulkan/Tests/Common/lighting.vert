@@ -70,7 +70,7 @@ layout(location = 0) out vec2 TexCoord;
 layout(location = 1) flat out uint MaterialIndex;
 layout(location = 2) out vec3 WorldPos;
 layout(location = 3) out vec3 Normal;
-layout(location = 4) out vec4 Color;
+layout(location = 4) out vec4 VertexColor;
 layout(location = 5) out vec3 Tangent;
 layout(location = 6) out vec3 Bitangent;
 
@@ -106,7 +106,7 @@ void main()
 
     Bitangent = mat3(WorldTransform) * vec3(vtx.bitangent_x, vtx.bitangent_y, vtx.bitangent_z);        
 
-    Color = md.Color;
+    VertexColor = vec4(vtx.color_r, vtx.color_g, vtx.color_b, vtx.color_a);
 
     // DEBUGGING
     //Normal = OrigNorm;  
