@@ -166,28 +166,24 @@ vec3 CalcShadowCoords(int Index)
 
 float CalcShadowFactorBasic(int Index, vec3 LightDirection)
 {
-    float ShadowFactor = 1.0;
+    vec3 ShadowCoords = CalcShadowCoords(Index);
 
-    if (ubo.LightSources[Index].Config.y > 0.0) {
-        vec3 ShadowCoords = CalcShadowCoords(Index);
-
-        if (IsOutsideShadowMap(ShadowCoords)) {
-            return 1.0;
-        }
-
-        float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
-
-        float bias;
-    
-        float ConfiguredBias = ubo.LightSources[Index].Config.z;
-        if (ConfiguredBias > 0.0) {
-            bias = ConfiguredBias;
-        } else {
-            bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
-        }
-
-        ShadowFactor = (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
+    if (IsOutsideShadowMap(ShadowCoords)) {
+        return 1.0;
     }
+
+    float DiffuseFactor = clamp(dot(GeoNormal, -LightDirection), 0.0, 1.0);
+
+    float bias;
+    
+    float ConfiguredBias = ubo.LightSources[Index].Config.z;
+    if (ConfiguredBias > 0.0) {
+        bias = ConfiguredBias;
+    } else {
+        bias = max(0.05 * (1.0 - DiffuseFactor), 0.0005);
+    }
+
+    float ShadowFactor = (ShadowTest(Index, ShadowCoords.xy, ShadowCoords.z, bias) > 0.5) ? 1.0 : kShadowFloor;
 
     return ShadowFactor;
 }
@@ -233,21 +229,27 @@ float CalcShadowFactorPCF(int Index, vec3 LightDirection)
 // Point lights use the cube map; spot and directional lights use the 2D map.
 float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 {
+    float ShadowFactor = 1.0;
 
-  //  if (IsPoint) {
-  //      return CalcShadowFactorPointLight(LightToPixel);
-  //  }
+    if (ubo.LightSources[Index].Config.y > 0.0) {
 
-    vec3 LightDirection = normalize(LightToPixel);
+      //  if (IsPoint) {
+      //      ShadowFactor = CalcShadowFactorPointLight(LightToPixel);
+      //  }
 
-    int ShadowMapFilterSize = int(ubo.LightSources[Index].Config.w);
- //   if (gShadowMapRandomRadius > 0.0) {
-  //      return CalcShadowFactorWithRandomSampling(LightDirection);
-    if (ShadowMapFilterSize > 0) {
-       return CalcShadowFactorPCF(Index, LightDirection);
-    } else {
-        return CalcShadowFactorBasic(Index, LightDirection);
+        vec3 LightDirection = normalize(LightToPixel);
+
+        int ShadowMapFilterSize = int(ubo.LightSources[Index].Config.w);
+     //   if (gShadowMapRandomRadius > 0.0) {
+      //      ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection);
+        if (ShadowMapFilterSize > 0) {
+           ShadowFactor = CalcShadowFactorPCF(Index, LightDirection);
+        } else {
+            ShadowFactor = CalcShadowFactorBasic(Index, LightDirection);
+        }
     }
+
+    return ShadowFactor;
 }
 
 // ---------------------------------------------------------------------------
@@ -519,4 +521,12 @@ void main()
     }
 
     //OutColor = vec4(normalize(Bitangent) * 0.5 + 0.5, 1);
+
+    //int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].m_indices1.y;
+
+   // TexColor = TextureBindless2D(NormalTextureIndex, TexCoord);
+
+    //OutColor = vec4(TexColor.rgb, 1.0);
+
+    //OutColor = vec4(CalcBumpedNormal(), 1.0);
 }
