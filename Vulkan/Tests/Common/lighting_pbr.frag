@@ -61,7 +61,7 @@ layout(location = 0) in vec2 TexCoord;
 layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 WorldPos;
 layout(location = 3) in vec3 Normal;
-layout(location = 4) in vec4 Color;
+layout(location = 4) in vec4 VertexColor;
 layout(location = 5) in vec3 Tangent;
 layout(location = 6) in vec3 Bitangent;
 
@@ -608,7 +608,7 @@ void main()
    
     vec4 AmbientOcclusion = sampleAO(tc);
     vec4 EmissiveColor = SampleEmissive(tc);
-    vec4 AlbedoColor = sampleAlbedo(tc);
+    vec4 AlbedoColor = sampleAlbedo(tc) * VertexColor;
     vec4 mrSample = sampleMetallicRoughness(tc);
     vec3 N = CalcBumpedNormal();
 
