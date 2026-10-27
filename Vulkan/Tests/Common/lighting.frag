@@ -57,7 +57,7 @@ layout(location = 0) in vec2 TexCoord;
 layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 WorldPos;
 layout(location = 3) in vec3 Normal;
-layout(location = 4) in vec4 Color;
+layout(location = 4) in vec4 VertexColor;
 layout(location = 5) in vec3 Tangent;
 layout(location = 6) in vec3 Bitangent;
 
@@ -80,9 +80,9 @@ layout(set = 1, binding = 6) uniform LightMats {
 } LightMatrices;
 
 struct MaterialData { 
-    ivec4 Indices; // .x = BaseColorIndex, .y = NormalMapIndex, .z = metallic roughness, .w = AO
-    ivec4 Indices2; // .x = Emissive, .y = clear coat, .z = clear coat roughness, .w = clear coat thickness
-    vec4 BaseColorFactor;
+    ivec4 m_indices1; // .x = BaseColorIndex, .y = NormalMapIndex, .z = metallic roughness, .w = AO
+    ivec4 m_indices2; // .x = Emissive, .y = clear coat, .z = clear coat roughness, .w = clear coat thickness
+    vec4 m_baseColorFactor;
     vec4 m_matallicRoughnessNormalOcclusion;
     vec4 m_emmisiveFactorAlphaCutoff;
     vec4 m_clearCoatTransmissionThinkness;
@@ -256,7 +256,7 @@ float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 
 vec3 CalcBumpedNormal()
 {
-    int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.y;
+    int NormalTextureIndex = MaterialBuf.materials[MaterialIndex].m_indices1.y;
 
     if (NormalTextureIndex < 0) {
         return GeoNormal;
@@ -438,7 +438,7 @@ vec4 GetTexColor()
    //     TexColor = vec4(1.0, 0.0, 0.0, 1.0);
     //}
 
-    int BaseColorTextureIndex = MaterialBuf.materials[MaterialIndex].Indices.x;
+    int BaseColorTextureIndex = MaterialBuf.materials[MaterialIndex].m_indices1.x;
 
     TexColor = TextureBindless2D(BaseColorTextureIndex, TexCoord);
 
@@ -488,7 +488,7 @@ void main()
 
     vec4 TexColor = GetTexColor();
 
-    vec4 BaseColor = TexColor * Color;
+    vec4 BaseColor = TexColor * VertexColor * MaterialBuf.materials[MaterialIndex].m_baseColorFactor;
 
     vec3 LightColor = ubo.LightSources[0].Color;
     float AmbientIntensity = ubo.LightSources[0].AmbientIntensity;
