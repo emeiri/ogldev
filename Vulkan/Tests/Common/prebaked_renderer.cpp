@@ -79,6 +79,7 @@ PreBakedRenderer::~PreBakedRenderer()
 
 	vkDestroyShaderModule(m_device, m_vs, NULL);
 	vkDestroyShaderModule(m_device, m_fs, NULL);
+	vkDestroyShaderModule(m_device, m_pbrFs, NULL);
 
 	for (OgldevVK::LightingProgram& p : m_pipelines) {
 		p.Destroy();
