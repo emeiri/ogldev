@@ -96,7 +96,7 @@ PreBakedRenderer::~PreBakedRenderer()
         }
 	}
 
-	for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersLights) {
+	for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersLightTransforms) {
         ub.Destroy(m_device);
 	}
 
@@ -477,8 +477,8 @@ void PreBakedRenderer::CreateUniformBuffers(int MeshIndex)
 	m_modelContext.m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
 
     // Light uniform buffers
-    size_t UniformBufferSizeLights = OgldevVK::LightingProgram::GetUniformBufferSizeLights();
-    m_uniformBuffersLights = m_vkCore.CreateUniformBuffers(UniformBufferSizeLights);
+    size_t UniformBufferSizeLightTransforms = OgldevVK::LightingProgram::GetUniformBufferSizeLightTransforms();
+    m_uniformBuffersLightTransforms = m_vkCore.CreateUniformBuffers(UniformBufferSizeLightTransforms);
 }
 
 
@@ -491,7 +491,7 @@ void PreBakedRenderer::CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& 
 	m_pipelines[0].UpdateDescriptorSets(md, m_modelContext.m_descSets,
 											m_modelContext.m_uniformBuffersVS, 
 											m_modelContext.m_uniformBuffersFS,
-									        m_uniformBuffersLights,
+									        m_uniformBuffersLightTransforms,
 									        m_shadowMaps);
 }
 
@@ -681,6 +681,8 @@ void PreBakedRenderer::UpdateGUI()
 		ImGui::RadioButton(lightingModeNames[i], (int*)&m_lightingMode, i);
 	}
 
+	ImGui::DragFloat("Exposure", &m_exposure, 0.01f, 0.0f, 10.0f);
+
 	static const char* LightTypeNames[] = { "Directional", "Point", "Spot" };   // match your LIGHT_TYPE_* order
 
 	int NumLights = m_modelContext.m_pModel->GetNumLights();
@@ -773,7 +775,8 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 												    m_lights,
 													m_modelContext.m_uniformBuffersVS[ImageIndex],
 													m_modelContext.m_uniformBuffersFS[ImageIndex],
-													m_uniformBuffersLights[ImageIndex],
+													m_uniformBuffersLightTransforms[ImageIndex],
 													SHADOW_MAP_WIDTH,
-													SHADOW_MAP_HEIGHT);
+													SHADOW_MAP_HEIGHT,
+                                                    m_exposure);
 }

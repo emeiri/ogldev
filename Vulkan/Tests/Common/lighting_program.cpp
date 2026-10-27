@@ -388,13 +388,15 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
                                            BufferAndMemory& UniformBufferFS,
                                            BufferAndMemory& UBOLights,
 										   uint ShadowMapWidth,
-										   uint ShadowMapHeight)
+										   uint ShadowMapHeight,
+                                           float Exposure)
 {
     LightingProgram::UpdateUniformBuffersVS(Device, VP, World, SubmeshTransformations, UniformBufferVS);
 
-    LightingProgram::UpdateUniformBuffersFS(Device, CameraWorldPos, NumLights, Lights, UniformBufferFS);
+    LightingProgram::UpdateUniformBuffersFS(Device, CameraWorldPos, NumLights, Lights, UniformBufferFS, Exposure);
 
-    LightingProgram::UpdateUniformBuffersLights(Device, NumLights, Lights, VP, PersProjInfo_, UBOLights, ShadowMapWidth, ShadowMapHeight);
+    LightingProgram::UpdateUniformBuffersLightTransforms(Device, NumLights, Lights, VP, PersProjInfo_, 
+														 UBOLights, ShadowMapWidth, ShadowMapHeight);
 }
 
 
@@ -423,15 +425,16 @@ void LightingProgram::UpdateUniformBuffersVS(VkDevice Device,
 
 
 void LightingProgram::UpdateUniformBuffersFS(VkDevice Device,
-    const glm::vec3& CameraWorldPos,
-    int NumLights,
-    const std::vector<LightSource>& Lights,
-    BufferAndMemory& UniformBufferFS)
+											 const glm::vec3& CameraWorldPos,
+											 int NumLights,
+											 const std::vector<LightSource>& Lights,
+											 BufferAndMemory& UniformBufferFS,
+											 float Exposure)
 {
 	UniformDataFS UboDataFS = {
-		.Counts = glm::ivec4(NumLights, 0, 0, 0),       // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+		.Counts = glm::ivec4(NumLights, 0, 0, 0),            // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
 		.CameraWorldPos = glm::vec4(CameraWorldPos, 1.0f),
-		.Material = glm::vec4(0.0f),            // .x = specular intensity
+		.Config = glm::vec4(0.0f, Exposure, 0.0f, 0.0f),     // .x = specular intensity, .y = exposure
 	};
 
 	for (int i = 0; i < NumLights; i++) {
@@ -442,7 +445,7 @@ void LightingProgram::UpdateUniformBuffersFS(VkDevice Device,
 }
 
 
-void LightingProgram::UpdateUniformBuffersLights(VkDevice Device,
+void LightingProgram::UpdateUniformBuffersLightTransforms(VkDevice Device,
 												int NumLights,
 												const std::vector<LightSource>& Lights,
 												const glm::mat4& VP,
@@ -451,15 +454,14 @@ void LightingProgram::UpdateUniformBuffersLights(VkDevice Device,
 												uint ShadowMapWidth,
 												uint ShadowMapHeight)
 {
-	UniformBufferLights UBL = {};
-	UBL.Counts = glm::ivec4(NumLights, 0, 0, 0);
+	UniformBufferLightTransforms UBL = {};
 
 	for (int i = 0; i < NumLights; i++) {
 		const LightSource& Light = Lights[i];
 
 		switch (Light.LightType) {
 		case LIGHT_TYPE_DIR:
-			UBL.ViewProj[i] = CalcTightLightProjection(VP, Light.Direction, PersProjInfo_.zNear, PersProjInfo_.zFar, 40.0f);
+			UBL.LightVP[i] = CalcTightLightProjection(VP, Light.Direction, PersProjInfo_.zNear, PersProjInfo_.zFar, 40.0f);
 			break;
 
 		case LIGHT_TYPE_SPOT:
@@ -471,7 +473,7 @@ void LightingProgram::UpdateUniformBuffersLights(VkDevice Device,
 			float FOV = 2.0f * acosf(Light.Cutoff);               // Cutoff is cos(half-angle) -> full cone angle in radians
 			float Aspect = (float)ShadowMapWidth / (float)ShadowMapHeight;
 			glm::mat4 Proj = glm::perspectiveLH_ZO(FOV, Aspect, 1.0f, 100.0f);
-			UBL.ViewProj[i] = Proj * View;
+			UBL.LightVP[i] = Proj * View;
 		}
 		break;
 

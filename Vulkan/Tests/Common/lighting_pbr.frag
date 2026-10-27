@@ -118,14 +118,13 @@ layout(set = 0, binding = 0) uniform sampler2D Textures[];
 layout(set = 1, binding = 4) uniform UniformBuffer { 
     ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
     vec4 CameraWorldPos;
-    vec4 Material;            // .x = specular intensity
+    vec4 Config;            // .x = specular intensity, .y = exposure
     LightSource LightSources[MAX_NUM_LIGHTS];
 } ubo;
 
 layout(set = 1, binding = 5) uniform sampler2D ShadowMaps[MAX_NUM_LIGHTS];
 
-layout(set = 1, binding = 6) uniform LightMats {
-    ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+layout(set = 1, binding = 6) uniform LightTransforms {
     mat4 LightVP[MAX_NUM_LIGHTS];
 } LightMatrices;
 
@@ -153,6 +152,18 @@ const float kShadowFloor = 0.0;
 const float M_PI = 3.141592653589793;
 
 vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection, vec3 lightColor);
+
+// Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
+vec3 ToneMapACES(vec3 x)
+{
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
 
 // ---------------------------------------------------------------------------
 // Material
@@ -623,6 +634,8 @@ void main()
    
     pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
 
+    vec3 Ambient = vec3(0.0);
+
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
             OutColor = AlbedoColor;
@@ -633,12 +646,15 @@ void main()
             break;
 
         case LIGHTING_MODE_AMBIENT_ONLY:
-        //    OutColor = vec4(AlbedoColor.rgb * LightColor * AmbientIntensity, AlbedoColor.a);
+            for (int i = 0; i < ubo.Counts.x; i++) {
+                if (ubo.LightSources[i].Config.x > 0.5) {
+                    Ambient += ubo.LightSources[i].Color * ubo.LightSources[i].AmbientIntensity;
+                }
+            }
             break;
 
         case LIGHTING_MODE_FULL:
           // Placeholder ambient until IBL (step 6)
-            vec3 Ambient = vec3(0.0);
             for (int i = 0; i < ubo.Counts.x; i++) {
                 if (ubo.LightSources[i].Config.x > 0.5) {
                     Ambient += ubo.LightSources[i].Color * ubo.LightSources[i].AmbientIntensity;
@@ -650,6 +666,8 @@ void main()
             Ambient *= pbrInputs.baseDiffuseColor * Occlusion;
 
             vec3 Color = Ambient + GetTotalLight() + EmissiveColor.rgb;
+            Color *= ubo.Config.y; // exposure
+            Color = ToneMapACES(Color);
             OutColor = vec4(Color, AlbedoColor.a);
 
             break;

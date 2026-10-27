@@ -101,13 +101,14 @@ public:
 									 BufferAndMemory& UniformBufferFS,
 									 BufferAndMemory& UniformBufferLights,
 									 uint ShadowMapWidth,
-									 uint ShadowMapHeight);
+									 uint ShadowMapHeight,
+									 float Exposure);
 
 	static size_t GetUniformBufferSizeVS(size_t NumSubmeshes) { return NumSubmeshes * sizeof(UniformDataVS); }
 
     static size_t GetUniformBufferSizeFS() { return sizeof(UniformDataFS); }
 
-    static size_t GetUniformBufferSizeLights() { return sizeof(UniformBufferLights); }
+    static size_t GetUniformBufferSizeLightTransforms() { return sizeof(UniformBufferLightTransforms); }
 
 protected:
 
@@ -127,9 +128,10 @@ private:
 									   const glm::vec3& CameraWorldPos,
 									   int NumLights,
 									   const std::vector<LightSource>& Lights,
-									   BufferAndMemory& UniformBufferFS);
+									   BufferAndMemory& UniformBufferFS,
+                                       float Exposure);
 
-    static void UpdateUniformBuffersLights(VkDevice Device,
+    static void UpdateUniformBuffersLightTransforms(VkDevice Device,
 											int NumLights,
 											const std::vector<LightSource>& Lights,
 											const glm::mat4& VP,
@@ -141,7 +143,7 @@ private:
 	struct UniformDataFS {
 		glm::ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
 		glm::vec4 CameraWorldPos;
-		glm::vec4 Material;            // .x = specular intensity
+		glm::vec4 Config;            // .x = specular intensity, .y = exposure
 		LightSource LightSources[MAX_NUM_LIGHTS];
 	};
 
@@ -151,9 +153,8 @@ private:
 		glm::mat4 NormalTransform;
 	};
 
-    struct UniformBufferLights {
-        glm::ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
-        glm::mat4 ViewProj[MAX_NUM_LIGHTS];
+    struct UniformBufferLightTransforms {
+        glm::mat4 LightVP[MAX_NUM_LIGHTS];
     };
 
 	int m_numImages = 0;

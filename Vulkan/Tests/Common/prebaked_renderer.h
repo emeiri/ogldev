@@ -143,7 +143,7 @@ private:
 	VkDevice m_device = NULL;
 	std::vector<OgldevVK::OffscreenImage> m_offscreenImages;
 	std::vector< std::vector<OgldevVK::VulkanTexture > > m_shadowMaps;   
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersLights;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersLightTransforms;
 	int m_numImages = 0;
 	struct MeshCmdBufs {
 		std::vector<VkCommandBuffer> m_cbs; // Size: m_numImages
@@ -173,5 +173,6 @@ private:
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
 	std::string m_appName;
 	GameCallbacks* m_pGameCallbacks = NULL;
+    float m_exposure = 0.6f;
     std::vector<OgldevVK::LightSource> m_lights;
 };

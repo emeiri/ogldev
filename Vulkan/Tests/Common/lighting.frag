@@ -68,14 +68,13 @@ layout(set = 0, binding = 0) uniform sampler2D Textures[];
 layout(set = 1, binding = 4) uniform UniformBuffer { 
     ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
     vec4 CameraWorldPos;
-    vec4 Material;            // .x = specular intensity
+    vec4 Config;            // .x = specular intensity, .y = exposure
     LightSource LightSources[MAX_NUM_LIGHTS];
 } ubo;
 
 layout(set = 1, binding = 5) uniform sampler2D ShadowMaps[MAX_NUM_LIGHTS];
 
-layout(set = 1, binding = 6) uniform LightMats {
-    ivec4 Counts;              // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
+layout(set = 1, binding = 6) uniform LightTransforms {
     mat4 LightVP[MAX_NUM_LIGHTS];
 } LightMatrices;
 
@@ -128,7 +127,7 @@ vec4 GetMaterialDiffuseColor()
 
 vec4 GetMaterialSpecularColor() 
 { 
-    return vec4(ubo.Material.x); 
+    return vec4(ubo.Config.x); 
 }
 
 
