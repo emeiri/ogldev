@@ -43,11 +43,13 @@ struct GPUMaterial {
     i32 m_normalTexIndex = -1;
     i32 m_metallicRoughnessTexIndex = -1;
     i32 m_aoTexIndex = -1;
+
     i32 m_emissionTexIndex = -1;
     i32 m_clearCoatTexIndex = -1;
     i32 m_clearCoatRoughnessTexIndex = -1;
     i32 m_clearCoatNormalTexIndex = -1;
-    glm::vec4 m_baseColorFactor = glm::vec4(1.0f);
+    
+	glm::vec4 m_baseColorFactor = glm::vec4(1.0f);
     glm::vec4 m_metallicRoughnessNormalOcclusion = glm::vec4(1.0f);
     glm::vec4 m_emmisiveFactorAlphaCutoff = glm::vec4(0.0f);
     glm::vec4 m_clearCoatTransmissionThinkness = glm::vec4(1.0f);

@@ -234,7 +234,7 @@ VkShaderModule CreateShaderModuleFromText(VkDevice Device, const char* pFilename
 	bool Success = CompileShader(Device, ShaderStage, Source.c_str(), ShaderModule);	
 
 	if (Success) {
-		printf("Created shader from text file '%s\\%s'\n", CurWorkDir, pFilename);
+		printf("Created shader from text file '%s\\%s' - handle %p\n", CurWorkDir, pFilename, (void*)ShaderModule.ShaderModule);
 		ret = ShaderModule.ShaderModule;
 		std::string BinaryFilename = std::string(pFilename) + ".spv";
 		WriteBinaryFile(BinaryFilename.c_str(), ShaderModule.SPIRV.data(), 
