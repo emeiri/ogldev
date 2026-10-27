@@ -645,7 +645,9 @@ void main()
                 }
             }
 
-            Ambient *= pbrInputs.baseDiffuseColor * AmbientOcclusion.r;
+            float OcclusionStrength = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.w;
+            float Occlusion = mix(1.0, AmbientOcclusion.r, OcclusionStrength);
+            Ambient *= pbrInputs.baseDiffuseColor * Occlusion;
 
             vec3 Color = Ambient + GetTotalLight() + EmissiveColor.rgb;
             OutColor = vec4(Color, AlbedoColor.a);
