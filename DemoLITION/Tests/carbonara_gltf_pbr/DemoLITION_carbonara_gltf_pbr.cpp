@@ -39,8 +39,8 @@ public:
 
         //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
         
-        m_pModel = m_pRenderingSystem->LoadModel("../Content/Mixamo/StandingIdle02/StandingIdle02.dae");
-        //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+       // m_pModel = m_pRenderingSystem->LoadModel("../Content/Mixamo/StandingIdle02/StandingIdle02.dae");
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
      //   m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
@@ -59,11 +59,12 @@ public:
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);
 
-        int t = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_diffuse.png");
-        m_pModel->SetColorTexture(t);
+        // These are causing a regression in damaged helmet. Need to investigate.        
+     //   int t = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_diffuse.png");
+     //   m_pModel->SetColorTexture(t);
 
-        int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
-        m_pModel->SetNormalMap(n);
+     //   int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
+     //   m_pModel->SetNormalMap(n);
 
         m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
         m_pSceneObject->RotateBy(0.0f, 100.0f, 0.0f);
