@@ -131,6 +131,7 @@ void PreBakedRenderer::Init(const std::string& AssetPath)
 	CreateMesh(AssetPath);
 	CreateCommandBuffers();
 	RecordCommandBuffers();
+    InitDefaultCamera();
 	InitCameraFromModel();
 	// The object is ready to receive callbacks
 	OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
@@ -254,14 +255,29 @@ void PreBakedRenderer::Execute()
 }
 
 
+void PreBakedRenderer::InitDefaultCamera()
+{
+	glm::vec3 DefaultPos(0.0f, 0.0f, -5.0f);
+	glm::vec3 DefaultTarget(0.0f, 0.0f, 1.0f);
+	glm::vec3 DefaultUp(0.0f, 1.0f, 0.0f);
+	PersProjInfo DefaultPersProj;
+	DefaultPersProj.Width = (float)m_windowWidth;
+	DefaultPersProj.Height = (float)m_windowHeight;
+	DefaultPersProj.FOV = 45.0f;
+	DefaultPersProj.zNear = 0.1f;
+	DefaultPersProj.zFar = 10.0f;
+	m_defaultCameraPers.Init(DefaultPos, DefaultTarget, DefaultUp, DefaultPersProj);
+}
+
+
 void PreBakedRenderer::InitCameraFromModel()
 {
     if (m_modelContext.m_pModel->GetCameras().size() == 0) {
-        OGLDEV_ERROR("Model has no cameras.");
-        assert(0);
-    }
-
-    m_pGameCamera = (GLMCameraFirstPerson*)&m_modelContext.m_pModel->GetCameras()[0];
+        printf("No cameras found in the model, using default camera\n");
+		m_pGameCamera = &m_defaultCameraPers;
+	} else {
+		m_pGameCamera = (GLMCameraFirstPerson*)&m_modelContext.m_pModel->GetCameras()[0];
+	}
 }
 
 
@@ -368,20 +384,26 @@ void PreBakedRenderer::CreateShadowMaps()
 
 void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
 {
-    m_modelContext.m_pModel = new OgldevVK::VkModel();
+	m_modelContext.m_pModel = new OgldevVK::VkModel();
 
-    // We don't really need a vector here, but we need to pass a vector to the CreateTextureArray function
+	// We don't really need a vector here, but we need to pass a vector to the CreateTextureArray function
 	std::vector<OgldevVK::ModelDesc> ModelDescs(1);
-		
+
 	m_modelContext.m_pModel->Init(&m_vkCore, true, false);
 	ModelLoadFlags Flags;
 	Flags.ConvertToLeftHanded = true;
 	m_modelContext.m_pModel->LoadAssimpModel(AssetPath, Flags);
-    CreateUniformBuffers(0);
-    CreateDescriptorSets(0, ModelDescs[0]);
+	CreateUniformBuffers(0);
+	CreateDescriptorSets(0, ModelDescs[0]);
 
 	m_bigTextureArray.CreateTextureArray(ModelDescs);
 
+	LoadLightsFromModel();
+}
+
+
+void PreBakedRenderer::LoadLightsFromModel()
+{
 	int NumTotalLights = 0;
 
 	const std::vector<DirectionalLight>& DirLights = m_modelContext.m_pModel->GetDirLights();
@@ -439,6 +461,15 @@ void PreBakedRenderer::CreateMesh(const std::string& AssetPath)
             .Cutoff = cosf(ToRadian(l.Cutoff))
 		};
 	}
+
+    if (NumTotalLights == 0) {
+        printf("No lights found in the model, using default directional light\n");
+        m_lights[0].Color = glm::vec3(1.0f);
+        m_lights[0].LightType = LIGHT_TYPE_DIR;
+        m_lights[0].Direction = glm::vec3(1.0f, -1.0f, 0.0f);
+        m_lights[0].AmbientIntensity = 0.1f;
+        m_lights[0].DiffuseIntensity = 1.0f;
+    }
 }
 
 

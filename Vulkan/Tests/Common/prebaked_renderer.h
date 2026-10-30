@@ -90,6 +90,8 @@ public:
 
 private:
 
+    void InitDefaultCamera();
+
 	void InitCameraFromModel();
 
 	void DefaultCreateCameraPers();
@@ -107,6 +109,8 @@ private:
     void CreateShadowMaps();
 
 	void CreateMesh(const std::string& AssetPath);
+
+    void LoadLightsFromModel();
 
 	void LoadPBRTextures();
 
@@ -164,6 +168,7 @@ private:
     OgldevVK::ShadowProgram m_shadowProgram;
 	ModelContext m_modelContext;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
+    GLMCameraFirstPerson m_defaultCameraPers;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
