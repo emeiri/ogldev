@@ -146,7 +146,8 @@ TerrainPBRTextures,gl,Windows/ogldev_vs_2026/TerrainPBRTextures/TerrainPBRTextur
 Terrain14_PerlinNoise,gl,Windows/ogldev_vs_2026/Terrain14/Terrain14.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Terrain14_PerlinNoise.exe,DemoLITION,,10,,,,1,ok,DemoLITION RenderingSystemGL::Execute; imgui
 Tutorial32,vk,Windows/ogldev_vs_2026/Vulkan/Tutorial32/Tutorial32.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Tutorial32.exe,Vulkan/Tutorial32,,10,,,,2,ok,"own GLFW loop; capture in VulkanCore; clock: glfwGetTime; imgui; fails without test mode too on a 2048x1152 screen (2560x1440 window): vkAcquireNextImageKHR/vkResetFences validation errors, then VK_ERROR_DEVICE_LOST"
 Tutorial33,vk,Windows/ogldev_vs_2026/Vulkan/Tutorial33/Tutorial33.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Tutorial33.exe,Vulkan/Tutorial33,,10,,,,2,ok,"own GLFW loop; capture in VulkanCore; clock: glfwGetTime; imgui; fails without test mode too on a 2048x1152 screen (2560x1440 window): vkAcquireNextImageKHR/vkResetFences validation errors, then VK_ERROR_DEVICE_LOST"
-SDL_Pong,sdl,Windows/ogldev_vs_2026/SDL/Pong/Pong.vcxproj,Windows/ogldev_vs_2026/x64/Debug/SDLPong.exe,Windows/DLL,,10,,,,3,todo,"SDL renderer, own loop; clock: SDL_GetTicks; random: rand"
+SDLPong,,Windows/ogldev_vs_2026/SDL/Pong/Pong.vcxproj,Windows/ogldev_vs_2026/x64/Debug/SDLPong.exe,Windows/DLL,,10,,,,,todo,
 Hello,sfml,Windows/ogldev_vs_2026/SFML/Hello/Hello.vcxproj,Windows/ogldev_vs_2026/x64/Debug/Hello.exe,Windows/DLL,,10,,,,3,todo,"SFML, own loop"
-SFML_Pong,sfml,Windows/ogldev_vs_2026/SFML/Pong/Pong.vcxproj,Windows/ogldev_vs_2026/x64/Debug/SFMLPong.exe,Windows/DLL,,10,,,,3,todo,"SFML, own loop; clock: sf::Clock; random: rand"
-Vulkan_Pong,vk,Windows/ogldev_vs_2026/Vulkan/Pong/Pong.vcxproj,Windows/ogldev_vs_2026/x64/Debug/PongVK.exe,Vulkan/Pong,,10,,,,2,ok,own GLFW loop; capture in VulkanCore; clock: glfwGetTime; random: rand; imgui
+SFMLPong,,Windows/ogldev_vs_2026/SFML/Pong/Pong.vcxproj,Windows/ogldev_vs_2026/x64/Debug/SFMLPong.exe,Windows/DLL,,10,,,,,todo,
+PongVK,,Windows/ogldev_vs_2026/Vulkan/Pong/Pong.vcxproj,Windows/ogldev_vs_2026/x64/Debug/PongVK.exe,Vulkan/Pong,,10,,,,,todo,
+LightingTest,,Windows/ogldev_vs_2026/Vulkan/LightingTest/LightingTest.vcxproj,Windows/ogldev_vs_2026/x64/Debug/LightingTest.exe,Vulkan/Tests/LightingTest,,10,,,,,ok,
