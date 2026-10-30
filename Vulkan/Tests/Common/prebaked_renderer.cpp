@@ -702,6 +702,7 @@ void PreBakedRenderer::UpdateGUI()
 	}
 
 	ImGui::DragFloat("Exposure", &m_exposure, 0.01f, 0.0f, 10.0f);
+	ImGui::DragFloat("IBL Intensity", &m_iblIntensity, 0.01f, 0.0f, 5.0f);
 
 	static const char* LightTypeNames[] = { "Directional", "Point", "Spot" };   // match your LIGHT_TYPE_* order
 
@@ -784,6 +785,10 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 	glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
 	int NumLights = m_modelContext.m_pModel->GetNumLights();
+
+    if (NumLights == 0) {
+        NumLights = 1; // Single default directional light
+    }
       
 	OgldevVK::LightingProgram::UpdateUniformBuffers(m_device, 
 													m_pGameCamera->GetPosition(),
@@ -798,5 +803,6 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 													m_uniformBuffersLightTransforms[ImageIndex],
 													SHADOW_MAP_WIDTH,
 													SHADOW_MAP_HEIGHT,
-                                                    m_exposure);
+                                                    m_exposure,
+                                                    m_iblIntensity);
 }

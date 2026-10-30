@@ -719,30 +719,28 @@ void main()
             break;
 
         case LIGHTING_MODE_AMBIENT_ONLY:
-            for (int i = 0; i < ubo.Counts.x; i++) {
-                if (ubo.LightSources[i].Config.x > 0.5) {
-                    Ambient += ubo.LightSources[i].Color * ubo.LightSources[i].AmbientIntensity;
-                }
+        {
+            vec3 IBLDiffuse = getIBLRadianceLambertian(pbrInputs);
+            vec3 IBLSpecular = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0);
+            float IBLIntensity = ubo.Config.z;
+            Ambient = (IBLDiffuse + IBLSpecular) * IBLIntensity;
             }
             break;
 
         case LIGHTING_MODE_FULL:
-          // Placeholder ambient until IBL (step 6)
-            for (int i = 0; i < ubo.Counts.x; i++) {
-                if (ubo.LightSources[i].Config.x > 0.5) {
-                    Ambient += ubo.LightSources[i].Color * ubo.LightSources[i].AmbientIntensity;
-                }
-            }
-
+         {
+            vec3 IBLDiffuse = getIBLRadianceLambertian(pbrInputs);
+            vec3 IBLSpecular = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0);            
             float OcclusionStrength = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.w;
             float Occlusion = mix(1.0, AmbientOcclusion.r, OcclusionStrength);
-            Ambient *= pbrInputs.baseDiffuseColor * Occlusion;
+            float IBLIntensity = ubo.Config.z;
+            Ambient = (IBLDiffuse + IBLSpecular) * IBLIntensity * Occlusion;
 
             vec3 Color = Ambient + GetTotalLight() + EmissiveColor.rgb;
             Color *= ubo.Config.y; // exposure
             Color = ToneMapACES(Color);
             OutColor = vec4(Color, AlbedoColor.a);
-
+        }
             break;
 
         default:
@@ -782,6 +780,12 @@ void main()
  //OutColor = vec4(pbrInputs.brdf_scale, pbrInputs.brdf_bias, 0.0, 1.0);
   //OutColor = vec4(ToneMapACES(getIBLRadianceLambertian(pbrInputs) * ubo.Config.y), 1.0);
 
+  //OutColor = vec4(ToneMapACES(getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0) * ubo.Config.y), 1.0);
 
-  OutColor = vec4(ToneMapACES(getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0) * ubo.Config.y), 1.0);
+//  float OcclusionStrength = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.w;
+//  float Occlusion = mix(1.0, AmbientOcclusion.r, OcclusionStrength);
+//  OutColor = vec4(vec3(Occlusion), 1.0);          // inside the FULL case, after Occlusion is computed
+//OutColor = vec4(AmbientOcclusion.rgb, 1.0);     // the raw AO texture
+//OutColor = vec4(vec3(ubo.Config.z), 1.0);       // IBL intensity, should be flat white at 1.0
+
 }

@@ -179,5 +179,6 @@ private:
 	std::string m_appName;
 	GameCallbacks* m_pGameCallbacks = NULL;
     float m_exposure = 0.6f;
+    float m_iblIntensity = 1.0f;
     std::vector<OgldevVK::LightSource> m_lights;
 };

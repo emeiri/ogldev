@@ -471,11 +471,12 @@ void LightingProgram::UpdateUniformBuffers(VkDevice Device,
                                            BufferAndMemory& UBOLights,
 										   uint ShadowMapWidth,
 										   uint ShadowMapHeight,
-                                           float Exposure)
+                                           float Exposure,
+                                           float IBLIntensity)
 {
     LightingProgram::UpdateUniformBuffersVS(Device, VP, World, SubmeshTransformations, UniformBufferVS);
 
-    LightingProgram::UpdateUniformBuffersFS(Device, CameraWorldPos, NumLights, Lights, UniformBufferFS, Exposure);
+    LightingProgram::UpdateUniformBuffersFS(Device, CameraWorldPos, NumLights, Lights, UniformBufferFS, Exposure, IBLIntensity);
 
     LightingProgram::UpdateUniformBuffersLightTransforms(Device, NumLights, Lights, VP, PersProjInfo_, 
 														 UBOLights, ShadowMapWidth, ShadowMapHeight);
@@ -511,12 +512,13 @@ void LightingProgram::UpdateUniformBuffersFS(VkDevice Device,
 											 int NumLights,
 											 const std::vector<LightSource>& Lights,
 											 BufferAndMemory& UniformBufferFS,
-											 float Exposure)
+											 float Exposure,
+											 float IBLIntensity)
 {
 	UniformDataFS UboDataFS = {
 		.Counts = glm::ivec4(NumLights, 0, 0, 0),            // .x = NumLights, .y = NumPointLights, .z = NumSpotLights, .w = NumDirectionalLights
 		.CameraWorldPos = glm::vec4(CameraWorldPos, 1.0f),
-		.Config = glm::vec4(0.0f, Exposure, 0.0f, 0.0f),     // .x = specular intensity, .y = exposure
+        .Config = glm::vec4(0.0f, Exposure, IBLIntensity, 0.0f),     // .x = specular intensity, .y = exposure, .z = IBL intensity, .w = unused
 	};
 
 	for (int i = 0; i < NumLights; i++) {

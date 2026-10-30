@@ -105,7 +105,8 @@ public:
 									 BufferAndMemory& UniformBufferLights,
 									 uint ShadowMapWidth,
 									 uint ShadowMapHeight,
-									 float Exposure);
+									 float Exposure,
+									 float IBLIntensity);
 
 	static size_t GetUniformBufferSizeVS(size_t NumSubmeshes) { return NumSubmeshes * sizeof(UniformDataVS); }
 
@@ -132,7 +133,8 @@ private:
 									   int NumLights,
 									   const std::vector<LightSource>& Lights,
 									   BufferAndMemory& UniformBufferFS,
-                                       float Exposure);
+                                       float Exposure,
+                                       float IBLIntensity);
 
     static void UpdateUniformBuffersLightTransforms(VkDevice Device,
 											int NumLights,
