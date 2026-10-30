@@ -71,6 +71,8 @@ PreBakedRenderer::~PreBakedRenderer()
 		m_vkCore.FreeCommandBuffers((u32)v.m_cbs.size(), v.m_cbs.data());
 	}
 
+	m_skybox.Destroy();
+
     for (std::vector<VkCommandBuffer>& v : m_shadowPassCmdBufs) {
         m_vkCore.FreeCommandBuffers((u32)v.size(), v.data());
     }
@@ -129,6 +131,7 @@ void PreBakedRenderer::Init(const std::string& AssetPath)
     CreateShadowMaps();
 	CreatePipelines();
 	CreateMesh(AssetPath);
+	m_skybox.Init(m_vkCore, m_descPool, m_envMap, OffscreenColorFormat);
 	CreateCommandBuffers();
 	RecordCommandBuffers();
     InitDefaultCamera();
@@ -265,7 +268,7 @@ void PreBakedRenderer::InitDefaultCamera()
 	DefaultPersProj.Height = (float)m_windowHeight;
 	DefaultPersProj.FOV = 45.0f;
 	DefaultPersProj.zNear = 0.1f;
-	DefaultPersProj.zFar = 10.0f;
+	DefaultPersProj.zFar = 1000.0f;
 	m_defaultCameraPers.Init(DefaultPos, DefaultTarget, DefaultUp, DefaultPersProj);
 }
 
@@ -314,7 +317,9 @@ void PreBakedRenderer::CreateDescriptorPool()
 	u32 UniformBufferCount = 50;
 	u32 StorageBufferCount = 50;
 	u32 StorageImageCount = m_numImages;
-	u32 MaxSets = (m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1)) + m_numImages; // +1 for the global texture array descriptor set
+	u32 MaxSets = (m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1)) + 
+				   m_numImages + // +1 for the global texture array descriptor set
+				   m_numImages; // +1 for the skybox descriptor set
 
 	m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, StorageImageCount, MaxSets);
 }
@@ -632,6 +637,9 @@ void PreBakedRenderer::RecordCommandBuffersInternal(int LightingMode, bool IsPBR
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContext.m_descSets[i], m_modelContext.m_baseTextureIndex);
 		}
 		m_modelContext.m_pModel->RecordCommandBufferIndirect(CmdBuf);
+
+		m_skybox.RecordCommandBuffer(CmdBuf, i);
+
 		vkCmdEndRendering(CmdBuf);
 
 		VkResult res = vkEndCommandBuffer(CmdBuf);
@@ -836,4 +844,8 @@ void PreBakedRenderer::UpdateUniformBuffers(int ImageIndex)
 													SHADOW_MAP_HEIGHT,
                                                     m_exposure,
                                                     m_iblIntensity);
+
+	glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
+
+	m_skybox.Update(ImageIndex, VPNoTranslate, m_exposure);
 }

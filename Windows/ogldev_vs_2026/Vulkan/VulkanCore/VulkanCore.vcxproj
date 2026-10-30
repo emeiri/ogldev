@@ -52,6 +52,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\queue.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\skybox.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\skybox_hdr.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\texture.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\util.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\wrapper.cpp" />
@@ -84,11 +85,19 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_shader.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_simple_mesh.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_skybox.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_skybox_hdr.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_texture.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_util.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_wrapper.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_fsquad_pipeline.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_texgen_pipeline.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox.frag" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox.vert" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox_hdr.frag" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox_hdr.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

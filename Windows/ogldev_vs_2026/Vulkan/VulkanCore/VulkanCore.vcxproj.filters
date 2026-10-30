@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Vulkan\Pipelines">
       <UniqueIdentifier>{e9a4855a-af94-4cb2-a38c-3a5f477511a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{063091f3-1859-4bf7-9e89-265202004d5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -150,6 +153,9 @@
     <ClCompile Include="..\..\..\..\DemoLITION\Framework\Source\assimp_model_loader.cpp">
       <Filter>Source Files\DemoLITION</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\skybox_hdr.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -248,5 +254,25 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_big_texture_array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_skybox_hdr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox_hdr.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox_hdr.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

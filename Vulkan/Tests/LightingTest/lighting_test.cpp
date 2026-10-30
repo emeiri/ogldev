@@ -38,7 +38,19 @@ public:
 
     void Init()
     {
-        std::string AssetPath = "lighting_test_2_spots_sun.glb";
+       // std::string AssetPath = "lighting_test_2_spots_sun.glb";
+        //std::string AssetPath = "G:/Models/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf";
+    //   std::string AssetPath = "../../../Content/glTF-Sample-Assets/Sponza/Sponza.glb";
+      //  std::string AssetPath = "G:/Models/McGuire/lost-empire/lost_empire.glb";
+      //  std::string AssetPath = "G:/Models/McGuire/sibenik/sibenik.glb";
+        std::string AssetPath = "../../../Content/DamagedHelmet/DamagedHelmet.gltf";
+        //std::string AssetPath = "G:/Models/glTF-Sample-Assets/Models/ABeautifulGame/glTF/ABeautifulGame.gltf";
+        //std::string AssetPath = "G:/Models/glTF-Sample-Assets/Models/AnisotropyBarnLamp/glTF/AnisotropyBarnLamp.gltf";
+        //std::string AssetPath = "../../../Content/Sketchfab/adjustable_spannerwrench/scene.gltf";
+       // std::string AssetPath = "../../../Content/Sketchfab/back_street_alley_photogrammetry_scan/scene.gltf";
+       // std::string AssetPath = "../../../Content/Sketchfab/futuristic_spaceship/scene.gltf";
+       // std::string AssetPath = "../../../Content/Sketchfab/old_street_store/scene.gltf";
+
         m_renderer.Init(AssetPath);
     }
 

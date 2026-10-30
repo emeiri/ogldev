@@ -28,6 +28,7 @@
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_big_texture_array.h"
 #include "ogldev_vulkan_model.h"
+#include "ogldev_vulkan_skybox_hdr.h"
 #include "ogldev_glm_camera.h"
 #include "lighting_program.h"
 #include "shadow_program.h"
@@ -176,6 +177,7 @@ private:
 	OgldevVK::VulkanTexture m_brdfLUT;
 	OgldevVK::VulkanTexture m_irradianceMap;
 	OgldevVK::VulkanTexture m_envMap;        // prefiltered specular
+	OgldevVK::SkyboxHDR m_skybox;
 
 	// GUI state
 	bool m_showGui = false;
