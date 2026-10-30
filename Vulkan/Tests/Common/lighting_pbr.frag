@@ -680,6 +680,18 @@ vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection,
 }
 
 
+vec3 CalcAmbientLight(float AmbientOcclusion)
+{
+    vec3 IBLDiffuse = getIBLRadianceLambertian(pbrInputs);
+    vec3 IBLSpecular = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0);            
+    float OcclusionStrength = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.w;
+    float Occlusion = mix(1.0, AmbientOcclusion, OcclusionStrength);
+    float IBLIntensity = ubo.Config.z;
+    vec3 Ambient = (IBLDiffuse + IBLSpecular) * IBLIntensity * Occlusion;
+    return Ambient;
+}
+
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -707,8 +719,6 @@ void main()
    
     pbrInputs = CalculatePBRInputsMetallicRoughness(AlbedoColor, N, mrSample);
 
-    vec3 Ambient = vec3(0.0);
-
     switch (LIGHTING_MODE) {
         case LIGHTING_MODE_UNLIT:
             OutColor = AlbedoColor;
@@ -720,22 +730,15 @@ void main()
 
         case LIGHTING_MODE_AMBIENT_ONLY:
         {
-            vec3 IBLDiffuse = getIBLRadianceLambertian(pbrInputs);
-            vec3 IBLSpecular = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0);
-            float IBLIntensity = ubo.Config.z;
-            Ambient = (IBLDiffuse + IBLSpecular) * IBLIntensity;
-            }
+            vec3 Ambient = CalcAmbientLight(AmbientOcclusion.r);
+            Ambient *= ubo.Config.y; // exposure
+            OutColor = vec4(ToneMapACES(Ambient), AlbedoColor.a);
+        }
             break;
 
         case LIGHTING_MODE_FULL:
          {
-            vec3 IBLDiffuse = getIBLRadianceLambertian(pbrInputs);
-            vec3 IBLSpecular = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, pbrInputs.perceptualRoughness, pbrInputs.reflectance0);            
-            float OcclusionStrength = MaterialBuf.materials[MaterialIndex].m_metallicRoughnessNormalOcclusion.w;
-            float Occlusion = mix(1.0, AmbientOcclusion.r, OcclusionStrength);
-            float IBLIntensity = ubo.Config.z;
-            Ambient = (IBLDiffuse + IBLSpecular) * IBLIntensity * Occlusion;
-
+            vec3 Ambient = CalcAmbientLight(AmbientOcclusion.r);
             vec3 Color = Ambient + GetTotalLight() + EmissiveColor.rgb;
             Color *= ubo.Config.y; // exposure
             Color = ToneMapACES(Color);
