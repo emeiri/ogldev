@@ -60,19 +60,6 @@ struct LightSource {
     float Cutoff;                  // offset 60
 };
 
-in vec2 TexCoord0;
-in vec2 TexCoord1;
-in vec3 Normal0;
-in vec3 WorldPos0;
-in vec4 LightSpacePos0;
-in vec3 Tangent0;
-in vec3 Bitangent0;
-in flat int MaterialIndex;
-in vec4 Color0;
-
-out vec4 out_FragColor;
-
-vec2 TexCoord;
 
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
@@ -119,8 +106,81 @@ struct InputAttributes {
     vec2 uv[2];
 };
 
+struct ClearCoat {
+    sampler2D TextureSampler;
+    uint TextureUV;
+    sampler2D RoughnessSampler;
+    uint RoughnessUV;
+    sampler2D NormalSampler;
+    uint NormalUV;
+    vec4 TransmissionThickness;
+};
+
+
+struct MetallicRoughnessDataGPU {
+    vec4 baseColorFactor;
+    vec4 metallicRoughnessNormalOcclusion; // packed metallicFactor, roughnessFactor, normalScale, occlusionStrength
+    vec4 emissiveFactorAlphaCutoff;        // packed vec3 emissiveFactor + float AlphaCutoff
+    uint occlusionTexture;
+    sampler2D occlusionTextureSampler;
+    uint occlusionTextureUV;
+    uint emissiveTexture;
+    sampler2D emissiveTextureSampler;
+    uint emissiveTextureUV;
+    uint baseColorTexture;
+    sampler2D baseColorTextureSampler;
+    uint baseColorTextureUV;
+    uint metallicRoughnessTexture;
+    sampler2D metallicRoughnessTextureSampler;
+    uint metallicRoughnessTextureUV;
+    uint normalTexture;
+    sampler2D normalTextureSampler;
+    uint normalTextureUV;
+    uint alphaMode;
+    ClearCoat clearCoat;
+    uint materialType;
+    float ior;
+};
+
+// corresponds to EnvironmentMapDataGPU from shared/UtilsGLTF.h 
+struct EnvironmentMapDataGPU {
+    uint envMapTexture;
+    samplerCube envMapTextureSampler;
+    uint envMapTextureIrradiance;
+    samplerCube envMapTextureIrradianceSampler;
+    uint texBRDF_LUT;
+    sampler2D texBRDF_LUTSampler;
+    uint unused0;
+    uint unused1;
+};
+
+
+
+in vec2 TexCoord0;
+in vec2 TexCoord1;
+in vec3 Normal0;
+in vec3 WorldPos0;
+in vec4 LightSpacePos0;
+in vec3 Tangent0;
+in vec3 Bitangent0;
+in flat int MaterialIndex;
+in vec4 Color0;
+
+out vec4 out_FragColor;
+
+vec2 TexCoord;
+
+
 layout(std140, binding = 1) uniform LightUBO {
     LightSource Lights[MAX_NUM_LIGHTS];
+};
+
+layout(std430, binding = 2) readonly buffer Materials {
+    MetallicRoughnessDataGPU material[];
+};
+
+layout(std430, binding = 3) readonly buffer Environments {
+    EnvironmentMapDataGPU environment[];
 };
 
 
@@ -250,61 +310,6 @@ void perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv, inout PBRInfo pbr
 }
 
 
-struct ClearCoat {
-    sampler2D TextureSampler;
-    uint TextureUV;
-    sampler2D RoughnessSampler;
-    uint RoughnessUV;
-    sampler2D NormalSampler;
-    uint NormalUV;
-    vec4 TransmissionThickness;
-};
-
-
-struct MetallicRoughnessDataGPU {
-    vec4 baseColorFactor;
-    vec4 metallicRoughnessNormalOcclusion; // packed metallicFactor, roughnessFactor, normalScale, occlusionStrength
-    vec4 emissiveFactorAlphaCutoff;        // packed vec3 emissiveFactor + float AlphaCutoff
-    uint occlusionTexture;
-    sampler2D occlusionTextureSampler;
-    uint occlusionTextureUV;
-    uint emissiveTexture;
-    sampler2D emissiveTextureSampler;
-    uint emissiveTextureUV;
-    uint baseColorTexture;
-    sampler2D baseColorTextureSampler;
-    uint baseColorTextureUV;
-    uint metallicRoughnessTexture;
-    sampler2D metallicRoughnessTextureSampler;
-    uint metallicRoughnessTextureUV;
-    uint normalTexture;
-    sampler2D normalTextureSampler;
-    uint normalTextureUV;
-    uint alphaMode;
-    ClearCoat clearCoat;
-    uint materialType;
-    float ior;
-};
-
-// corresponds to EnvironmentMapDataGPU from shared/UtilsGLTF.h 
-struct EnvironmentMapDataGPU {
-    uint envMapTexture;
-    samplerCube envMapTextureSampler;
-    uint envMapTextureIrradiance;
-    samplerCube envMapTextureIrradianceSampler;
-    uint texBRDF_LUT;
-    sampler2D texBRDF_LUTSampler;
-    uint unused0;
-    uint unused1;
-};
-
-layout(std430, binding = 2) readonly buffer Materials {
-    MetallicRoughnessDataGPU material[];
-};
-
-layout(std430, binding = 3) readonly buffer Environments {
-    EnvironmentMapDataGPU environment[];
-};
 
 uint getEnvironmentId() 
 {
