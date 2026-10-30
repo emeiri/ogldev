@@ -944,7 +944,7 @@ void AssimpModelLoader::LoadRoughnessTexture(const std::string& Dir, const aiMat
 
 void AssimpModelLoader::LoadAmbientOcclusionTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_UNKNOWN, 0, TEX_TYPE_AMBIENT_OCCLUSION);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_LIGHTMAP, 0, TEX_TYPE_AMBIENT_OCCLUSION);
 }
 
 
