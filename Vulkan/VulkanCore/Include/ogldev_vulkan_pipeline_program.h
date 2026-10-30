@@ -68,6 +68,13 @@ protected:
 		return VK_CULL_MODE_BACK_BIT;
 	}
 
+
+	virtual VkCompareOp GetDepthCompareOp() const 
+	{ 
+		return VK_COMPARE_OP_LESS; 
+	}
+
+
 	virtual std::vector<VkPushConstantRange> GetPushConstantRange()
 	{
 		std::vector<VkPushConstantRange> PushConstantRanges;
@@ -87,8 +94,7 @@ protected:
 private:
 
 	VkPipeline CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
-		VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
-		VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS);
+		VkFormat ColorFormat, VkFormat DepthFormat, VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS);
 
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;	

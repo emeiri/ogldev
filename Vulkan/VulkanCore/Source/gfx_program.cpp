@@ -34,7 +34,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const
 	m_descSetLayouts = CreateDescSetLayout(vkCore);
 
 	m_pipeline = CreatePipeline(vkCore.GetWindow(), m_vs, m_fs, vkCore.GetSwapChainFormat(), 
-		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, NULL, NULL);
+		                        vkCore.GetDepthFormat(), NULL, NULL);
 }
 
 
@@ -52,7 +52,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore,
 	m_descSetLayouts = CreateDescSetLayout(vkCore);
 
 	m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs,	vkCore.GetSwapChainFormat(), 
-		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, pSpecInfoVS, pSpecInfoFS);
+		                        vkCore.GetDepthFormat(), pSpecInfoVS, pSpecInfoFS);
 }
 
 
@@ -71,7 +71,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore,
 	m_descSetLayouts = CreateDescSetLayout(vkCore);
 
 	m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs, ColorFormat,
-		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, pSpecInfoVS, pSpecInfoFS);
+		                        vkCore.GetDepthFormat(), pSpecInfoVS, pSpecInfoFS);
 }
 
 
@@ -145,7 +145,7 @@ void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>
 
 
 VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
-	                                        VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
+	                                        VkFormat ColorFormat, VkFormat DepthFormat, 
 										    VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS)
 {
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -224,6 +224,8 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 		.sampleShadingEnable = VK_FALSE,
 		.minSampleShading = 1.0f
 	};
+
+    VkCompareOp DepthCompareOp = GetDepthCompareOp();
 
 	VkPipelineDepthStencilStateCreateInfo DepthStencilState = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
