@@ -1043,12 +1043,14 @@ void VulkanCore::CreateTextureFromKTX(const char* pFilename, VulkanTexture& Tex)
 	if (!IsKTX) {
 		printf("'%s' is not a KTX file\n", pFilename);
 		assert(0);
+        exit(1);
 	}
 
 	gli::texture t = gli::load(pFilename);
 	if (t.empty()) {
 		printf("Empty texture '%s'\n", pFilename);
 		assert(0);
+        exit(1);
 	}
 
     VkFormat Format = VK_FORMAT_UNDEFINED;
@@ -1073,7 +1075,7 @@ void VulkanCore::CreateTextureFromKTX(const char* pFilename, VulkanTexture& Tex)
 
 	bool IsCubemap = t.faces() == 6;
 
-    int MipLevels = (int)t.levels();
+    u32 MipLevels = (u32)t.levels();
 
     gli::image::extent_type Extent = t.extent(0);
 
