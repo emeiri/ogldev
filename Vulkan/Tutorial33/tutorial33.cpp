@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #33: Offscreen Rendering
+		Tutorial #33: Offscreen Rendering (Parts 1 & 2)
 */
 
 #include <array>
