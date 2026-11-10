@@ -15,6 +15,7 @@ COMMON_OBJS := ogldev_util \
                3rdparty/stb_image \
                ogldev_world_transform \
                ogldev_basic_mesh \
-               technique
+               technique \
+               ogldev_glfw
 
 include ../../Make/project.mk

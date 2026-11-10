@@ -226,7 +226,7 @@ void PreBakedRenderer::Execute()
 void PreBakedRenderer::InitCameraFromModel()
 {
     if (m_modelContext.m_pModel->GetCameras().size() == 0) {
-        OGLDEV_ERROR("Model has no cameras.");
+        OGLDEV_ERROR0("Model has no cameras.");
         assert(0);
     }
 

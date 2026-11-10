@@ -12,6 +12,7 @@ CPPFLAGS="-I../../Common/3rdparty/ImGui/imGuIZMO.quat \
 	  -I../../DemoLITION/Framework/Include/ 
 	  -I../VulkanCore/Include \
 	  -I../../Include  \
+	  -I../../Games/Pong \
 	  -I$VULKAN_SDK/include \
           -DOGLDEV_VULKAN -ggdb3 -std=c++20 \
 	  -DIMGUIZMO_MANUAL_IMGUI_INCLUDE"
@@ -23,6 +24,7 @@ LDFLAGS=`pkg-config --libs glfw3 vulkan`
 LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer"
 
 $CC *.cpp \
+    ../../Games/Pong/pong.cpp \
     ../VulkanCore/Source/big_texture_array.cpp \
     ../VulkanCore/Source/core.cpp \
     ../VulkanCore/Source/spirv_reflect.c \
@@ -50,6 +52,7 @@ $CC *.cpp \
   ../../Common/3rdparty/stb_image.cpp \
     ../../Common/ogldev_ect_cubemap.cpp \
     ../../DemoLITION/Framework/Source/core_model.cpp \
+    ../../DemoLITION/Framework/Source/assimp_model_loader.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_draw.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_impl_glfw.cpp \
@@ -57,4 +60,4 @@ $CC *.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_tables.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_widgets.cpp \
     ../../Common/3rdparty/ImGui/imGuIZMO.quat/imguizmo_quat.cpp \
-    $CPPFLAGS $LDFLAGS -o tutorial33
+    $CPPFLAGS $LDFLAGS -o vulkan_pong

@@ -1,14 +1,17 @@
 # WaterSine
 
-TARGET := terrain_demo13
+TARGET := water_sine
 API    := gl
 
-SRCS := terrain_demo13.cpp \
+SRCS := terrain_water.cpp \
         geomip_grid.cpp \
         terrain_technique.cpp \
         midpoint_disp_terrain.cpp \
         terrain.cpp \
-        lod_manager.cpp
+        lod_manager.cpp \
+        simple_water.cpp \
+        simple_water_technique.cpp \
+        triangle_list.cpp
 
 # Common files, linked as ready-made objects
 COMMON_OBJS := ogldev_util \
@@ -19,9 +22,14 @@ COMMON_OBJS := ogldev_util \
                technique \
                ogldev_texture \
                cubemap_texture \
+               ogldev_ect_cubemap \
                ogldev_skydome \
                ogldev_basic_mesh \
                ogldev_skydome_technique \
+               ogldev_gui_texture \
+               ogldev_guitex_technique \
+               ogldev_screen_quad \
+               ogldev_framebuffer \
                3rdparty/stb_image \
                3rdparty/ImGui/GLFW/imgui \
                3rdparty/ImGui/GLFW/imgui_draw \

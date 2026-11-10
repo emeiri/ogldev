@@ -1,10 +1,14 @@
 # Vulkan/Pong
 
-TARGET := tutorial33
+TARGET := vulkan_pong
 API    := vulkan
 
-SRCS := $(wildcard *.cpp)
+# The game logic is shared with the other Pong versions in Games/Pong
+SRCS := $(wildcard *.cpp) \
+        ../../Games/Pong/pong.cpp
 
 LIBS := vulkancore
+
+EXTRA_CPPFLAGS := -I../../Games/Pong
 
 include ../../Make/project.mk

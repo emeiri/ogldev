@@ -2,4 +2,4 @@
 
 export LD_LIBRARY_PATH=../../Lib:$VULKAN_SDK/lib
 
-./tutorial29
+./vulkan_pong
