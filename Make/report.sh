@@ -25,7 +25,7 @@ sort "$STATE/failed" | while read -r DIR; do
     I=$((I + 1))
     echo
     echo "==== Problem $I/$FAILED: $DIR   (full log: $DIR/build.log)"
-    ERRORS=$(grep -E "error|undefined reference|multiple definition|No rule|cannot find" "$DIR/build.log" | head -10)
+    ERRORS=$(grep -E "error|undefined reference|multiple definition|No rule|cannot find|\*\*\* [^[]" "$DIR/build.log" | head -10)
     if [ -n "$ERRORS" ]; then
         echo "$ERRORS"
     else

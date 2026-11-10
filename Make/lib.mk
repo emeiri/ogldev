@@ -14,6 +14,11 @@
 
 include $(dir $(lastword $(MAKEFILE_LIST)))config.mk
 
+# All the libraries include headers from the meshoptimizer git submodule
+ifeq ($(wildcard $(ROOT)/Common/3rdparty/meshoptimizer/src/meshoptimizer.h),)
+  $(error The meshoptimizer submodule is missing. Run: git submodule update --init Common/3rdparty/meshoptimizer)
+endif
+
 ifeq ($(API),vulkan)
   ifeq ($(VULKAN_SDK),)
     $(error $(VK_SDK_MISSING))

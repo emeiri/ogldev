@@ -29,7 +29,7 @@ if [ "$KIND" = lib ]; then
         printf "  library %-28s OK    (%ss)\n" "$DIR" "$SECS"
     else
         printf "  library %-28s FAILED, see %s/build.log\n" "$DIR" "$DIR"
-        grep -m 10 -E "error|undefined reference|multiple definition|No rule" "$DIR/build.log"
+        grep -m 10 -E "error|undefined reference|multiple definition|No rule|\*\*\* [^[]" "$DIR/build.log"
     fi
     exit $RESULT
 fi
