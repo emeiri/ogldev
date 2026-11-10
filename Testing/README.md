@@ -1,76 +1,111 @@
 # Golden-image regression suite
 
-Builds nothing by itself: it launches the Debug x64 executables of the VS 2026 solution in a test mode, captures chosen frames from inside each application and compares them with locally stored golden images.
+Builds nothing by itself (unless asked to): it launches the executables of the VS 2026 solution on Windows, or of the Makefiles on Linux, in a test mode, captures chosen frames from inside each application and compares them with golden images.
+
+Each platform has its own goldens, and every run compares with both: strictly with the goldens of its own platform and with a larger tolerance with the goldens of the other platform.
 
 Everything that belongs to the suite is in this folder, except for a few headers and hooks listed under "What lives outside this folder".
 
 ## Usage
 
-Run from the repo root. Needs `pip install pillow numpy`.
+Run from the repo root.
 
-```powershell
-# Create (or refresh) the goldens on this machine
-python Testing\regress.py --update-golden
+- Windows: needs `pip install pillow numpy`.
+- Linux: needs `sudo apt install python3-pil python3-numpy xvfb mesa-utils`, and the projects built with `make`.
 
-# Compare every enabled project with its golden
-python Testing\regress.py
+```
+# Create (or refresh) the goldens of this platform
+python Testing/regress.py --update-golden
+
+# Compare every enabled project with the goldens
+python Testing/regress.py
 
 # A subset, by manifest name (this also runs rows that are still 'todo')
-python Testing\regress.py --only Tutorial67_ProjectedTexture Tutorial17
+python Testing/regress.py --only Tutorial67_ProjectedTexture Tutorial17
 
-# Build the solution first
-python Testing\regress.py --build
+# Build first (the solution on Windows, 'make' on Linux)
+python Testing/regress.py --build
 ```
 
-Other options: `--api gl|vk`, `--tier N`, `--strict` (OpenGL/Vulkan errors fail the run), `--audit N` (run each project N times and require byte-identical captures), `--retries N`, `--timeout SECONDS`, `--gpu SLUG`, `--coverage`.
+On Linux use `python3`.
 
-After a run open `Testing\out\report.html`: golden, actual and an amplified difference image side by side. `Testing\out\<project>\log.txt` has the application's output.
+Other options: `--api gl|vk`, `--tier N`, `--strict` (OpenGL/Vulkan errors fail the run), `--audit N` (run each project N times and require byte-identical captures), `--retries N`, `--timeout SECONDS`, `--gpu NAME` (use `goldens/NAME` instead of the platform's goldens), `--capture hw|sw|sw-gl46` (Linux, see below), `--coverage`.
 
-Every run also writes `Testing\out\run_<date>_<time>.log`, which is never overwritten. It records the date and time, the git commit and branch, the machine and GPU, the mode, the build result, a summary with the number of projects per outcome (passed, failed comparison, no golden, crashed, timed out, capture failed, did not build, ...) and the status of every project, including the ones the manifest excludes and why.
+After a run open `Testing/out/report.html`: golden, actual and an amplified difference image side by side, then the other platform's golden and its difference image. `Testing/out/<project>/log.txt` has the application's output.
 
-With `--build`, a failed solution build does not stop the run: the projects that failed to build are reported as "Did not build" and the rest are tested.
+Every run also writes `Testing/out/run_<date>_<time>.log`, which is never overwritten. It records the date and time, the git commit and branch, the machine, platform and GPU, the capture methods, the mode, the build result, a summary with the number of projects per outcome (passed, failed comparison, failed comparison with the other platform, no golden, crashed, timed out, capture failed, did not build, ...) and the status of every project, including the ones the manifest excludes and why.
 
-A project passes when it exits with code 0 and, for every captured frame, at most 0.1% of the pixels differ from the golden by more than 8/255 in any channel. `FLAKY` means it passed only on the retry.
+With `--build`, a failed build does not stop the run: the projects that failed to build are reported as "Did not build" and the rest are tested.
+
+## Passing
+
+A project passes when it exits with code 0 and, for every captured frame:
+
+- at most 0.1% of the pixels differ from the golden of its own platform by more than 8/255 in any channel (columns `tol` and `max_bad` override this), and
+- at most 2% of the pixels differ from the golden of the other platform by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of the other platform is reported but is not a failure.
+
+`FLAKY` means it passed only on the retry.
+
+## Capture on Linux
+
+A project is captured in one of these ways:
+
+| Method | How |
+| --- | --- |
+| `hw` | The GPU, on the X display of the desktop session (`$DISPLAY`, else `:0`; `OGLDEV_HW_DISPLAY` overrides it) |
+| `sw` | Mesa's software renderers, llvmpipe for OpenGL and lavapipe for Vulkan, on a private Xvfb |
+| `sw-gl46` | The same, with llvmpipe reporting OpenGL 4.6 (it implements 4.5, the shaders of some projects ask for 4.60) |
+
+The method is chosen when a project's Linux golden is first created and is recorded in the manifest column `linux_capture`. Later runs always use the recorded method. To choose it, the runner tries `hw` in strict mode and accepts it when the project runs on a hardware renderer with no OpenGL errors and its window kept its size. Otherwise it tries `sw`, then `sw-gl46`. `Testing/out/<project>/methods.txt` says why a method was rejected. `--capture METHOD` with `--update-golden` sets the method, e.g. `--capture sw` to create goldens while the desktop is locked. To choose again, clear the project's `linux_capture` and run `--update-golden --only NAME`.
+
+`hw` needs the desktop session to be unlocked and on screen. A locked session (light-locker switches to the greeter) stops the GPU rendering for it. During a run the screen saver and DPMS are switched off and restored at the end. If the display is not available, `hw` projects are reported as skipped, and new projects are not given a method rather than falling back to software.
+
+`golden.json` next to each golden records the platform, method, renderer, OpenGL/Vulkan version, date and commit it was made with.
 
 ## Files
 
 | Path | Purpose |
 | --- | --- |
 | `regress.py` | The runner |
-| `make_manifest.py` | Regenerates `manifest.csv` from the solution; hand-edited columns are kept |
-| `manifest.csv` | One row per application project: its `.vcxproj`, how to launch it, frames to capture, tier, status |
+| `make_manifest.py` | Regenerates `manifest.csv` from the solution (Windows) or adds the Linux projects (`--linux`); hand-edited columns are kept |
+| `manifest.csv` | One row per application: how to launch it on each platform, frames to capture, tolerances, tier, status |
 | `shim/` | Wrapper headers for GLFW and freeglut (see below) |
-| `goldens/<gpu>/<project>/fNNNN.png` | Golden images. Local to a machine, not committed |
+| `goldens/windows/<project>/fNNNN.png` | Golden images made on Windows (NVIDIA GeForce GTX 1650) |
+| `goldens/linux/<project>/fNNNN.png` | Golden images made on Linux (Intel HD Graphics 3000, or llvmpipe/lavapipe) |
 | `out/` | Captures, logs and reports of the last run. Not committed |
 
-Manifest `status` is `ok` (runs by default), `todo` (runs only with `--only`) or `skip` (never runs; the reason is in `note`).
+The manifest columns `project`, `exe`, `cwd`, `status` and `note` describe the Windows project. `linux_dir` (the directory of its Makefile), `linux_cwd`, `linux_status`, `linux_capture` and `linux_note` describe the Linux one. A row may have only one of them: some rows are Windows only, and the rows named `linux_*` are Linux only.
 
-`--enable NAME...` and `--disable NAME...` switch rows between `todo` and `ok` in the manifest and exit without running anything. `skip` rows are left alone.
+Status (`status` on Windows, `linux_status` on Linux) is `ok` (runs by default), `todo` (runs only with `--only`) or `skip` (never runs; the reason is in the note).
 
-```powershell
-python Testing\regress.py --enable Tutorial27 Tutorial29
-python Testing\regress.py --disable Tutorial27
+`--enable NAME...` and `--disable NAME...` switch rows of the current platform between `todo` and `ok` in the manifest and exit without running anything. `skip` rows are left alone.
+
+```
+python Testing/regress.py --enable Tutorial27 Tutorial29
+python Testing/regress.py --disable Tutorial27
 ```
 
-## Adding a project to the solution
+## Adding a project
 
-The test mode reaches a new project by itself, but the runner only tests what is in the manifest. At the start of every run it compares the solution with the manifest and prints a warning, also written to the run log, that lists the application projects that have no row. To add them:
+The test mode reaches a new project by itself, but the runner only tests what is in the manifest. At the start of every run it compares the projects with the manifest and prints a warning, also written to the run log, that lists the projects that have no row. To add them:
 
-```powershell
-python Testing\make_manifest.py Windows\ogldev_vs_2026\ogldev_vs_2026.sln   # adds the new rows as 'todo'
-python Testing\regress.py --audit 3 --only MyNewProject                      # is it repeatable?
-python Testing\regress.py --update-golden --only MyNewProject                # create its golden, then look at it
+```
+python Testing\make_manifest.py Windows\ogldev_vs_2026\ogldev_vs_2026.sln   # Windows: adds the new rows as 'todo'
+python3 Testing/make_manifest.py --linux                                    # Linux: the same for the Makefiles
+python Testing/regress.py --audit 3 --only MyNewProject                     # is it repeatable?
+python Testing/regress.py --update-golden --only MyNewProject               # create its golden, then look at it
 ```
 
-Then enable it with `python Testing\regress.py --enable MyNewProject`.
+Then enable it with `python Testing/regress.py --enable MyNewProject`. A project that exists on both platforms should have one row with both sets of columns, so that its captures are compared across platforms.
 
 ## How the test mode gets into the applications
 
-The tutorials contain no testing code. `Windows\ogldev_vs_2026\Directory.Build.targets` is imported by MSBuild into every project of the solution and puts `Testing\shim` in front of the include path. `<GLFW/glfw3.h>` and `<GL/freeglut.h>` therefore resolve to the wrappers in `shim/`, which include the real header and then redirect a few calls:
+The tutorials contain no testing code. On Windows `Windows\ogldev_vs_2026\Directory.Build.targets` is imported by MSBuild into every project of the solution and puts `Testing\shim` in front of the include path. On Linux `Make/config.mk` does the same. `<GLFW/glfw3.h>` and `<GL/freeglut.h>` therefore resolve to the wrappers in `shim/`, which include the real header and then redirect a few calls:
 
 - `glfwSwapBuffers` / `glutSwapBuffers`: end of the frame. Captures the back buffer on the requested frames and closes the application after the last one.
 - `glfwGetTime` / `glutGet(GLUT_ELAPSED_TIME)`: a fixed clock that advances 1/60 s per frame.
-- input callbacks and full screen: disabled.
+- `glfwCreateWindow` / `glutInitWindowSize` / `glutEnterGameMode`: never full screen, and an 800x600 window for OpenGL, so that it fits every desktop and the captures of all machines have the same size. Vulkan windows keep their size because several Vulkan tutorials size their render area from their own constants.
+- input callbacks: disabled.
 
 Unless the application is started with `--test-frames`, every wrapper just calls the real function.
 
@@ -84,10 +119,8 @@ Options understood by an application (the runner passes them):
 ## What lives outside this folder
 
 - `Include/regress_hook.h`, `Include/regress_capture_gl.h`: the test mode itself and the OpenGL capture.
-- `Windows/ogldev_vs_2026/Directory.Build.targets`: adds the shim to the include path.
+- `Windows/ogldev_vs_2026/Directory.Build.targets` (Windows) and `Make/config.mk` (Linux): add the shim to the include path.
 - `Common/ogldev_util.cpp`: `GetCurrentTimeMillis` returns the test clock; `glDebugOutput` reports errors for `--test-strict`.
 - `Common/ogldev_base_app.cpp`, `ogldev_base_app2.cpp`, `DemoLITION/Framework/Source/core_rendering_system.cpp`: 800x600 window in test mode (these demos ask for windows larger than most screens).
 - `Common/3rdparty/ImGui/GLFW/imgui_impl_opengl3.cpp`: no GUI in test mode, because it shows frame rates.
 - `Vulkan/VulkanCore`: swapchain capture in `VulkanCore::CaptureSwapChainImage`, called from `VulkanQueue::Present`.
-
-The Linux build does not use the shim, so the test mode is Windows only.
