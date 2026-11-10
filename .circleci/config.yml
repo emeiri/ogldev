@@ -43,11 +43,6 @@ jobs:
           command: |
             Start-Process -FilePath .\VulkanSDK.exe -ArgumentList "--root C:\VulkanSDK\1.4.304.0 --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.debug" -Wait
       - run:
-          name: Set Environment Variables
-          command: |
-            $env:VULKAN_SDK="C:\VulkanSDK\1.4.304.0\"
-            $env:PATH="$env:VULKAN_SDK\Bin;$env:PATH"
-      - run:
           name: Authenticate with GitHub
           command: |
             git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
@@ -69,8 +64,13 @@ jobs:
             cmd /c echo %VULKAN_SDK%
             cmd /c dir C:\VulkanSDK\1.4.304.0\Lib
             
-            # Use the explicit path to Visual Studio 2026 BuildTools to handle toolset v145
-            & "C:\Program Files (x86)\Microsoft Visual Studio\2026\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "Windows\\ogldev_vs_2026\\ogldev_vs_2026.sln" /p:Configuration=Debug /m
+            # Locate MSBuild of the VS 2026 Build Tools (installs under "Microsoft Visual Studio\18", not "\2026")
+            $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+            $msbuild = & $vswhere -latest -prerelease -products * -version "[18.0,19.0)" -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1
+            if (-not $msbuild) { Write-Error "MSBuild for VS 2026 not found"; exit 1 }
+            Write-Host "Using $msbuild"
+            & $msbuild "Windows\\ogldev_vs_2026\\ogldev_vs_2026.sln" /p:Configuration=Debug /p:Platform=x64 /m
+            exit $LASTEXITCODE
 workflows:
   version: 2
   build_all_platforms:
