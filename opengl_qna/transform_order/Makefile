@@ -1,0 +1,20 @@
+# opengl_qna/transform_order
+
+TARGET := tranform_order
+API    := gl
+
+SRCS := tranform_order.cpp \
+        camera.cpp \
+        lighting_technique.cpp \
+        simple_technique.cpp
+
+# Common files, linked as ready-made objects
+COMMON_OBJS := ogldev_util \
+               math_3d \
+               ogldev_texture \
+               3rdparty/stb_image \
+               ogldev_world_transform \
+               ogldev_basic_mesh \
+               technique
+
+include ../../Make/project.mk
