@@ -1,0 +1,12 @@
+{
+ "api": "vk",
+ "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+ "version": "driver 25.2.8",
+ "width": 2560,
+ "height": 1440,
+ "seed": 1,
+ "platform": "linux",
+ "created": "2026-11-10 17:46",
+ "commit": "836edfe2",
+ "method": "sw"
+}
