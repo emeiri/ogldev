@@ -14,7 +14,7 @@ build_ogldev() {
 }
 
 build_demolition() {
-	cd $ROOTDIR/Common
+	cd $ROOTDIR/DemoLITION
 	./build.sh
 	cd -
 }
