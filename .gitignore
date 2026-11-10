@@ -59,3 +59,5 @@ imgui.ini
 
 /Testing/out/
 /Testing/goldens/
+build/
+Lib/linux/
