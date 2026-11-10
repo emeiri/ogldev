@@ -27,6 +27,13 @@
 
 #include "regress_hook.h"
 
+// The framebuffer and pixel buffer bindings need a loader (GLEW). On Windows the
+// enums exist only with one, but Mesa's GL/gl.h on Linux defines them without
+// declaring the functions, e.g. in a program that includes only freeglut.
+#if defined(_WIN32) || defined(__glew_h__) || defined(GL_GLEXT_PROTOTYPES)
+#define REGRESS_GL_HAS_LOADER
+#endif
+
 namespace Regress {
 
 inline bool CaptureGL(const char* pPath, int Width, int Height, void* pApiContext)
@@ -45,13 +52,13 @@ inline bool CaptureGL(const char* pPath, int Width, int Height, void* pApiContex
     GLint PrevPackAlignment = 4;
     glGetIntegerv(GL_PACK_ALIGNMENT, &PrevPackAlignment);
 
-#ifdef GL_READ_FRAMEBUFFER
+#if defined(GL_READ_FRAMEBUFFER) && defined(REGRESS_GL_HAS_LOADER)
     GLint PrevReadFBO = 0;
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &PrevReadFBO);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 #endif
 
-#ifdef GL_PIXEL_PACK_BUFFER
+#if defined(GL_PIXEL_PACK_BUFFER) && defined(REGRESS_GL_HAS_LOADER)
     GLint PrevPackBuffer = 0;
     glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING, &PrevPackBuffer);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -67,11 +74,11 @@ inline bool CaptureGL(const char* pPath, int Width, int Height, void* pApiContex
 
     glPixelStorei(GL_PACK_ALIGNMENT, PrevPackAlignment);
 
-#ifdef GL_PIXEL_PACK_BUFFER
+#if defined(GL_PIXEL_PACK_BUFFER) && defined(REGRESS_GL_HAS_LOADER)
     glBindBuffer(GL_PIXEL_PACK_BUFFER, PrevPackBuffer);
 #endif
 
-#ifdef GL_READ_FRAMEBUFFER
+#if defined(GL_READ_FRAMEBUFFER) && defined(REGRESS_GL_HAS_LOADER)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, PrevReadFBO);
 #endif
 
