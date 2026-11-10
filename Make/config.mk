@@ -36,11 +36,17 @@ endif
 # -MMD -MP generate the header dependency files (*.d)
 BASE_CXXFLAGS := -std=c++20 -ggdb3 -fPIC -MMD -MP
 
+# The regression test mode (see Testing/README.md). Testing/shim goes in front
+# of the include path so that <GLFW/glfw3.h> and <GL/freeglut.h> resolve to
+# thin wrappers. They do nothing unless a program is started with --test-frames.
+TEST_CPPFLAGS := -I$(ROOT)/Testing/shim
+
 # ---------------------------------------------------------------------------
 #  OpenGL
 # ---------------------------------------------------------------------------
 GL_PKGS     := glew glfw3 assimp freetype2 fontconfig ImageMagick++
-GL_CPPFLAGS := $(shell pkg-config --cflags $(GL_PKGS) 2>/dev/null) \
+GL_CPPFLAGS := $(TEST_CPPFLAGS) \
+               $(shell pkg-config --cflags $(GL_PKGS) 2>/dev/null) \
                -I$(ROOT)/Include \
                -I$(ROOT)/Common/FreetypeGL \
                -I$(ROOT)/Common/3rdparty/ImGui/GLFW
@@ -49,7 +55,8 @@ GL_LDLIBS   := $(shell pkg-config --libs $(GL_PKGS) 2>/dev/null) -lglut -lX11 -l
 # ---------------------------------------------------------------------------
 #  Vulkan (requires the LunarG SDK: source <sdk dir>/setup-env.sh)
 # ---------------------------------------------------------------------------
-VK_CPPFLAGS := -DOGLDEV_VULKAN -DIMGUIZMO_MANUAL_IMGUI_INCLUDE \
+VK_CPPFLAGS := $(TEST_CPPFLAGS) \
+               -DOGLDEV_VULKAN -DIMGUIZMO_MANUAL_IMGUI_INCLUDE \
                -I$(ROOT)/Common/3rdparty/ImGui/imGuIZMO.quat \
                -I$(ROOT)/Common/3rdparty/ImGui/GLFW \
                -I$(ROOT)/Include/assimp5 \
