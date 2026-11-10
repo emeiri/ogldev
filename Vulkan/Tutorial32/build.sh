@@ -50,6 +50,7 @@ $CC *.cpp \
   ../../Common/3rdparty/stb_image.cpp \
     ../../Common/ogldev_ect_cubemap.cpp \
     ../../DemoLITION/Framework/Source/core_model.cpp \
+    ../../DemoLITION/Framework/Source/assimp_model_loader.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_draw.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_impl_glfw.cpp \

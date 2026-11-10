@@ -19,6 +19,7 @@
 */
 
 #include <cfloat>
+#include <algorithm>
 #include <math.h>
 #include <GL/glew.h>
 #include <string>
@@ -382,12 +383,12 @@ private:
                 frustumCornersL[j].Print();
                 printf("\n");
 
-                minX = min(minX, frustumCornersL[j].x);
-                maxX = max(maxX, frustumCornersL[j].x);
-                minY = min(minY, frustumCornersL[j].y);
-                maxY = max(maxY, frustumCornersL[j].y);
-                minZ = min(minZ, frustumCornersL[j].z);
-                maxZ = max(maxZ, frustumCornersL[j].z);
+                minX = std::min(minX, frustumCornersL[j].x);
+                maxX = std::max(maxX, frustumCornersL[j].x);
+                minY = std::min(minY, frustumCornersL[j].y);
+                maxY = std::max(maxY, frustumCornersL[j].y);
+                minZ = std::min(minZ, frustumCornersL[j].z);
+                maxZ = std::max(maxZ, frustumCornersL[j].z);
             }
 
             printf("BB: %f %f %f %f %f %f\n", minX, maxX, minY, maxY, minZ, maxZ);

@@ -2,7 +2,7 @@
 
 source ../build_base.sh
 
-SOURCES="terrain_demo14.cpp \
+SOURCES="terrain_pbr_textures.cpp \
 	terrain_technique.cpp \
 	midpoint_disp_terrain.cpp \
 	terrain.cpp \
@@ -27,4 +27,4 @@ SOURCES="terrain_demo14.cpp \
 	$ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_impl_glfw.cpp \
 	$ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_impl_opengl3.cpp "
 
-$CC $SOURCES $OGL_CPPFLAGS $OGL_LDFLAGS -o terrain_demo14
+$CC $SOURCES $OGL_CPPFLAGS $OGL_LDFLAGS -o terrain_pbr_textures

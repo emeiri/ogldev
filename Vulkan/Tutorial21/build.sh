@@ -29,4 +29,5 @@ $CC tutorial21.cpp \
   ../../Common/3rdparty/stb_image.cpp \
     ../../Common/ogldev_ect_cubemap.cpp \
     ../../DemoLITION/Framework/Source/core_model.cpp \
+    ../../DemoLITION/Framework/Source/assimp_model_loader.cpp \
     $CPPFLAGS $LDFLAGS -o tutorial21
