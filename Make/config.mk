@@ -6,6 +6,11 @@
 ifndef OGLDEV_CONFIG_MK
 OGLDEV_CONFIG_MK := 1
 
+# make splits paths on spaces, so it can't work in such a directory
+ifneq ($(words $(CURDIR)),1)
+  $(error The path "$(CURDIR)" contains a space. Move the repository to a path without spaces)
+endif
+
 # Root of the repository (the parent of this Make/ directory)
 ROOT   := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 LIBDIR := $(ROOT)/Lib/linux
