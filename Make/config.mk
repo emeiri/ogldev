@@ -37,11 +37,11 @@ BASE_CXXFLAGS := -std=c++20 -ggdb3 -fPIC -MMD -MP
 #  OpenGL
 # ---------------------------------------------------------------------------
 GL_PKGS     := glew glfw3 assimp freetype2 fontconfig ImageMagick++
-GL_CPPFLAGS := $(shell pkg-config --cflags $(GL_PKGS)) \
+GL_CPPFLAGS := $(shell pkg-config --cflags $(GL_PKGS) 2>/dev/null) \
                -I$(ROOT)/Include \
                -I$(ROOT)/Common/FreetypeGL \
                -I$(ROOT)/Common/3rdparty/ImGui/GLFW
-GL_LDLIBS   := $(shell pkg-config --libs $(GL_PKGS)) -lglut -lX11 -lmeshoptimizer -ldl
+GL_LDLIBS   := $(shell pkg-config --libs $(GL_PKGS) 2>/dev/null) -lglut -lX11 -lmeshoptimizer -ldl
 
 # ---------------------------------------------------------------------------
 #  Vulkan (requires the LunarG SDK: source <sdk dir>/setup-env.sh)
@@ -58,6 +58,12 @@ VK_CPPFLAGS := -DOGLDEV_VULKAN -DIMGUIZMO_MANUAL_IMGUI_INCLUDE \
 VK_LDLIBS   := $(shell pkg-config --libs glfw3 vulkan 2>/dev/null) -L$(VULKAN_SDK)/lib \
                -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV \
                -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer
+
+# Stop if any of the pkg-config packages in $(1) is not installed.
+# A single missing package would otherwise drop the flags of all of them.
+pkg_missing = $(strip $(foreach p,$(1),$(if $(shell pkg-config --exists $(p) && echo y),,$(p))))
+check_pkgs  = $(if $(call pkg_missing,$(1)),$(error Missing development packages \
+  (pkg-config names): $(call pkg_missing,$(1)). See install_requirements_ubuntu.sh))
 
 VK_SDK_MISSING := Missing environment variable VULKAN_SDK. Download the SDK from \
   https://vulkan.lunarg.com/sdk/home\#linux, extract it and run: source <extracted dir>/setup-env.sh

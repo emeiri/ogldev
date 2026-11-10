@@ -25,9 +25,11 @@ ifeq ($(API),vulkan)
   ifeq ($(VULKAN_SDK),)
     $(error $(VK_SDK_MISSING))
   endif
+  $(call check_pkgs,glfw3 vulkan)
   CPPFLAGS := $(VK_CPPFLAGS) $(EXTRA_CPPFLAGS)
   LDLIBS   := $(VK_LDLIBS) $(EXTRA_LDLIBS)
 else
+  $(call check_pkgs,$(GL_PKGS))
   CPPFLAGS := $(GL_CPPFLAGS) $(EXTRA_CPPFLAGS)
   LDLIBS   := $(GL_LDLIBS) $(EXTRA_LDLIBS)
 endif
