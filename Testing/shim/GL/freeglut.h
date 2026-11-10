@@ -52,10 +52,28 @@ inline int GlutGet(GLenum Query)
 }
 
 
+// Always REGRESS_WINDOW_WIDTH x REGRESS_WINDOW_HEIGHT so that the window fits
+// every desktop and the captures of all machines match
+inline void GlutInitWindowSize(int Width, int Height)
+{
+    if (Active()) {
+        Width = REGRESS_WINDOW_WIDTH;
+        Height = REGRESS_WINDOW_HEIGHT;
+    }
+
+    glutInitWindowSize(Width, Height);
+}
+
+
 // Never full screen
 inline int GlutEnterGameMode()
 {
-    return Active() ? glutCreateWindow("Regression test") : glutEnterGameMode();
+    if (!Active()) {
+        return glutEnterGameMode();
+    }
+
+    glutInitWindowSize(REGRESS_WINDOW_WIDTH, REGRESS_WINDOW_HEIGHT);
+    return glutCreateWindow("Regression test");
 }
 
 
@@ -104,6 +122,7 @@ inline void GlutPassiveMotionFunc(void (*Callback)(int, int))
 #define glutSwapBuffers       Regress::GlutSwapBuffers
 #define glutGet               Regress::GlutGet
 #define glutEnterGameMode     Regress::GlutEnterGameMode
+#define glutInitWindowSize    Regress::GlutInitWindowSize
 #define glutKeyboardFunc      Regress::GlutKeyboardFunc
 #define glutSpecialFunc       Regress::GlutSpecialFunc
 #define glutMouseFunc         Regress::GlutMouseFunc

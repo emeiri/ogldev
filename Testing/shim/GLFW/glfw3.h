@@ -25,9 +25,20 @@ inline double GlfwGetTime()
 }
 
 
-// Never full screen
+// Never full screen. OpenGL windows are always REGRESS_WINDOW_WIDTH x
+// REGRESS_WINDOW_HEIGHT so that they fit every desktop and the captures of all
+// machines match. Vulkan windows keep their size: several Vulkan tutorials size
+// their render area from their own window size constants, and a render area
+// larger than the framebuffer is undefined behavior (lavapipe crashes).
 inline GLFWwindow* GlfwCreateWindow(int Width, int Height, const char* pTitle, GLFWmonitor* pMonitor, GLFWwindow* pShare)
 {
+#ifndef OGLDEV_VULKAN
+    if (Active()) {
+        Width = REGRESS_WINDOW_WIDTH;
+        Height = REGRESS_WINDOW_HEIGHT;
+    }
+#endif
+
     return glfwCreateWindow(Width, Height, pTitle, Active() ? NULL : pMonitor, pShare);
 }
 
