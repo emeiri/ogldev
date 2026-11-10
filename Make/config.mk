@@ -60,7 +60,10 @@ VK_CPPFLAGS := -DOGLDEV_VULKAN -DIMGUIZMO_MANUAL_IMGUI_INCLUDE \
                -I$(VULKAN_SDK)/include
 VK_LDLIBS   := $(shell pkg-config --libs glfw3 vulkan 2>/dev/null) -L$(VULKAN_SDK)/lib \
                -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV \
-               -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer
+               -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer \
+               -Wl,-rpath,$(VULKAN_SDK)/lib
+# The rpath above lets the Vulkan programs find the SDK libraries without
+# setup-env.sh. Rebuild after moving or upgrading the SDK.
 
 # Stop if any of the pkg-config packages in $(1) is not installed.
 # A single missing package would otherwise drop the flags of all of them.
