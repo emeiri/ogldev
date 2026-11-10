@@ -27,7 +27,10 @@ ifeq ($(MAKELEVEL),0)
   MAKEFLAGS += --output-sync=target --no-print-directory
 endif
 
-CXX := g++
+# g++ unless CXX is set in the environment or on the command line
+ifeq ($(origin CXX),default)
+  CXX := g++
+endif
 
 # Flags shared by every compilation unit.
 # -MMD -MP generate the header dependency files (*.d)
