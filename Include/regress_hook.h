@@ -316,7 +316,12 @@ inline void ReportApiError(const char* pMsg)
 {
     if (Strict()) {
         fprintf(stderr, "Regress: API error in strict mode: %s\n", pMsg ? pMsg : "");
-        exit(REGRESS_EXIT_API_ERROR);
+        fflush(stdout);
+        fflush(stderr);
+        // Not exit(): this runs inside the driver's debug callback, and the static
+        // destructors and atexit handlers that exit() runs call back into the driver,
+        // which deadlocks (seen with the NVIDIA Vulkan driver)
+        _Exit(REGRESS_EXIT_API_ERROR);
     }
 }
 
