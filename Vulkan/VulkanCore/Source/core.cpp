@@ -1121,12 +1121,16 @@ void VulkanCore::CreateTextureFromKTX(const char* pFilename, VulkanTexture& Tex)
 
 void VulkanTexture::Destroy(VkDevice Device)
 {
+	// The handles are reset so that a second Destroy (e.g. an explicit call
+	// followed by the destructor of the owner) does nothing
 	if (m_sampler) {
 		vkDestroySampler(Device, m_sampler, NULL);
+		m_sampler = VK_NULL_HANDLE;
 	}
 
 	if (m_mem) {
 		vkFreeMemory(Device, m_mem, NULL);
+		m_mem = VK_NULL_HANDLE;
 	}
 	
     VulkanBaseImage::Destroy(Device);
@@ -1442,11 +1446,15 @@ u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags Re
 
 void BufferAndMemory::Destroy(VkDevice Device)
 {
+	// The handles are reset so that a second Destroy (e.g. VkModel::Destroy called
+	// explicitly and then again by ~VkModel) does nothing
 	if (m_mem) {
 		vkFreeMemory(Device, m_mem, NULL);
+		m_mem = VK_NULL_HANDLE;
 	}
 	if (m_buffer) {
 		vkDestroyBuffer(Device, m_buffer, NULL);
+		m_buffer = VK_NULL_HANDLE;
 	}
 }
 
