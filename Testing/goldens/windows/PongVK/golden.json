@@ -1,0 +1,11 @@
+{
+ "api": "vk",
+ "renderer": "NVIDIA GeForce GTX 1650",
+ "version": "driver 617.168.0",
+ "width": 2560,
+ "height": 1415,
+ "seed": 1,
+ "platform": "windows",
+ "created": "2026-11-11 10:39",
+ "commit": "fef2acca"
+}
