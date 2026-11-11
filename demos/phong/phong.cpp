@@ -47,6 +47,10 @@ public:
 
     PhongDemo()
     {
+        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, 1.0f);
+        m_dirLight.DiffuseIntensity = 1.0f;
+        m_dirLight.AmbientIntensity = 0.5f;
+
         pointLights[0].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
         pointLights[0].DiffuseIntensity = 1.0f;
         pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -238,6 +242,7 @@ private:
     {
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
+        m_phongRenderer.SetDirLight(m_dirLight);
         m_phongRenderer.SetPointLights(2, pointLights);
         m_phongRenderer.SetSpotLights(2, spotLights);
     }
@@ -250,8 +255,11 @@ private:
         // pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
 
         pMesh1 = new SkinnedMesh();
-        pMesh1->LoadMesh("../Content/Vanguard.dae");
-        pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
+        pMesh1->LoadMesh("../Content/Mixamo/Running/Running.dae");
+        pMesh1->SetPosition(0.0f, -5.0f, 25.0f);
+        // The model is 200 units high
+        pMesh1->SetScale(0.05f);
+        pMesh1->SetRotation(0.0f, 180.0f, 0.0f);
         //        pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
     }
 
@@ -260,6 +268,7 @@ private:
     PhongRenderer m_phongRenderer;
     SkinnedMesh* pMesh1 = NULL;
     PersProjInfo persProjInfo;
+    DirectionalLight m_dirLight;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
