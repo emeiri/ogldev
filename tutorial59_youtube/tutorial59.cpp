@@ -37,7 +37,7 @@
 // https://unity3d.com/files/labs/downloads/vfx/assets01/Explosion01/Explosion01-sequence-tga.zip 
 // https://unity3d.com/files/labs/downloads/vfx/assets01/Explosion02/Explosion02-sequence-tga.zip
 // Extract them somewhere and set the path below to point to the directory where you extracted them.
-#define IMAGE_BASE_DIR "G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src"
+#define IMAGE_BASE_DIR "G:/Books/3D-Graphics-Rendering-Cookbook-2/deps/src"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
