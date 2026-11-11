@@ -1,0 +1,12 @@
+{
+ "api": "gl",
+ "renderer": "NVIDIA GeForce MX150/PCIe/SSE2",
+ "version": "4.6.0 NVIDIA 580.178.04",
+ "width": 800,
+ "height": 600,
+ "seed": 1,
+ "platform": "linux",
+ "created": "2026-11-11 10:39",
+ "commit": "73d6dff7",
+ "method": "hw"
+}

@@ -1,0 +1,12 @@
+{
+ "api": "vk",
+ "renderer": "NVIDIA GeForce MX150",
+ "version": "driver 580.712.256",
+ "width": 2560,
+ "height": 1440,
+ "seed": 1,
+ "platform": "linux",
+ "created": "2026-11-11 11:02",
+ "commit": "73d6dff7",
+ "method": "hw"
+}
