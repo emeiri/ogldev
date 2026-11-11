@@ -18,10 +18,42 @@
 
 #include <iostream>
 #include <math.h>
+#include <string.h>
 #include "ogldev_util.h"
 #include "ogldev_texture.h"
 #include "3rdparty/stb_image.h"
 #include "3rdparty/stb_image_write.h"
+
+
+// GLEW can't be trusted here: with glewExperimental it reports an extension
+// whenever the driver exports its functions, which Mesa does for extensions
+// that it doesn't support (e.g. bindless textures on llvmpipe)
+static bool HasGLExtension(const char* pName)
+{
+    GLint NumExtensions = 0;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &NumExtensions);
+
+    for (GLint i = 0; i < NumExtensions; i++) {
+        const char* pExt = (const char*)glGetStringi(GL_EXTENSIONS, i);
+        if (pExt && !strcmp(pExt, pName)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+static bool HasBindlessTextures()
+{
+    static int Supported = -1;
+
+    if (Supported == -1) {
+        Supported = HasGLExtension("GL_ARB_bindless_texture") ? 1 : 0;
+    }
+
+    return Supported == 1;
+}
 
 
 static int GetNumMipMapLevels2D(int w, int h)
@@ -298,17 +330,20 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_config.m_wrapMode);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_config.m_wrapMode);
 
-    GLfloat MaxAnisotropy = 0.0f;
-    if (glewIsSupported("GL_ARB_texture_filter_anisotropic") || GL_VERSION_4_6) {
+    if (GLEW_VERSION_4_6 || HasGLExtension("GL_ARB_texture_filter_anisotropic")) {
+        GLfloat MaxAnisotropy = 0.0f;
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &MaxAnisotropy);
+        glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, (GLint)MaxAnisotropy);
     }
-
-    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, (GLint)MaxAnisotropy);
 
     glGenerateTextureMipmap(m_textureObj);
 
-    m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
-    glMakeTextureHandleResidentARB(m_bindlessHandle);
+    // Not every driver has bindless textures (e.g. Mesa's llvmpipe). The handle
+    // then stays -1, which is what GetBindlessHandle() users check for.
+    if (HasBindlessTextures()) {
+        m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
+        glMakeTextureHandleResidentARB(m_bindlessHandle);
+    }
 }
 
 
