@@ -52,15 +52,11 @@ inline int GlutGet(GLenum Query)
 }
 
 
-// Always REGRESS_WINDOW_WIDTH x REGRESS_WINDOW_HEIGHT so that the window fits
-// every desktop and the captures of all machines match
+// The size of --test-window when it is given, so that the window fits a small
+// desktop (the runner passes it on Linux)
 inline void GlutInitWindowSize(int Width, int Height)
 {
-    if (Active()) {
-        Width = REGRESS_WINDOW_WIDTH;
-        Height = REGRESS_WINDOW_HEIGHT;
-    }
-
+    WindowSize(Width, Height);
     glutInitWindowSize(Width, Height);
 }
 
@@ -72,7 +68,10 @@ inline int GlutEnterGameMode()
         return glutEnterGameMode();
     }
 
-    glutInitWindowSize(REGRESS_WINDOW_WIDTH, REGRESS_WINDOW_HEIGHT);
+    int Width = 0, Height = 0;
+    if (WindowSize(Width, Height)) {
+        glutInitWindowSize(Width, Height);
+    }
     return glutCreateWindow("Regression test");
 }
 

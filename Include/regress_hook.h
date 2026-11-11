@@ -24,6 +24,9 @@
         --screenshot-dir DIR      write DIR/f0010.png ... and DIR/info.json
         --test-seed S             seed for rand() and for Regress::Seed()
         --test-strict             OpenGL/Vulkan errors are fatal (exit code 3)
+        --test-window 800x600     the size of every OpenGL window. Without it the
+                                  windows keep their own size, except for the
+                                  frameworks that call ForceWindowSize (800x600)
 
     The tutorials are not patched. On Windows the GLFW and freeglut headers are
     wrapped by Testing/shim (see Testing/README.md), which calls:
@@ -67,6 +70,8 @@ struct State {
     int Frame = 0;          // number of completed frames
     int Width = 0;
     int Height = 0;
+    int WindowWidth = 0;    // --test-window, 0 when not given
+    int WindowHeight = 0;
     CaptureFn Capture = NULL;
     QuitFn Quit = NULL;
     std::string Api;
@@ -124,6 +129,14 @@ inline bool Init(int argc, char** argv)
             s.Seed = (unsigned int)strtoul(argv[++i], NULL, 10);
         } else if (!strcmp(argv[i], "--test-strict")) {
             s.Strict = true;
+        } else if (!strcmp(argv[i], "--test-window") && HasValue) {
+            char* pEnd = NULL;
+            long w = strtol(argv[++i], &pEnd, 10);
+            long h = (*pEnd == 'x') ? strtol(pEnd + 1, NULL, 10) : 0;
+            if ((w > 0) && (h > 0)) {
+                s.WindowWidth = (int)w;
+                s.WindowHeight = (int)h;
+            }
         }
     }
 
@@ -206,15 +219,34 @@ inline int Frame()
 }
 
 
-// Sets a fixed window size in test mode, else leaves the values alone
+// In test mode with --test-window, replaces the size of a window by the
+// requested one and returns true. Otherwise leaves the values alone.
+template<typename T>
+inline bool WindowSize(T& Width, T& Height)
+{
+    if (!Active() || !GetState().WindowWidth) {
+        return false;
+    }
+
+    Width = (T)GetState().WindowWidth;
+    Height = (T)GetState().WindowHeight;
+    return true;
+}
+
+
+// For the frameworks whose windows are larger than most screens: a fixed
+// window size in test mode (--test-window, else 800x600), else leaves the
+// values alone
 template<typename T>
 inline void ForceWindowSize(T& Width, T& Height)
 {
     if (Active()) {
-        Width = (T)REGRESS_WINDOW_WIDTH;
-        Height = (T)REGRESS_WINDOW_HEIGHT;
-        GetState().Width = REGRESS_WINDOW_WIDTH;
-        GetState().Height = REGRESS_WINDOW_HEIGHT;
+        if (!WindowSize(Width, Height)) {
+            Width = (T)REGRESS_WINDOW_WIDTH;
+            Height = (T)REGRESS_WINDOW_HEIGHT;
+        }
+        GetState().Width = (int)Width;
+        GetState().Height = (int)Height;
     }
 }
 
