@@ -22,7 +22,7 @@
 
         --test-frames 10,60,200   capture these frames, then quit after the last one
         --screenshot-dir DIR      write DIR/f0010.png ... and DIR/info.json
-        --test-seed S             seed for rand() and for Regress::Seed()
+        --test-seed S             seed for rand(), Regress::Rand() and Regress::Seed()
         --test-strict             OpenGL/Vulkan errors are fatal (exit code 3)
         --test-window 800x600     the size of every OpenGL window. Without it the
                                   windows keep their own size, except for the
@@ -65,6 +65,7 @@ struct State {
     bool Active = false;
     bool Strict = false;
     unsigned int Seed = 1;
+    unsigned int RandState = 1;   // Regress::Rand()
     std::vector<int> Frames;
     std::string Dir = ".";
     int Frame = 0;          // number of completed frames
@@ -144,6 +145,7 @@ inline bool Init(int argc, char** argv)
 
     if (s.Active) {
         srand(s.Seed);
+        s.RandState = s.Seed;
         // The runner reads the output through a pipe
         setvbuf(stdout, NULL, _IONBF, 0);
         printf("Regress: test mode, %d capture(s), last frame %d, output '%s'\n",
@@ -209,6 +211,26 @@ inline unsigned int Seed()
 {
     Active();
     return GetState().Seed;
+}
+
+
+// A random number generator that gives the same sequence on every platform, so
+// that a program that uses random numbers renders the same image on all of them
+// (RANDOM and SRANDOM in ogldev_util.h use it in test mode). It is the generator
+// of the MSVC runtime, so on Windows it gives the same numbers as rand().
+#define REGRESS_RAND_MAX 0x7fff
+
+inline void SeedRand(unsigned int S)
+{
+    GetState().RandState = S;
+}
+
+
+inline int Rand()
+{
+    unsigned int& r = GetState().RandState;
+    r = r * 214013u + 2531011u;
+    return (int)((r >> 16) & REGRESS_RAND_MAX);
 }
 
 

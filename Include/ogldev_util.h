@@ -59,15 +59,20 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #ifdef _WIN64
 #define SNPRINTF _snprintf_s
 #define VSNPRINTF vsnprintf_s
-#define RANDOM rand
-#define SRANDOM srand(Regress::Active() ? Regress::Seed() : (unsigned)time(NULL))
+#define OGLDEV_SYS_RANDOM rand
+#define OGLDEV_SYS_SRANDOM srand((unsigned)time(NULL))
 #pragma warning (disable: 4566)
 #else
 #define SNPRINTF snprintf
 #define VSNPRINTF vsnprintf
-#define RANDOM random
-#define SRANDOM srandom(Regress::Active() ? Regress::Seed() : getpid())
+#define OGLDEV_SYS_RANDOM random
+#define OGLDEV_SYS_SRANDOM srandom(getpid())
 #endif
+
+// The regression test mode uses a generator that gives the same numbers on all platforms
+#define RANDOM() (Regress::Active() ? Regress::Rand() : (int)OGLDEV_SYS_RANDOM())
+#define RANDOM_MAX (Regress::Active() ? REGRESS_RAND_MAX : RAND_MAX)
+#define SRANDOM (Regress::Active() ? Regress::SeedRand(Regress::Seed()) : OGLDEV_SYS_SRANDOM)
 
 #define INVALID_UNIFORM_LOCATION 0xffffffff
 #define INVALID_OGL_VALUE 0xffffffff

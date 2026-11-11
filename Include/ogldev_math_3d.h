@@ -49,7 +49,7 @@
 
 static inline float RandomFloat()
 {
-    float Max = RAND_MAX;
+    float Max = (float)RANDOM_MAX;
     return ((float)RANDOM() / Max);
 }
 
