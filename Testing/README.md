@@ -46,7 +46,7 @@ A project passes when it exits with code 0 and, for every captured frame:
 
 The goldens of the two platforms may have different sizes, because each platform captures every window at the size the project asks for and a window manager may shrink a window that doesn't fit the screen. The comparison with the other platform then scales the larger image down to the size of the smaller one. When the aspect ratios differ, it tries both stretching the image and cropping its center to the same aspect ratio, which matches a projection that keeps its vertical or horizontal field of view, and keeps whichever is closer. The status says which one was used, e.g. `(windows golden: 0.13% differ, scaled: 1600x843 and 1920x1080 compared at 1600x843)`.
 
-`cross_max_bad` = `off` turns the comparison with the other platform off for a row whose image cannot match, e.g. because it depends on `rand()`, whose sequence differs between MSVC and glibc. The note gives the reason.
+`cross_max_bad` = `off` turns the comparison with the other platform off for a row whose image cannot match. The note gives the reason. Random numbers are not such a reason: in test mode `RANDOM`, `SRANDOM` and `RandomFloat` (Include/ogldev_util.h) use `Regress::Rand()`, which gives the same sequence on every platform. A program that calls `rand()` directly still gets the sequence of its C runtime.
 
 `FLAKY` means it passed only on the retry.
 
@@ -117,7 +117,7 @@ Options understood by an application (the runner passes them):
 
 - `--test-frames 10,60,200`: capture these frames and exit with code 0 after the last one
 - `--screenshot-dir DIR`: where `fNNNN.png` and `info.json` go
-- `--test-seed S`: seed for `rand()`
+- `--test-seed S`: seed for `rand()` and `Regress::Rand()`
 - `--test-strict`: exit with code 3 on an OpenGL debug error or a Vulkan validation error
 - `--test-window 800x600`: the size of the OpenGL windows
 
