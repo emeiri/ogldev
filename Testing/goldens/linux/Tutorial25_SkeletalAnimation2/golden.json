@@ -1,12 +1,12 @@
 {
  "api": "gl",
- "renderer": "Mesa Intel(R) HD Graphics 3000 (SNB GT2)",
- "version": "3.3 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
- "width": 800,
- "height": 600,
+ "renderer": "llvmpipe (LLVM 20.1.2, 256 bits)",
+ "version": "4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4",
+ "width": 1920,
+ "height": 1080,
  "seed": 1,
  "platform": "linux",
- "created": "2026-11-10 17:48",
- "commit": "836edfe2",
- "method": "hw"
+ "created": "2026-11-11 07:29",
+ "commit": "d68355e7",
+ "method": "sw"
 }
