@@ -422,15 +422,36 @@ private:
 
 	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
 	{
+		// The meshes are drawn by consecutive command buffers into the same image. Only
+		// the first one may start from VK_IMAGE_LAYOUT_UNDEFINED, which allows the driver
+		// to discard the contents (the NVIDIA driver does), and only the last one
+		// prepares the image for presentation.
 		bool FirstCommandBuffer = (MeshIndex == 0);
+		bool LastCommandBuffer = (MeshIndex == (int)m_modelContexts.size() - 1);
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
-				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+			if (FirstCommandBuffer) {
+				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
+										  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+			} else {
+				// Keep the color and depth of the previous meshes: draw after their writes
+				VkMemoryBarrier Barrier = {
+					.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+					.pNext = NULL,
+					.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+					.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+									 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+				};
+
+				vkCmdPipelineBarrier(CmdBuf,
+					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+					0, 1, &Barrier, 0, NULL, 0, NULL);
+			}
 
 			BeginRendering(CmdBuf, i, FirstCommandBuffer);
 		
@@ -443,7 +464,7 @@ private:
 
 			vkCmdEndRendering(CmdBuf);
 
-			if (WithSecondBarrier) {
+			if (WithSecondBarrier && LastCommandBuffer) {
 				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
 			}
