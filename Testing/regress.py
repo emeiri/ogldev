@@ -53,6 +53,7 @@ NOTE = "linux_note" if PLATFORM == "linux" else "note"
 METHODS = ["hw", "sw", "sw-gl46"]
 SOFTWARE_RENDERERS = ("llvmpipe", "softpipe", "lavapipe", "swrast", "software")
 LAVAPIPE_ICD = "/usr/share/vulkan/icd.d/lvp_icd.json"
+XVFB_SIZE = (2560, 1600)
 
 
 # ---------------------------------------------------------------------------
@@ -109,7 +110,7 @@ class LinuxDisplays:
         self.timeout = timeout
         self.xvfb, self.sw_display = None, None
         self.hw_checked, self.hw_display, self.hw_renderer, self.hw_reason = False, None, "", ""
-        self.xset_restore = None
+        self.xset_restore, self.scale_restore = None, None
         atexit.register(self.close)
 
     def software(self):
@@ -120,7 +121,7 @@ class LinuxDisplays:
                 if not Path(f"/tmp/.X11-unix/X{n}").exists() and not Path(f"/tmp/.X{n}-lock").exists():
                     break
             # Large enough for the projects that ask for big windows
-            self.xvfb = subprocess.Popen(["Xvfb", f":{n}", "-screen", "0", "2560x1600x24", "-nolisten", "tcp"],
+            self.xvfb = subprocess.Popen(["Xvfb", f":{n}", "-screen", "0", f"{XVFB_SIZE[0]}x{XVFB_SIZE[1]}x24", "-nolisten", "tcp"],
                                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             for _ in range(100):
                 if Path(f"/tmp/.X11-unix/X{n}").exists():
@@ -154,7 +155,31 @@ class LinuxDisplays:
             return None
         self.hw_display, self.hw_renderer = display, renderer
         self.keep_awake(env)
+        self.enlarge_screen(env)
         return display
+
+    def enlarge_screen(self, env):
+        # The window manager shrinks a window that doesn't fit the work area (a 1920x1080
+        # window on a 1920x1080 screen loses the panel and the title bar), which changes
+        # the image. Scale the X screen up to the size of the virtual X server for the
+        # run: the GPU still renders the windows at their real size. OGLDEV_HW_SCALE=0
+        # turns it off.
+        if os.environ.get("OGLDEV_HW_SCALE") == "0" or not shutil.which("xrandr"):
+            return
+        q = subprocess.run(["xrandr", "--current"], env=env, capture_output=True, text=True).stdout
+        out = re.search(r"^(\S+) connected primary (\d+)x(\d+)", q, re.M) or \
+              re.search(r"^(\S+) connected (\d+)x(\d+)", q, re.M)
+        if not out or len(re.findall(r"^\S+ connected (?:primary )?\d", q, re.M)) != 1:
+            return      # nothing to do, or several monitors: leave the layout alone
+        name, w, h = out.group(1), int(out.group(2)), int(out.group(3))
+        scale = max(XVFB_SIZE[0] / w, XVFB_SIZE[1] / h)
+        if scale <= 1:
+            return
+        r = subprocess.run(["xrandr", "--output", name, "--scale", f"{scale:.4f}x{scale:.4f}"],
+                           env=env, capture_output=True, text=True)
+        if r.returncode == 0:
+            self.scale_restore = (env, ["xrandr", "--output", name, "--scale", "1x1"])
+            time.sleep(3)   # let the window manager take the new work area
 
     def keep_awake(self, env):
         # A screen saver would lock the session (light-locker), which stops the GPU
@@ -198,6 +223,10 @@ class LinuxDisplays:
         return self.env(method, self.software()), None
 
     def close(self):
+        if self.scale_restore:
+            env, cmd = self.scale_restore
+            subprocess.run(cmd, env=env, capture_output=True)
+            self.scale_restore = None
         if self.xset_restore:
             env, restore = self.xset_restore
             for cmd in restore:
