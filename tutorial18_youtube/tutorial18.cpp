@@ -124,7 +124,8 @@ void Tutorial18::RenderSceneCB()
     pGameCamera->OnRender();
 
 #ifdef _WIN64
-    float YRotationAngle = 0.1f;
+    // The regression test mode uses the speed of the other platforms
+    float YRotationAngle = Regress::Active() ? 1.0f : 0.1f;
 #else
     float YRotationAngle = 1.0f;
 #endif

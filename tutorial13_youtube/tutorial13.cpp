@@ -42,7 +42,8 @@ static void RenderSceneCB()
     static float Scale = 0.0f;
 
 #ifdef _WIN64
-    Scale += 0.001f;
+    // The regression test mode uses the speed of the other platforms
+    Scale += Regress::Active() ? 0.02f : 0.001f;
 #else
     Scale += 0.02f;
 #endif
