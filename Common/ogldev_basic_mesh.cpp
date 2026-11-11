@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "ogldev_basic_mesh.h"
 #include "ogldev_engine_common.h"
 
@@ -36,6 +38,10 @@ std::string GetFullPath(const std::string& Dir, const aiString& Path)
     else if (p.substr(0, 2) == ".\\") {
         p = p.substr(2, p.size() - 2);
     }
+
+    // Model files made on Windows may separate directories with backslashes,
+    // which Linux doesn't accept. Windows accepts both.
+    std::replace(p.begin(), p.end(), '\\', '/');
 
     std::string FullPath = Dir + "/" + p;
 
