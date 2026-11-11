@@ -427,6 +427,14 @@ def read_info(outdir):
         return {}
 
 
+def cross_off_reason(row):
+    # Why the other platform's golden is not compared, from the notes of the row
+    for note in (row.get(NOTE, ""), row.get("note", ""), row.get("linux_note", "")):
+        if "not compared" in note:
+            return note.split(", so the")[0].strip()
+    return "cross_max_bad=off in the manifest"
+
+
 def check(row, outdir, golden_set, update, method=""):
     # Compares the captures with the goldens of this platform and of the other one.
     # Returns the status, the golden folder of this platform and the frame names.
@@ -481,7 +489,7 @@ def check(row, outdir, golden_set, update, method=""):
     if cross_fail:
         text = f"{cross_fail} the {OTHER} golden (other platform{', ' + cross_how if cross_how else ''})"
         return (f"UPDATED, but {text}" if update else f"FAIL ({text})"), own, frames
-    note = f" ({OTHER} golden not compared)" if cross_off else \
+    note = f" ({OTHER} golden not compared: {cross_off_reason(row)})" if cross_off else \
         f" ({PLATFORM} only)" if cross_missing and not on_other_platform(row) else \
         f" (no {OTHER} golden)" if cross_missing else \
         f" ({OTHER} golden: {cross_worst:.2%} differ{', ' + cross_how if cross_how else ''})"
@@ -738,9 +746,12 @@ def write_report(results):
                     continue
                 f.write(f"<td><img src='../goldens/{r['gpu']}/{html.escape(base)}' width=260>"
                         f"<td><img src='{html.escape(base)}' width=260>"
-                        f"<td><img src='{html.escape(base.replace('.png', '.diff.png'))}' width=260>"
-                        f"<td><img src='../goldens/{OTHER}/{html.escape(base)}' width=260>"
-                        f"<td><img src='{html.escape(base.replace('.png', '.xdiff.png'))}' width=260>")
+                        f"<td><img src='{html.escape(base.replace('.png', '.diff.png'))}' width=260>")
+                if r.get("cross_off"):
+                    f.write(f"<td colspan=2>not compared with the {OTHER} golden")
+                else:
+                    f.write(f"<td><img src='../goldens/{OTHER}/{html.escape(base)}' width=260>"
+                            f"<td><img src='{html.escape(base.replace('.png', '.xdiff.png'))}' width=260>")
 
 
 def main():
@@ -875,7 +886,7 @@ def main():
                 status = "FLAKY (passed on retry)"
             failed += status.startswith("FAIL")
             results.append({"name": r["name"], "status": status, "gpu": gpu, "frames": frames,
-                            "method": method, "renderer": read_info(outdir).get("renderer", "")})
+                            "method": method, "cross_off": r.get("cross_max_bad") == "off", "renderer": read_info(outdir).get("renderer", "")})
             print(f"{r['name']:32} {status}" + (f"  [{method}]" if method else ""), flush=True)
     finally:
         if manifest_changed:
