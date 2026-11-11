@@ -571,6 +571,9 @@ def choose_method(row, outdir, displays, opt):
             probe = outdir.parent / (outdir.name + ".size_check")
             probe_code = run_once(row, probe, False, opt.timeout, sw_env)
             if probe_code != 0:
+                # Some projects need llvmpipe to report OpenGL 4.6
+                probe_code = run_once(row, probe, False, opt.timeout, displays.for_method("sw-gl46")[0])
+            if probe_code != 0:
                 # Without the size of the window on the virtual X server, a window
                 # that the window manager shrank cannot be told apart
                 tried.append(f"hw: cannot check the window size, the software run failed "
