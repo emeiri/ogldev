@@ -122,6 +122,12 @@ private:
 
 	std::vector<VulkanMeshEntry> m_alignedMeshes;
 
+	void CreateInternalUniformBuffers(bool RangePerSubmesh);
+
+	// Distance between the uniforms of consecutive submeshes in the internal
+	// uniform buffers: one mat4 rounded up to minUniformBufferOffsetAlignment
+	size_t m_uniformStride = 0;
+
 	MemBuf m_alignedVertices;
 	MemBuf m_alignedIndices;
 };

@@ -1595,11 +1595,15 @@ VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount,
 }
 
 
-std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size)
+std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size, size_t BoundRange)
 {
-    if (Size >= GetPhysicalDeviceLimits().maxUniformBufferRange) {
-        printf("Requested uniform buffer size %d exceeds device limit %d\n", 
-			(int)Size, (int)GetPhysicalDeviceLimits().maxUniformBufferRange);
+	if (BoundRange == 0) {
+		BoundRange = Size;
+	}
+
+    if (BoundRange > GetPhysicalDeviceLimits().maxUniformBufferRange) {
+        printf("Requested uniform buffer range %d exceeds device limit %d\n", 
+			(int)BoundRange, (int)GetPhysicalDeviceLimits().maxUniformBufferRange);
 		assert(0);
         exit(1);
     }

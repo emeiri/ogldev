@@ -191,10 +191,6 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_alignedIndices.pMem, IndexBufferSize);
 
-	if (m_useInternalUniformBuffers) {
-		m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_modelData.m_meshes.size());
-	}
-
 	if (m_isDescriptorIndexing) {
 		CreateMetaData();
 		CreateIndirectBuffer();
@@ -245,9 +241,32 @@ void VkModel::CreateIndirectBuffer()
 }
 
 
+// The internal uniform buffers hold one mat4 per submesh. Their layout depends on
+// the pipeline, so they are created with the descriptor sets:
+//   RangePerSubmesh true  (V2, V3): each submesh binds its own range, which must start
+//                         at a multiple of minUniformBufferOffsetAlignment (256 bytes on NVIDIA)
+//   RangePerSubmesh false (V4):     the shader reads the whole buffer as an array of mat4
+//                         indexed by the draw, so the matrices are tightly packed
+void VkModel::CreateInternalUniformBuffers(bool RangePerSubmesh)
+{
+	if (!m_useInternalUniformBuffers || !m_uniformBuffers.empty()) {
+		return;
+	}
+
+	m_uniformStride = RangePerSubmesh ?
+		AlignUpToMultiple(UNIFORM_BUFFER_SIZE, m_pVulkanCore->GetPhysicalDeviceLimits().minUniformBufferOffsetAlignment) :
+		UNIFORM_BUFFER_SIZE;
+
+	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(m_uniformStride * m_modelData.m_meshes.size(),
+														   RangePerSubmesh ? UNIFORM_BUFFER_SIZE : 0);
+}
+
+
 void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
 	assert(!m_isDescriptorIndexing);
+
+	CreateInternalUniformBuffers(true);
 
 	int NumSubmeshes = (int)m_modelData.m_meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
@@ -264,6 +283,8 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 {
 	assert(m_isDescriptorIndexing);
 
+	CreateInternalUniformBuffers(true);
+
 	int NumSubmeshes = (int)m_modelData.m_meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets, m_texturesDescriptorSet);
 
@@ -278,6 +299,8 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 {
 	assert(m_isDescriptorIndexing);
+
+	CreateInternalUniformBuffers(false);
 
 	m_descriptorSets.resize(1);
 	Pipeline.AllocateDescriptorSets(m_descriptorSets[0]);
@@ -425,7 +448,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md, bool IsPBR)
 
 		md.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };
 
-		offset = SubmeshIndex * UNIFORM_BUFFER_SIZE;
+		offset = SubmeshIndex * m_uniformStride;
 		range = UNIFORM_BUFFER_SIZE;
 
 		md.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = offset, .m_range = range };
@@ -509,18 +532,21 @@ void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf)
 
 void VkModel::Update(int ImageIndex, const glm::mat4& Transformation)
 {
-    if (!m_useInternalUniformBuffers) {
-        printf("VkModel::Update called but m_useInternalUniformBuffers is false\n");
+    if (!m_useInternalUniformBuffers || m_uniformBuffers.empty()) {
+        printf("VkModel::Update called without internal uniform buffers (call CreateDescriptorSets first)\n");
         assert(0);
     }
 
-	std::vector<glm::mat4> Transformations(m_modelData.m_meshes.size());
+	// One mat4 per submesh, m_uniformStride bytes apart
+	size_t NumSubmeshes = m_modelData.m_meshes.size();
+	std::vector<char> Uniforms(m_uniformStride * NumSubmeshes, 0);
 
-	for (u32 SubmeshIndex = 0; SubmeshIndex < Transformations.size(); SubmeshIndex++) {
-		Transformations[SubmeshIndex] = Transformation * GetTransformations()[SubmeshIndex];
+	for (size_t SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+		glm::mat4 WVP = Transformation * GetTransformations()[SubmeshIndex];
+		memcpy(Uniforms.data() + SubmeshIndex * m_uniformStride, &WVP, sizeof(WVP));
 	}
 
-	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), Transformations.data(), ARRAY_SIZE_IN_BYTES(Transformations));
+	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), Uniforms.data(), Uniforms.size());
 }
 
 

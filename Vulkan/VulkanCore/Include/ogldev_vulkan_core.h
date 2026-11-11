@@ -102,7 +102,9 @@ public:
 
 	BufferAndMemory CreateIndirectBuffer(const void* pVertices, size_t Size);
 
-	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
+	// BoundRange: the largest range of the buffer that one descriptor binds,
+	// which maxUniformBufferRange limits (0 means the whole buffer)
+	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size, size_t BoundRange = 0);
 
 	void CreateTexture(const char* pFilename, VulkanTexture& Tex, VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB);
 
