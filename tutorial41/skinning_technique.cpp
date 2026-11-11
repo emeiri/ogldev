@@ -251,13 +251,13 @@ void SkinningTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
 
 void SkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
 {
-    assert(Index < MAX_BONES);
+    assert(Index < SKINNING_MAX_BONES);
     glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);       
 }
 
 
 void SkinningTechnique::SetPrevBoneTransform(uint Index, const Matrix4f& Transform)
 {
-    assert(Index < MAX_BONES);
+    assert(Index < SKINNING_MAX_BONES);
     glUniformMatrix4fv(m_prevBoneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);       
 }

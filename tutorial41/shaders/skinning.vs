@@ -13,7 +13,7 @@ out vec4 ClipSpacePos0;
 out vec4 PrevClipSpacePos0;                                                                
 
 
-const int MAX_BONES = 200;
+const int MAX_BONES = 100; // SKINNING_MAX_BONES in skinning_technique.h
 
 uniform mat4 gWVP;
 uniform mat4 gWorld;

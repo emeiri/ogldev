@@ -21,6 +21,11 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
+// The size of the bone arrays in shaders/skinning.vs (keep the two in sync).
+// Two arrays of 200 matrices exceed the vertex shader uniform space of some
+// GPUs (NVIDIA: 4096 components), and the model of this tutorial has 33 bones.
+#define SKINNING_MAX_BONES 100
+
 struct BaseLight
 {
     Vector3f Color;
@@ -144,8 +149,8 @@ private:
         } Atten;
     } m_spotLightsLocation[MAX_SPOT_LIGHTS];
 
-    GLuint m_boneLocation[MAX_BONES];
-    GLuint m_prevBoneLocation[MAX_BONES];
+    GLuint m_boneLocation[SKINNING_MAX_BONES];
+    GLuint m_prevBoneLocation[SKINNING_MAX_BONES];
 };
 
 
