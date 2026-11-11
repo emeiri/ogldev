@@ -826,6 +826,42 @@ BufferAndMemory VulkanCore::CreateUniformBuffer(size_t Size)
 }
 
 
+// vkAllocateMemory, and when the video memory is full (e.g. the 4K textures of the
+// larger scenes on a 2GB GPU) a second try in system memory that the GPU can use:
+// slower, but the program runs
+static VkResult AllocateMemory(VkDevice Device, const VkPhysicalDeviceMemoryProperties& MemProps,
+							   VkMemoryAllocateInfo& AllocInfo, u32 MemTypeBits, VkDeviceMemory* pMem)
+{
+	VkResult res = vkAllocateMemory(Device, &AllocInfo, NULL, pMem);
+
+	if (res != VK_ERROR_OUT_OF_DEVICE_MEMORY) {
+		return res;
+	}
+
+	VkMemoryPropertyFlags WantedFlags = MemProps.memoryTypes[AllocInfo.memoryTypeIndex].propertyFlags & ~VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+	for (u32 i = 0; (i < MemProps.memoryTypeCount) && (res != VK_SUCCESS); i++) {
+		const VkMemoryType& MemType = MemProps.memoryTypes[i];
+		bool InVideoMemory = MemProps.memoryHeaps[MemType.heapIndex].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT;
+
+		// Keep the other properties that were asked for (e.g. host visible)
+		if ((MemTypeBits & (1 << i)) && !InVideoMemory && ((MemType.propertyFlags & WantedFlags) == WantedFlags)) {
+			AllocInfo.memoryTypeIndex = i;
+			res = vkAllocateMemory(Device, &AllocInfo, NULL, pMem);
+		}
+	}
+
+	static bool Warned = false;
+
+	if ((res == VK_SUCCESS) && !Warned) {
+		printf("Warning: out of video memory, new allocations are placed in system memory\n");
+		Warned = true;
+	}
+
+	return res;
+}
+
+
 BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, 
 	                                     VkMemoryPropertyFlags Properties)
 {
@@ -873,7 +909,7 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 		MemAllocInfo.pNext = &FlagsInfo;
 	}
 
-	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &Buf.m_mem);
+	res = AllocateMemory(m_device, m_physDevices.Selected().m_memProps, MemAllocInfo, MemReqs.memoryTypeBits, &Buf.m_mem);
 	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
 
 	// Step 5: bind memory
@@ -1215,7 +1251,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 		.memoryTypeIndex = MemoryTypeIndex
 	};
 
-	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &Tex.m_mem);
+	res = AllocateMemory(m_device, m_physDevices.Selected().m_memProps, MemAllocInfo, MemReqs.memoryTypeBits, &Tex.m_mem);
 	CHECK_VK_RESULT(res, "vkAllocateMemory error");
 
 	// Step 5: bind memory
