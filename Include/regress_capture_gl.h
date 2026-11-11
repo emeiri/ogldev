@@ -40,6 +40,11 @@ inline bool CaptureGL(const char* pPath, int Width, int Height, void* pApiContex
 {
     (void)pApiContext;
 
+    // Errors left by the application are not errors of the capture (strict mode
+    // reports them through the debug callback)
+    for (int i = 0; (i < 32) && (glGetError() != GL_NO_ERROR); i++) {
+    }
+
     GLint Viewport[4] = { 0 };
     glGetIntegerv(GL_VIEWPORT, Viewport);
 
