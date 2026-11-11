@@ -15,7 +15,9 @@
 # On Linux a project is captured either on the GPU of the desktop session
 # ('hw') or with Mesa's software renderers on a virtual X server ('sw').
 # The method is chosen when the golden is first created and recorded in the
-# manifest (linux_capture), and later runs always use it.
+# manifest (linux_capture), and later runs always use it. A golden set of its
+# own (--gpu NAME, e.g. a second Linux machine) keeps its methods in its
+# golden.json files instead and leaves the manifest alone.
 #
 # Needs: pip install pillow numpy (on Linux: apt install python3-pil python3-numpy xvfb mesa-utils)
 
@@ -849,12 +851,24 @@ def main():
             signal.signal(sig, lambda *_: sys.exit(1))
     results, failed, manifest_changed = [], 0, False
 
+    # A golden set other than the platform's own (--gpu) belongs to another machine:
+    # it records its capture methods in its golden.json files, not in the manifest
+    own_set = not opt.gpu or opt.gpu == PLATFORM
+
+    def recorded_method(r):
+        if own_set:
+            return r.get("linux_capture", "")
+        try:
+            return json.loads((GOLD / opt.gpu / r["name"] / "golden.json").read_text()).get("method", "")
+        except (OSError, ValueError):
+            return ""
+
     def environment(r, outdir):
         # Linux: the environment of the row's recorded capture method.
         # Returns (env, method, status) where status is set when the row cannot run.
         if PLATFORM != "linux":
             return None, "", None
-        method = r.get("linux_capture", "")
+        method = recorded_method(r)
         if opt.update_golden and (opt.capture or not method):
             return None, "", None          # choose_method() decides
         if not method:
@@ -870,7 +884,7 @@ def main():
                 env, method, status = None, "", None
                 if PLATFORM == "linux":
                     # A new project has no recorded method yet: audit it in software unless told otherwise
-                    method = opt.capture or r.get("linux_capture") or "sw"
+                    method = opt.capture or recorded_method(r) or "sw"
                     env, reason = displays.for_method(method)
                     if env is None:
                         status = f"SKIP ({method} capture: {reason})"
@@ -900,7 +914,7 @@ def main():
                     if isinstance(code, str) and code.startswith("SKIP"):
                         status = code
                         break
-                    if method and method != r.get("linux_capture"):
+                    if own_set and method and method != r.get("linux_capture"):
                         r["linux_capture"] = method
                         manifest_changed = True
                     if method:
