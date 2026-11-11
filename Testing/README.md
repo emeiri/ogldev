@@ -29,7 +29,7 @@ python Testing/regress.py --build
 
 On Linux use `python3`.
 
-Other options: `--api gl|vk`, `--tier N`, `--strict` (OpenGL/Vulkan errors fail the run), `--audit N` (run each project N times and require byte-identical captures), `--retries N`, `--timeout SECONDS`, `--gpu NAME` (use `goldens/NAME` instead of the platform's goldens), `--capture hw|sw|sw-gl46` (Linux, see below), `--coverage`.
+Other options: `--window WxH|native` (see below), `--api gl|vk`, `--tier N`, `--strict` (OpenGL/Vulkan errors fail the run), `--audit N` (run each project N times and require byte-identical captures), `--retries N`, `--timeout SECONDS`, `--gpu NAME` (use `goldens/NAME` instead of the platform's goldens), `--capture hw|sw|sw-gl46` (Linux, see below), `--coverage`.
 
 After a run open `Testing/out/report.html`: golden, actual and an amplified difference image side by side, then the other platform's golden and its difference image. `Testing/out/<project>/log.txt` has the application's output.
 
@@ -44,6 +44,10 @@ A project passes when it exits with code 0 and, for every captured frame:
 - at most 0.1% of the pixels differ from the golden of its own platform by more than 8/255 in any channel (columns `tol` and `max_bad` override this), and
 - at most 2% of the pixels differ from the golden of the other platform by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of the other platform is reported but is not a failure.
 
+The goldens of the two platforms may have different sizes, because each platform captures every window at the size the project asks for and a window manager may shrink a window that doesn't fit the screen. The comparison with the other platform then scales the larger image down to the size of the smaller one. When the aspect ratios differ, it tries both stretching the image and cropping its center to the same aspect ratio, which matches a projection that keeps its vertical or horizontal field of view, and keeps whichever is closer. The status says which one was used, e.g. `(windows golden: 0.13% differ, scaled: 1600x843 and 1920x1080 compared at 1600x843)`.
+
+`cross_max_bad` = `off` turns the comparison with the other platform off for a row whose image cannot match, e.g. because it depends on `rand()`, whose sequence differs between MSVC and glibc. The note gives the reason.
+
 `FLAKY` means it passed only on the retry.
 
 ## Capture on Linux
@@ -56,7 +60,7 @@ A project is captured in one of these ways:
 | `sw` | Mesa's software renderers, llvmpipe for OpenGL and lavapipe for Vulkan, on a private Xvfb |
 | `sw-gl46` | The same, with llvmpipe reporting OpenGL 4.6 (it implements 4.5, the shaders of some projects ask for 4.60) |
 
-The method is chosen when a project's Linux golden is first created and is recorded in the manifest column `linux_capture`. Later runs always use the recorded method. To choose it, the runner tries `hw` in strict mode and accepts it when the project runs on a hardware renderer with no OpenGL errors and its window kept its size. Otherwise it tries `sw`, then `sw-gl46`. `Testing/out/<project>/methods.txt` says why a method was rejected. `--capture METHOD` with `--update-golden` sets the method, e.g. `--capture sw` to create goldens while the desktop is locked. To choose again, clear the project's `linux_capture` and run `--update-golden --only NAME`.
+The method is chosen when a project's Linux golden is first created and is recorded in the manifest column `linux_capture`. Later runs always use the recorded method. To choose it, the runner tries `hw` in strict mode and accepts it when the project runs on a hardware renderer with no OpenGL errors and its window kept its size (a window larger than the screen is shrunk by the window manager, so such a project is captured with `sw`, on a 2560x1600 Xvfb). Otherwise it tries `sw`, then `sw-gl46`. `Testing/out/<project>/methods.txt` says why a method was rejected. `--capture METHOD` with `--update-golden` sets the method, e.g. `--capture sw` to create goldens while the desktop is locked. To choose again, clear the project's `linux_capture` and run `--update-golden --only NAME`.
 
 `hw` needs the desktop session to be unlocked and on screen. A locked session (light-locker switches to the greeter) stops the GPU rendering for it. During a run the screen saver and DPMS are switched off and restored at the end. If the display is not available, `hw` projects are reported as skipped, and new projects are not given a method rather than falling back to software.
 
@@ -104,7 +108,7 @@ The tutorials contain no testing code. On Windows `Windows\ogldev_vs_2026\Direct
 
 - `glfwSwapBuffers` / `glutSwapBuffers`: end of the frame. Captures the back buffer on the requested frames and closes the application after the last one.
 - `glfwGetTime` / `glutGet(GLUT_ELAPSED_TIME)`: a fixed clock that advances 1/60 s per frame.
-- `glfwCreateWindow` / `glutInitWindowSize` / `glutEnterGameMode`: never full screen, and an 800x600 window for OpenGL, so that it fits every desktop and the captures of all machines have the same size. Vulkan windows keep their size because several Vulkan tutorials size their render area from their own constants.
+- `glfwCreateWindow` / `glutInitWindowSize` / `glutEnterGameMode`: never full screen. An OpenGL window keeps the size the project asks for, unless the runner passes `--window WxH` (then `--test-window WxH`). Many tutorials size their viewport and projection from their own constants, so in a smaller window they draw only part of the image. Vulkan windows always keep their size for the same reason. The frameworks of `ogldev_base_app` and DemoLITION ask for windows larger than most screens and use 800x600 in test mode (or the `--test-window` size).
 - input callbacks: disabled.
 
 Unless the application is started with `--test-frames`, every wrapper just calls the real function.
@@ -115,12 +119,13 @@ Options understood by an application (the runner passes them):
 - `--screenshot-dir DIR`: where `fNNNN.png` and `info.json` go
 - `--test-seed S`: seed for `rand()`
 - `--test-strict`: exit with code 3 on an OpenGL debug error or a Vulkan validation error
+- `--test-window 800x600`: the size of the OpenGL windows
 
 ## What lives outside this folder
 
 - `Include/regress_hook.h`, `Include/regress_capture_gl.h`: the test mode itself and the OpenGL capture.
 - `Windows/ogldev_vs_2026/Directory.Build.targets` (Windows) and `Make/config.mk` (Linux): add the shim to the include path.
 - `Common/ogldev_util.cpp`: `GetCurrentTimeMillis` returns the test clock; `glDebugOutput` reports errors for `--test-strict`.
-- `Common/ogldev_base_app.cpp`, `ogldev_base_app2.cpp`, `DemoLITION/Framework/Source/core_rendering_system.cpp`: 800x600 window in test mode (these demos ask for windows larger than most screens).
+- `Common/ogldev_base_app.cpp`, `ogldev_base_app2.cpp`, `DemoLITION/Framework/Source/core_rendering_system.cpp`: 800x600 window in test mode, or the `--test-window` size (these demos ask for windows larger than most screens).
 - `Common/3rdparty/ImGui/GLFW/imgui_impl_opengl3.cpp`: no GUI in test mode, because it shows frame rates.
 - `Vulkan/VulkanCore`: swapchain capture in `VulkanCore::CaptureSwapChainImage`, called from `VulkanQueue::Present`.

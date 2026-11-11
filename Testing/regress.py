@@ -36,6 +36,12 @@ DEFAULT_CROSS_TOL, DEFAULT_CROSS_MAX_BAD = 48, 0.02
 EXIT_CODES = {2: "capture failed", 3: "API error in strict mode"}
 
 PLATFORM = "linux" if sys.platform.startswith("linux") else "windows"
+# --window: the size of the OpenGL windows in test mode (--test-window). By default
+# every project keeps the size it asks for, because many tutorials size their
+# viewport and projection from their own constants and draw only part of the
+# image into a smaller window. The comparison with the other platform scales
+# the larger image down.
+WINDOW = ""
 OTHER = "windows" if PLATFORM == "linux" else "linux"
 STATUS = "linux_status" if PLATFORM == "linux" else "status"
 NOTE = "linux_note" if PLATFORM == "linux" else "note"
@@ -307,6 +313,61 @@ def compare(actual, golden, tol, max_bad, masks):
     return bad <= max_bad, bad, np.clip(diff * 8, 0, 255).astype(np.uint8)
 
 
+def resized(a, w, h):
+    return np.asarray(Image.fromarray(a.astype(np.uint8)).resize((w, h), Image.BOX), dtype=np.int16)
+
+
+def crop_to_aspect(a, aspect, keep):
+    # Center crop to the aspect ratio width/height. keep="height" removes columns
+    # (a projection with a fixed vertical field of view), keep="width" rows.
+    h, w = a.shape[:2]
+    if keep == "height" and w / h > aspect:
+        cw = max(1, round(h * aspect))
+        x = (w - cw) // 2
+        return a[:, x:x + cw]
+    if keep == "width" and w / h < aspect:
+        ch = max(1, round(w / aspect))
+        y = (h - ch) // 2
+        return a[y:y + ch]
+    return a
+
+
+def fitted(a, g):
+    # Images of different sizes, made the same size: the larger one is scaled down
+    # to the smaller one. A different aspect ratio is first removed by cropping
+    # (the projection keeps its vertical or its horizontal field of view) or by
+    # stretching (no projection, e.g. the first tutorials). Yields (how, a, g).
+    (ah, aw), (gh, gw) = a.shape[:2], g.shape[:2]
+    candidates = [("scaled", a, g)]
+    if aw * gh != gw * ah:
+        aspect = min(aw / ah, gw / gh)
+        candidates.append(("cropped", crop_to_aspect(a, aspect, "height"), crop_to_aspect(g, aspect, "height")))
+        aspect = max(aw / ah, gw / gh)
+        candidates.append(("cropped", crop_to_aspect(a, aspect, "width"), crop_to_aspect(g, aspect, "width")))
+    for how, ca, cg in candidates:
+        w, h = min(ca.shape[1], cg.shape[1]), min(ca.shape[0], cg.shape[0])
+        yield how, (ca if ca.shape[:2] == (h, w) else resized(ca, w, h)), (cg if cg.shape[:2] == (h, w) else resized(cg, w, h))
+
+
+def compare_cross(actual, golden, tol, max_bad, masks):
+    # The comparison with the other platform's golden, which may have another size.
+    # Returns (ok, fraction of bad pixels, difference image, note).
+    a, g = load(actual, masks), load(golden, masks)
+    if a.shape == g.shape:
+        diff = np.abs(a - g).max(axis=2)
+        bad = float((diff > tol).mean())
+        return bad <= max_bad, bad, np.clip(diff * 8, 0, 255).astype(np.uint8), ""
+    best = None
+    for how, fa, fg in fitted(a, g):
+        diff = np.abs(fa - fg).max(axis=2)
+        bad = float((diff > tol).mean())
+        if best is None or bad < best[0]:
+            best = (bad, diff, how)
+    bad, diff, how = best
+    note = f"{how}: {a.shape[1]}x{a.shape[0]} and {g.shape[1]}x{g.shape[0]} compared at {diff.shape[1]}x{diff.shape[0]}"
+    return bad <= max_bad, bad, np.clip(diff * 8, 0, 255).astype(np.uint8), note
+
+
 def run_once(row, outdir, strict, timeout, env=None):
     exe = exe_path(row)
     if not exe.is_file():
@@ -326,6 +387,8 @@ def run_once(row, outdir, strict, timeout, env=None):
             "--screenshot-dir", str(outdir), "--test-seed", "1"]
     if strict:
         cmd.append("--test-strict")
+    if WINDOW:
+        cmd += ["--test-window", WINDOW]
     if env is None:
         env = dict(os.environ)
     if PLATFORM == "windows":
@@ -369,8 +432,10 @@ def check(row, outdir, golden_set, update, method=""):
     tol = int(row["tol"] or DEFAULT_TOL)
     max_bad = float(row["max_bad"] or DEFAULT_MAX_BAD)
     cross_tol = int(row.get("cross_tol") or DEFAULT_CROSS_TOL)
-    cross_max_bad = float(row.get("cross_max_bad") or DEFAULT_CROSS_MAX_BAD)
-    frames, cross_worst, cross_missing, cross_fail = [], 0.0, False, None
+    # 'off': the image cannot match the other platform (e.g. it depends on rand())
+    cross_off = row.get("cross_max_bad") == "off"
+    cross_max_bad = 1.0 if cross_off else float(row.get("cross_max_bad") or DEFAULT_CROSS_MAX_BAD)
+    frames, cross_worst, cross_missing, cross_fail, cross_how = [], 0.0, False, None, ""
     for f in frame_list(row):
         name = f"f{f:04d}.png"
         frames.append(name)
@@ -392,15 +457,17 @@ def check(row, outdir, golden_set, update, method=""):
                     return f"FAIL (frame {f}: image size differs from the golden)", own, frames
                 return f"FAIL (frame {f}: {bad:.2%} of pixels differ)", own, frames
         # The other platform: a larger tolerance, and a missing golden is not an error
+        if cross_off:
+            continue
         if not other.exists():
             cross_missing = True
             continue
-        ok, bad, diff = compare(actual, other, cross_tol, cross_max_bad, masks)
-        if diff is not None:
-            Image.fromarray(diff).save(outdir / name.replace(".png", ".xdiff.png"))
+        ok, bad, diff, how = compare_cross(actual, other, cross_tol, cross_max_bad, masks)
+        Image.fromarray(diff).save(outdir / name.replace(".png", ".xdiff.png"))
         cross_worst = max(cross_worst, bad)
+        cross_how = cross_how or how
         if not ok and cross_fail is None:
-            cross_fail = f"frame {f}: " + ("image size differs from" if diff is None else f"{bad:.2%} of pixels differ from")
+            cross_fail = f"frame {f}: {bad:.2%} of pixels differ from"
     if update:
         golden_info = dict(meta, platform=PLATFORM, created=f"{datetime.datetime.now():%Y-%m-%d %H:%M}",
                            commit=git("log", "-1", "--format=%h"))
@@ -408,9 +475,10 @@ def check(row, outdir, golden_set, update, method=""):
             golden_info["method"] = method
         (GOLD / own / row["name"] / "golden.json").write_text(json.dumps(golden_info, indent=1) + "\n")
     if cross_fail:
-        text = f"{cross_fail} the {OTHER} golden (other platform)"
+        text = f"{cross_fail} the {OTHER} golden (other platform{', ' + cross_how if cross_how else ''})"
         return (f"UPDATED, but {text}" if update else f"FAIL ({text})"), own, frames
-    note = f" (no {OTHER} golden)" if cross_missing else f" ({OTHER} golden: {cross_worst:.2%} differ)"
+    note = f" ({OTHER} golden not compared)" if cross_off else f" (no {OTHER} golden)" if cross_missing else \
+        f" ({OTHER} golden: {cross_worst:.2%} differ{', ' + cross_how if cross_how else ''})"
     return ("UPDATED" if update else "PASS") + note, own, frames
 
 
@@ -458,13 +526,19 @@ def choose_method(row, outdir, displays, opt):
             size = (info.get("width"), info.get("height"))
             sw_env, _ = displays.for_method("sw")
             probe = outdir.parent / (outdir.name + ".size_check")
-            if run_once(row, probe, False, opt.timeout, sw_env) == 0:
-                sw_size = (read_info(probe).get("width"), read_info(probe).get("height"))
-                shutil.rmtree(probe, ignore_errors=True)
-                if sw_size != size:
-                    tried.append(f"hw: the {sw_size[0]}x{sw_size[1]} window does not fit the desktop "
-                                 f"(it became {size[0]}x{size[1]})")
-                    continue
+            probe_code = run_once(row, probe, False, opt.timeout, sw_env)
+            if probe_code != 0:
+                # Without the size of the window on the virtual X server, a window
+                # that the window manager shrank cannot be told apart
+                tried.append(f"hw: cannot check the window size, the software run failed "
+                             f"({fail_status(probe_code)[6:-1]}, see {probe.name}/log.txt)")
+                continue
+            sw_size = (read_info(probe).get("width"), read_info(probe).get("height"))
+            shutil.rmtree(probe, ignore_errors=True)
+            if sw_size != size:
+                tried.append(f"hw: the {sw_size[0]}x{sw_size[1]} window does not fit the desktop "
+                             f"(it became {size[0]}x{size[1]})")
+                continue
             # Run it again on the GPU, the software run replaced nothing in outdir
             return method, 0
         if code == 0 and captured and method != "hw":
@@ -680,7 +754,13 @@ def main():
     ap.add_argument("--disable", nargs="+", default=[], metavar="NAME", help="set the status of these projects back to 'todo' on this platform and exit")
     ap.add_argument("--capture", choices=METHODS,
                     help="Linux: with --update-golden, use (and record) this capture method; with --audit, use it")
+    ap.add_argument("--window", default="native", metavar="WxH|native",
+                    help="size of the OpenGL windows in test mode (default: the size each project asks for)")
     opt = ap.parse_args()
+    global WINDOW
+    WINDOW = "" if opt.window == "native" else opt.window
+    if WINDOW and not re.fullmatch(r"[1-9]\d*x[1-9]\d*", WINDOW):
+        sys.exit("--window takes WIDTHxHEIGHT or 'native'")
     if opt.capture and not (opt.update_golden or opt.audit):
         sys.exit("--capture is only used with --update-golden or --audit")
 
