@@ -42,7 +42,7 @@ With `--build`, a failed build does not stop the run: the projects that failed t
 A project passes when it exits with code 0 and, for every captured frame:
 
 - at most 0.1% of the pixels differ from the golden of its own platform by more than 8/255 in any channel (columns `tol` and `max_bad` override this), and
-- at most 2% of the pixels differ from the golden of the other platform by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of the other platform is reported but is not a failure.
+- at most 2% of the pixels differ from the golden of the other platform by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of the other platform is reported (`no windows golden`) but is not a failure. A project that exists on only one platform is reported as `linux only` or `windows only`.
 
 The goldens of the two platforms may have different sizes, because each platform captures every window at the size the project asks for and a window manager may shrink a window that doesn't fit the screen. The comparison with the other platform then scales the larger image down to the size of the smaller one. When the aspect ratios differ, it tries both stretching the image and cropping its center to the same aspect ratio, which matches a projection that keeps its vertical or horizontal field of view, and keeps whichever is closer. The status says which one was used, e.g. `(windows golden: 0.13% differ, scaled: 1600x843 and 1920x1080 compared at 1600x843)`.
 

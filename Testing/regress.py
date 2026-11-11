@@ -79,6 +79,10 @@ def linux_target(linux_dir):
     return _targets[linux_dir]
 
 
+def on_other_platform(row):
+    return bool(row.get("exe")) if PLATFORM == "linux" else bool(row.get("linux_dir"))
+
+
 def exe_path(row):
     if PLATFORM == "linux":
         return REPO / row["linux_dir"] / linux_target(row["linux_dir"])
@@ -477,7 +481,9 @@ def check(row, outdir, golden_set, update, method=""):
     if cross_fail:
         text = f"{cross_fail} the {OTHER} golden (other platform{', ' + cross_how if cross_how else ''})"
         return (f"UPDATED, but {text}" if update else f"FAIL ({text})"), own, frames
-    note = f" ({OTHER} golden not compared)" if cross_off else f" (no {OTHER} golden)" if cross_missing else \
+    note = f" ({OTHER} golden not compared)" if cross_off else \
+        f" ({PLATFORM} only)" if cross_missing and not on_other_platform(row) else \
+        f" (no {OTHER} golden)" if cross_missing else \
         f" ({OTHER} golden: {cross_worst:.2%} differ{', ' + cross_how if cross_how else ''})"
     return ("UPDATED" if update else "PASS") + note, own, frames
 
