@@ -250,7 +250,7 @@ private:
         // pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
 
         pMesh1 = new SkinnedMesh();
-        pMesh1->LoadMesh("../Content/Vanguard2.fbx");
+        pMesh1->LoadMesh("../Content/Vanguard.dae");
         pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
         //        pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
     }
