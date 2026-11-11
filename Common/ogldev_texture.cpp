@@ -198,11 +198,21 @@ void Texture::LoadRaw(int Width, int Height, int BPP, const void* pImageData, bo
 
 void Texture::LoadInternal(const void* pImageData, bool IsSRGB)
 {
+    // The rows of the image data are tightly packed (stb_image, LoadRaw). With the
+    // default alignment of 4, OpenGL expects every row to start on a 4 byte boundary,
+    // so e.g. a 250 pixel wide RGB image (750 bytes per row) would be read skewed and
+    // past the end of the buffer.
+    GLint PrevAlignment = 4;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &PrevAlignment);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     if (IsGLVersionHigher(4, 5)) {
         LoadInternalDSA(pImageData, IsSRGB);
     } else {
         LoadInternalNonDSA(pImageData, IsSRGB);
     }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, PrevAlignment);
 }
 
 
