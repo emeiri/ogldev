@@ -302,7 +302,7 @@ float CalcShadowFactor(int Index, vec3 LightToPixel, bool IsPoint)
 
         vec3 LightDirection = normalize(LightToPixel);
 
-        u32 ShadowMapFilterSize = (u32)ubo.LightSources[Index].Config.w;
+        uint ShadowMapFilterSize = uint(ubo.LightSources[Index].Config.w);
      //   if (gShadowMapRandomRadius > 0.0) {
       //      ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection);
         if (ShadowMapFilterSize > 0) {
