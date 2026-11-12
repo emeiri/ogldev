@@ -51,7 +51,7 @@ private:
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet m_descSet;
+	VkDescriptorSet m_descSet = VK_NULL_HANDLE;
 	u32 m_bindingPoint = 0;
 };
 

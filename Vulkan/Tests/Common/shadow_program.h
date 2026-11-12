@@ -41,7 +41,7 @@ class ShadowProgram : public GraphicsPipeline {
 
 public:
 
-	ShadowProgram() {}
+	ShadowProgram() : m_vs(VK_NULL_HANDLE), m_fs(VK_NULL_HANDLE) {}
 
 	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool,
 				      const std::vector<VkDescriptorSetLayout>& LightingDescSetLayouts,
@@ -84,8 +84,8 @@ private:
 	};
 
 	int m_numImages = 0;
-	VkShaderModule m_vs;
-	VkShaderModule m_fs;
+	VkShaderModule m_vs = VK_NULL_HANDLE;
+	VkShaderModule m_fs = VK_NULL_HANDLE;
     std::vector<VkDescriptorSetLayout> m_lightingDescSetLayouts;
 	uint m_shadowMapWidth = 0;
 	uint m_shadowMapHeight = 0;

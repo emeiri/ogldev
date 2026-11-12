@@ -50,6 +50,16 @@ public:
        // std::string AssetPath = "../../../Content/Sketchfab/back_street_alley_photogrammetry_scan/scene.gltf";
        // std::string AssetPath = "../../../Content/Sketchfab/futuristic_spaceship/scene.gltf";
        // std::string AssetPath = "../../../Content/Sketchfab/old_street_store/scene.gltf";
+      //  std::string AssetPath = "G:/Models/coast_land_rocks_03_4k.gltf/coast_land_rocks_03_4k.gltf";
+       // std::string AssetPath = "G:/Models/concrete_cat_statue_4k.gltf/concrete_cat_statue_4k.gltf";
+       // std::string AssetPath = "G:/Models/GLTF-Assets/Bistro/BistroExterior.gltf"; // KTX2 problem
+        //std::string AssetPath = "G:/Models/ship_pinnace_2k.gltf/ship_pinnace_2k.gltf";
+       // std::string AssetPath = "G:/Models/ship_pinnace_4k.gltf/ship_pinnace_4k.gltf";
+        //std::string AssetPath = "G:/Models/Sketchfab/art_gallery/scene.gltf"; // doesn't look good
+        //std::string AssetPath = "G:/Models/Sketchfab/dragon_sculpture/scene.gltf";
+     //   std::string AssetPath = "G:/Models/Sketchfab/plane/scene.gltf";
+        //std::string AssetPath = "G:/Models/Sketchfab/wizards_triplet_towers.glb";
+      //  std::string AssetPath = "G:/Models/Sketchfab/blood_pool__location.glb";// lots of z fights
 
         m_renderer.Init(AssetPath);
     }
