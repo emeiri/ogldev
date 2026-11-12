@@ -1,0 +1,4 @@
+name,platform,description,product,cpus
+windows,windows,Windows PC,,
+linux-t420,linux,Lenovo ThinkPad T420 (4 cores),T420,4
+linux-ideapad,linux,Lenovo IdeaPad (8 cores),ideapad,8

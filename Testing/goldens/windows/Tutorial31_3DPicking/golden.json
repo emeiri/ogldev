@@ -1,0 +1,11 @@
+{
+ "api": "gl",
+ "renderer": "NVIDIA GeForce GTX 1650/PCIe/SSE2",
+ "version": "4.6.0 NVIDIA 617.42",
+ "width": 1920,
+ "height": 1080,
+ "seed": 1,
+ "platform": "windows",
+ "created": "2026-11-11 22:55",
+ "commit": "0ca7a6e1"
+}
