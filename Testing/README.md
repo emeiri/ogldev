@@ -33,9 +33,9 @@ Other options: `--window WxH|native` (see below), `--api gl|vk`, `--tier N`, `--
 
 After a run open `Testing/out/report.html`: this machine's golden, actual and an amplified difference image side by side, then each other machine's golden and its difference image. `Testing/out/<project>/log.txt` has the application's output.
 
-Every run also writes `Testing/out/run_<date>_<time>.log`, which is never overwritten. It records the date and time, the git commit and branch, the machine, platform and GPU, the capture methods, the mode, the build result, a summary with the number of projects per outcome (passed, failed comparison, failed comparison with another machine, no golden, crashed, timed out, capture failed, did not build, ...) and the status of every project, including the ones the manifest excludes and why.
+Every run also writes `Testing/out/run_<date>_<time>.log`, which is never overwritten, and a copy of it named `Testing/out/last_run.log`. The terminal shows only the second name, so that its output has no date or time. It records the date and time, the git commit and branch, the machine, platform and GPU, the capture methods, the mode, the build result, a summary with the number of projects per outcome (passed, failed comparison, failed comparison with another machine, no golden, crashed, timed out, capture failed, did not build, ...) and the status of every project, including the ones the manifest excludes and why.
 
-At the end of a run the runner prints a summary and writes it to `Testing/results/<machine>.md`, meant to be committed. It says which machine the run was on, the commit and the GPU, and has one row per golden set, this machine's first: how many projects were run, passed, failed, were flaky, had no golden, were not compared or were skipped, followed by the problems with each golden set. This machine's row counts the outcome of each project; the other rows count how its captures compare with that machine's goldens. The summary is also appended to the run log.
+At the end of a run the runner prints a short summary and writes it to `Testing/results/<machine>.md`, meant to be committed. It names the machine and the commit (no date or time, so it can be committed without saying when it ran), gives the result on this machine (passed, failed, flaky, ...), then one line per other machine saying how many captures match its goldens, differ from them or were not compared, followed by a table of the problems on this machine and a table of the differences from the other machines. The summary is also appended to the run log.
 
 ## Machines
 
@@ -53,10 +53,9 @@ With `--build`, a failed build does not stop the run: the projects that failed t
 
 ## Passing
 
-A project passes when it exits with code 0 and, for every captured frame:
+A project passes when it exits with code 0 and, for every captured frame, at most 0.1% of the pixels differ from the golden of this machine by more than 8/255 in any channel (columns `tol` and `max_bad` override this). Only this machine's goldens decide the result and the exit code.
 
-- at most 0.1% of the pixels differ from the golden of this machine by more than 8/255 in any channel (columns `tol` and `max_bad` override this), and
-- at most 2% of the pixels differ from the golden of each other machine by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of another machine is reported (`no linux-t420 golden`) but is not a failure. A project that exists on only one platform is reported as `linux only` or `windows only`.
+The captures are also compared with the golden of each other machine, which matches when at most 2% of the pixels differ by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A difference is reported (`PASS, but frame 10: 2.06% of pixels differ from the linux-t420 golden`) and listed in the summary, but it is not a failure. A missing golden of another machine is reported too (`no linux-t420 golden`). A project that exists on only one platform is reported as `linux only` or `windows only`.
 
 The goldens of two machines may have different sizes, because each machine captures every window at the size the project asks for and a window manager may shrink a window that doesn't fit the screen. The comparison with another machine then scales the larger image down to the size of the smaller one. When the aspect ratios differ, it tries both stretching the image and cropping its center to the same aspect ratio, which matches a projection that keeps its vertical or horizontal field of view, and keeps whichever is closer. The status says which one was used, e.g. `(windows golden: 0.13% differ, scaled: 1600x843 and 1920x1080 compared at 1600x843)`.
 

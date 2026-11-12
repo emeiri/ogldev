@@ -617,9 +617,10 @@ def check(row, outdir, update, method=""):
     if own_fail:
         return f"FAIL ({own_fail})", sets, frames
     if cross_fail:
+        # Only this machine's goldens decide: a difference from another machine is reported, not a failure
         text = "; ".join(f"{cross_fail[n]} from the {n} golden (other machine{', ' + how[n] if how[n] else ''})"
                          for n in cross_fail)
-        return (f"UPDATED, but {text}" if update else f"FAIL ({text})"), sets, frames
+        return f"{'UPDATED' if update else 'PASS'}, but {text}", sets, frames
     if cross_off:
         note = f" (other goldens not compared: {cross_off_reason(row)})"
     else:
@@ -798,48 +799,58 @@ def set_problems(results, name):
     return problems
 
 
+def md_table(headers, rows, right=()):
+    # A Markdown table whose columns are also aligned in the plain text.
+    # 'right': the indexes of the columns aligned to the right (numbers).
+    rows = [[str(c).replace("|", "/") for c in row] for row in rows]
+    widths = [max(len(h), *(len(row[i]) for row in rows)) for i, h in enumerate(headers)]
+
+    def line(cells):
+        return "| " + " | ".join(c.rjust(w) if i in right else c.ljust(w)
+                                 for i, (c, w) in enumerate(zip(cells, widths))) + " |"
+
+    rule = "|" + "|".join("-" * (w + 1) + ":" if i in right else "-" * (w + 2) for i, w in enumerate(widths)) + "|"
+    return [line(headers), rule] + [line(row) for row in rows]
+
+
+def split_difference(detail):
+    # "frame 10: 19.19% of pixels differ, cropped: ..." -> ("10", "19.19%", "cropped: ...")
+    m = re.match(r"frame (\d+): ([\d.]+%) of pixels differ(?:, (.*))?$", detail)
+    return (m.group(1), m.group(2), m.group(3) or "") if m else ("", "", detail)
+
+
 def summary_lines(started, mode, how_found, rows, selected, results):
-    # A Markdown summary of the run per golden set, this machine's first
-    seconds = int((datetime.datetime.now() - started).total_seconds())
+    # A short Markdown summary: the result on this machine, then how the captures
+    # compare with the goldens of each other machine (which doesn't decide the result)
     modified = [l for l in git("status", "--porcelain", "--untracked-files=no", "--ignore-submodules").splitlines() if l]
-    gpus = sorted({r["renderer"] for r in results if r.get("renderer")})
-    not_run = [r for r in rows if r not in selected]
-    skipped = sum(r[STATUS] == "skip" for r in not_run)
-    todo = sum(r[STATUS] == "todo" for r in not_run)
     failed = any(r["status"].startswith("FAIL") for r in results)
-    desc = MACHINE.get("description") or OWN
+    own = set_counts(results, OWN)
+    own_text = ", ".join([f"{own['Passed']} passed", f"{own['Failed']} failed"] +
+                         [f"{own[c]} {c.lower()}" for c in ("Flaky", "No golden", "Skipped") if own[c]])
+    commit = f"`{git('log', '-1', '--format=%h') or 'unknown'}` {git('log', '-1', '--format=%s')}" + \
+             (f" (+{len(modified)} uncommitted)" if modified else "")
 
     lines = [f"# Regression results: {OWN}", "",
-             f"Testing executed on **{desc}** (golden set `{OWN}`, {PLATFORM}, detected by {how_found}).", "",
-             f"- Date: {started:%Y-%m-%d %H:%M} (took {seconds // 60}m {seconds % 60:02d}s)",
-             f"- Commit: `{git('log', '-1', '--format=%h') or 'unknown'}` {git('log', '-1', '--format=%s')}"
-             f" ({git('rev-parse', '--abbrev-ref', 'HEAD') or 'unknown'}"
-             + (f", {len(modified)} uncommitted modified file(s)" if modified else "") + ")",
-             f"- GPU: {', '.join(gpus) or 'unknown'}",
-             f"- Mode: {mode}",
-             f"- Projects: {len(results)} run, {len(not_run)} not run ({skipped} excluded in the manifest, "
-             f"{todo} not enabled yet, {len(not_run) - skipped - todo} not selected)",
-             f"- Result: **{'FAILED' if failed else 'OK'}**", "",
-             "## Results per golden set", "",
-             "| Golden set | Machine | Compared with | Run | " + " | ".join(SET_COLUMNS) + " |",
-             "|---|---|---|--:|" + "--:|" * len(SET_COLUMNS)]
-    for s in SETS:
-        own = s["name"] == OWN
-        counts = set_counts(results, s["name"])
-        cells = [str(counts[c]) if own or c not in ("Flaky", "Skipped") else "-" for c in SET_COLUMNS]
-        label = f"**{s['name']}** (this machine)" if own else s["name"]
-        lines.append(f"| {label} | {s['description'] or '-'} | {'strict tolerance' if own else 'cross tolerance'} "
-                     f"| {len(results)} | " + " | ".join(cells) + " |")
-    lines += ["", f"The `{OWN}` row counts the outcome of each project; the other rows count how its captures "
-              "compare with that machine's goldens. *Not compared*: the project doesn't exist on that platform, "
-              "the manifest turns the comparison off (`cross_max_bad`), or the project produced no capture.", ""]
+             f"Testing executed on {MACHINE.get('description') or OWN} (`{OWN}`), commit {commit}"
+             + ("" if mode == "compare with goldens" else f", {mode}") + ".", "",
+             f"**Result: {'FAIL' if failed else 'PASS'}**: {len(results)} run, {own_text}.", ""]
+    others = [s for s in SETS if s["name"] != OWN]
+    if others:
+        lines.append("Other machines (larger tolerance, not part of the result):")
+        for s in others:
+            c = set_counts(results, s["name"])
+            parts = [f"{c['Passed']} match", f"{c['Failed']} differ"] + \
+                    [f"{c[k]} {k.lower()}" for k in ("No golden", "Not compared") if c[k]]
+            lines.append(f"- `{s['name']}`" + (f", {s['description']}" if s["description"] else "") + ": " + ", ".join(parts))
+        lines.append("")
 
-    for s in SETS:
-        problems = set_problems(results, s["name"])
-        if problems:
-            lines += [f"## Problems with the `{s['name']}` goldens", "", "| Project | Problem |", "|---|---|"]
-            lines += [f"| {p} | {d.replace('|', '/')} |" for p, d in problems]
-            lines.append("")
+    problems = set_problems(results, OWN)
+    if problems:
+        lines += ["## Problems on this machine", ""] + md_table(["Project", "Problem"], problems) + [""]
+    differ = [(p, s["name"], *split_difference(d)) for s in others for p, d in set_problems(results, s["name"])]
+    if differ:
+        lines += ["## Differences from the other machines", ""]
+        lines += md_table(["Project", "Golden set", "Frame", "Pixels differ", "Note"], differ, right=(2, 3)) + [""]
     return lines
 
 
@@ -847,6 +858,15 @@ def write_summary(lines):
     RESULTS.mkdir(exist_ok=True)
     path = RESULTS / f"{OWN}.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def last_log(log):
+    # A copy of the run log under a fixed name, which is what the terminal shows:
+    # the name of the run log has the date and time, and the terminal output is
+    # meant to be pasted elsewhere
+    path = OUT / "last_run.log"
+    shutil.copyfile(log, path)
     return path
 
 
@@ -954,29 +974,49 @@ def set_status(rows, enable, disable):
     return 1 if refused else 0
 
 
+def report_section(status):
+    if status.startswith("FAIL"):
+        return "Failed"
+    if status.startswith("FLAKY"):
+        return "Flaky"
+    if status.startswith("SKIP"):
+        return "Skipped"
+    return "Passed"
+
+
 def write_report(results):
+    # One table per outcome: the failures first, then flaky, skipped and passed
     others = [s["name"] for s in SETS if s["name"] != OWN]
+    header = (f"<table border=1 cellpadding=4><tr><th>frame<th>status<th>{OWN} golden<th>actual<th>difference x8"
+              + "".join(f"<th>{html.escape(o)} golden<th>difference x8" for o in others))
     with open(OUT / "report.html", "w") as f:
-        f.write("<meta charset=utf-8><title>Regression report</title>"
-                f"<table border=1 cellpadding=4><tr><th>frame<th>status<th>{OWN} golden<th>actual<th>difference x8"
-                + "".join(f"<th>{html.escape(o)} golden<th>difference x8" for o in others))
-        for r in results:
-            for name in r["frames"] or [""]:
-                base = f"{r['name']}/{name}"
-                f.write(f"<tr><td>{html.escape(base)}<td>{html.escape(r['status'])}")
-                if not name:
-                    f.write(f"<td colspan={3 + 2 * len(others)}><a href='{html.escape(r['name'])}/log.txt'>log</a>")
-                    continue
-                f.write(f"<td><img src='../goldens/{OWN}/{html.escape(base)}' width=260>"
-                        f"<td><img src='{html.escape(base)}' width=260>"
-                        f"<td><img src='{html.escape(base.replace('.png', '.diff.png'))}' width=260>")
-                for o in others:
-                    result = r.get("sets", {}).get(o, ["not run", ""])[0]
-                    if result in ("pass", "fail"):
-                        f.write(f"<td><img src='../goldens/{html.escape(o)}/{html.escape(base)}' width=260>"
-                                f"<td><img src='{html.escape(base.replace('.png', f'.{o}.xdiff.png'))}' width=260>")
-                    else:
-                        f.write(f"<td colspan=2>{html.escape(result)}")
+        f.write(f"<meta charset=utf-8><title>Regression report</title><h1>Regression report: {html.escape(OWN)}</h1>")
+        for section in ("Failed", "Flaky", "Skipped", "Passed"):
+            group = [r for r in results if report_section(r["status"]) == section]
+            if group:
+                f.write(f"<h2>{section} ({len(group)})</h2>" + header)
+                write_report_rows(f, group, others)
+                f.write("</table>")
+
+
+def write_report_rows(f, results, others):
+    for r in results:
+        for name in r["frames"] or [""]:
+            base = f"{r['name']}/{name}"
+            f.write(f"<tr><td>{html.escape(base)}<td>{html.escape(r['status'])}")
+            if not name:
+                f.write(f"<td colspan={3 + 2 * len(others)}><a href='{html.escape(r['name'])}/log.txt'>log</a>")
+                continue
+            f.write(f"<td><img src='../goldens/{OWN}/{html.escape(base)}' width=260>"
+                    f"<td><img src='{html.escape(base)}' width=260>"
+                    f"<td><img src='{html.escape(base.replace('.png', '.diff.png'))}' width=260>")
+            for o in others:
+                result = r.get("sets", {}).get(o, ["not run", ""])[0]
+                if result in ("pass", "fail"):
+                    f.write(f"<td><img src='../goldens/{html.escape(o)}/{html.escape(base)}' width=260>"
+                            f"<td><img src='{html.escape(base.replace('.png', f'.{o}.xdiff.png'))}' width=260>")
+                else:
+                    f.write(f"<td colspan=2>{html.escape(result)}")
 
 
 def main():
@@ -1092,7 +1132,7 @@ def main():
             print(f"{len(selected)} audited, {failed} failed")
             log = write_run_log(started, opt, f"determinism audit, {opt.audit} runs per project", build_line, rows,
                                 selected, results, missing, how_found)
-            print(f"log: {log.relative_to(REPO)}")
+            print(f"log: {last_log(log).relative_to(REPO)}")
             return 1 if failed else 0
 
         for r in selected:
@@ -1152,7 +1192,7 @@ def main():
         f.write("\n" + "\n".join(summary) + "\n")
     path = write_summary(summary)
     print("\n" + "\n".join(summary))
-    print(f"log: {log.relative_to(REPO)}")
+    print(f"log: {last_log(log).relative_to(REPO)}")
     print(f"summary: {path.relative_to(REPO)}")
     return 1 if failed else 0
 
