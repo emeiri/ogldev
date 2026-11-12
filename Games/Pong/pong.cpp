@@ -18,11 +18,9 @@
 
 
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 
+#include "ogldev_math_3d.h"
 #include "pong.h"
-#include "regress_hook.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -31,10 +29,10 @@
 static glm::vec2 CreateRandomNormalizedVector()
 {
     // 1. Generate a random offset between -45 and +45 degrees (-PI/4 to +PI/4 radians)
-    float randomSpread = ((float)rand() / RAND_MAX) * (float)(M_PI / 2.0) - (float)(M_PI / 4.0);
+    float randomSpread = RandomFloat() * (float)(M_PI / 2.0) - (float)(M_PI / 4.0);
 
     // 2. Randomly decide to point Left (PI radians base) or Right (0 radians base)
-    float baseAngle = (rand() % 2 == 0) ? 0.0f : (float)M_PI;
+    float baseAngle = (RandomFloat() < 0.5f) ? 0.0f : (float)M_PI;
 
     // 3. Combine the base direction and the offset spread
     float angle = baseAngle + randomSpread;
@@ -99,7 +97,7 @@ void Pong::Init(const GameConfig& config)
 {
     m_config = config;
 
-    srand(Regress::Active() ? Regress::Seed() : (unsigned int)time(NULL));
+    SRANDOM;
 
     m_halfWindowSize = m_config.WindowSize / 2.0f;
 
