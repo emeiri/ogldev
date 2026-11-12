@@ -273,6 +273,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain6", "Terrain6\Terrain6.vcxproj", "{6B8A5879-9F19-4821-8A8A-511A0C646081}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoLITION_Framework", "DemoLITION\DemoLITION.vcxproj", "{892BD692-485D-4406-8D87-43EB0F16F290}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87743A97-581B-4DDD-B1B5-F7F63148D230} = {87743A97-581B-4DDD-B1B5-F7F63148D230}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoLITION_test_minimal", "DemoLITION Tests\minimal\DemoLITION_test_minimal.vcxproj", "{9A5D24DE-9604-4A04-9EAF-2E4E183F8C60}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -543,6 +546,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13", "Vulkan\Tutori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial53_PVP", "Tutorial53_PVP\Tutorial53.vcxproj", "{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial54_EndlessGrid", "Tutorial54_EndlessGrid\Tutorial54.vcxproj", "{46B8672D-6DF6-4C38-BE85-B163900C19E1}"
 	ProjectSection(ProjectDependencies) = postProject
