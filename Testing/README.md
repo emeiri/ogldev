@@ -2,7 +2,7 @@
 
 Builds nothing by itself (unless asked to): it launches the executables of the VS 2026 solution on Windows, or of the Makefiles on Linux, in a test mode, captures chosen frames from inside each application and compares them with golden images.
 
-Each platform has its own goldens, and every run compares with both: strictly with the goldens of its own platform and with a larger tolerance with the goldens of the other platform.
+Each machine has its own goldens (`goldens/<machine>/`). The runner detects the machine it runs on (see "Machines"), and every run compares with all the golden sets: strictly with the goldens of this machine and with a larger tolerance with the goldens of every other machine.
 
 Everything that belongs to the suite is in this folder, except for a few headers and hooks listed under "What lives outside this folder".
 
@@ -14,7 +14,7 @@ Run from the repo root.
 - Linux: needs `sudo apt install python3-pil python3-numpy xvfb mesa-utils`, and the projects built with `make`.
 
 ```
-# Create (or refresh) the goldens of this platform
+# Create (or refresh) the goldens of this machine
 python Testing/regress.py --update-golden
 
 # Compare every enabled project with the goldens
@@ -29,11 +29,25 @@ python Testing/regress.py --build
 
 On Linux use `python3`.
 
-Other options: `--window WxH|native` (see below), `--api gl|vk`, `--tier N`, `--strict` (OpenGL/Vulkan errors fail the run), `--audit N` (run each project N times and require byte-identical captures), `--retries N`, `--timeout SECONDS`, `--gpu NAME` (use `goldens/NAME` instead of the platform's goldens), `--capture hw|sw|sw-gl46` (Linux, see below), `--coverage`.
+Other options: `--window WxH|native` (see below), `--api gl|vk`, `--tier N`, `--strict` (OpenGL/Vulkan errors fail the run), `--audit N` (run each project N times and require byte-identical captures), `--retries N`, `--timeout SECONDS`, `--machine NAME` (don't detect the machine, see "Machines"), `--capture hw|sw|sw-gl46` (Linux, see below), `--coverage`.
 
-After a run open `Testing/out/report.html`: golden, actual and an amplified difference image side by side, then the other platform's golden and its difference image. `Testing/out/<project>/log.txt` has the application's output.
+After a run open `Testing/out/report.html`: this machine's golden, actual and an amplified difference image side by side, then each other machine's golden and its difference image. `Testing/out/<project>/log.txt` has the application's output.
 
-Every run also writes `Testing/out/run_<date>_<time>.log`, which is never overwritten. It records the date and time, the git commit and branch, the machine, platform and GPU, the capture methods, the mode, the build result, a summary with the number of projects per outcome (passed, failed comparison, failed comparison with the other platform, no golden, crashed, timed out, capture failed, did not build, ...) and the status of every project, including the ones the manifest excludes and why.
+Every run also writes `Testing/out/run_<date>_<time>.log`, which is never overwritten. It records the date and time, the git commit and branch, the machine, platform and GPU, the capture methods, the mode, the build result, a summary with the number of projects per outcome (passed, failed comparison, failed comparison with another machine, no golden, crashed, timed out, capture failed, did not build, ...) and the status of every project, including the ones the manifest excludes and why.
+
+At the end of a run the runner prints a summary and writes it to `Testing/results/<machine>.md`, meant to be committed. It says which machine the run was on, the commit and the GPU, and has one row per golden set, this machine's first: how many projects were run, passed, failed, were flaky, had no golden, were not compared or were skipped, followed by the problems with each golden set. This machine's row counts the outcome of each project; the other rows count how its captures compare with that machine's goldens. The summary is also appended to the run log.
+
+## Machines
+
+`machines.csv` lists the machines that have goldens. `name` is the folder under `goldens/`, `platform` is `windows` or `linux`, and `description` appears in the summary. The runner picks the row of its platform whose `product` is part of the computer's vendor and model as the firmware reports them (`/sys/class/dmi/id` on Linux, the BIOS registry key on Windows; case is ignored), or else the row whose `cpus` is the number of logical CPUs (`nproc`). A platform with a single row and neither column needs no detection. `--machine NAME`, or the environment variable `OGLDEV_MACHINE`, chooses the row instead.
+
+| Machine | Goldens |
+| --- | --- |
+| Windows PC | `goldens/windows` |
+| Lenovo ThinkPad T420 (4 cores) | `goldens/linux-t420` |
+| Lenovo IdeaPad (8 cores) | `goldens/linux-ideapad` |
+
+All machines of a platform use that platform's columns of the manifest. To add a machine, add its row and create its goldens with `--update-golden`.
 
 With `--build`, a failed build does not stop the run: the projects that failed to build are reported as "Did not build" and the rest are tested.
 
@@ -41,12 +55,12 @@ With `--build`, a failed build does not stop the run: the projects that failed t
 
 A project passes when it exits with code 0 and, for every captured frame:
 
-- at most 0.1% of the pixels differ from the golden of its own platform by more than 8/255 in any channel (columns `tol` and `max_bad` override this), and
-- at most 2% of the pixels differ from the golden of the other platform by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of the other platform is reported (`no windows golden`) but is not a failure. A project that exists on only one platform is reported as `linux only` or `windows only`.
+- at most 0.1% of the pixels differ from the golden of this machine by more than 8/255 in any channel (columns `tol` and `max_bad` override this), and
+- at most 2% of the pixels differ from the golden of each other machine by more than 48/255 (columns `cross_tol` and `cross_max_bad`). A missing golden of another machine is reported (`no linux-t420 golden`) but is not a failure. A project that exists on only one platform is reported as `linux only` or `windows only`.
 
-The goldens of the two platforms may have different sizes, because each platform captures every window at the size the project asks for and a window manager may shrink a window that doesn't fit the screen. The comparison with the other platform then scales the larger image down to the size of the smaller one. When the aspect ratios differ, it tries both stretching the image and cropping its center to the same aspect ratio, which matches a projection that keeps its vertical or horizontal field of view, and keeps whichever is closer. The status says which one was used, e.g. `(windows golden: 0.13% differ, scaled: 1600x843 and 1920x1080 compared at 1600x843)`.
+The goldens of two machines may have different sizes, because each machine captures every window at the size the project asks for and a window manager may shrink a window that doesn't fit the screen. The comparison with another machine then scales the larger image down to the size of the smaller one. When the aspect ratios differ, it tries both stretching the image and cropping its center to the same aspect ratio, which matches a projection that keeps its vertical or horizontal field of view, and keeps whichever is closer. The status says which one was used, e.g. `(windows golden: 0.13% differ, scaled: 1600x843 and 1920x1080 compared at 1600x843)`.
 
-`cross_max_bad` = `off` turns the comparison with the other platform off for a row whose image cannot match. The note gives the reason. Random numbers are not such a reason: in test mode `RANDOM`, `SRANDOM` and `RandomFloat` (Include/ogldev_util.h) use `Regress::Rand()`, which gives the same sequence on every platform. A program that calls `rand()` directly still gets the sequence of its C runtime.
+`cross_max_bad` = `off` turns the comparison with the other machines off for a row whose image cannot match. The note gives the reason. Random numbers are not such a reason: in test mode `RANDOM`, `SRANDOM` and `RandomFloat` (Include/ogldev_util.h) use `Regress::Rand()`, which gives the same sequence on every platform. A program that calls `rand()` directly still gets the sequence of its C runtime.
 
 `FLAKY` means it passed only on the retry.
 
@@ -60,11 +74,11 @@ A project is captured in one of these ways:
 | `sw` | Mesa's software renderers, llvmpipe for OpenGL and lavapipe for Vulkan, on a private Xvfb |
 | `sw-gl46` | The same, with llvmpipe reporting OpenGL 4.6 (it implements 4.5, the shaders of some projects ask for 4.60) |
 
-The method is chosen when a project's Linux golden is first created and is recorded in the manifest column `linux_capture`. Later runs always use the recorded method. To choose it, the runner tries `hw` in strict mode and accepts it when the project runs on a hardware renderer with no OpenGL errors and its window kept its size (a window larger than the screen is shrunk by the window manager, so such a project is captured with `sw`, on a 2560x1600 Xvfb). Otherwise it tries `sw`, then `sw-gl46`. `Testing/out/<project>/methods.txt` says why a method was rejected. `--capture METHOD` with `--update-golden` sets the method, e.g. `--capture sw` to create goldens while the desktop is locked. To choose again, clear the project's `linux_capture` and run `--update-golden --only NAME`.
+The method is chosen when a project's golden is first created on a Linux machine and is recorded in that golden's `golden.json`, so each machine has its own. Later runs on that machine always use the recorded method. To choose it, the runner tries `hw` in strict mode and accepts it when the project runs on a hardware renderer with no OpenGL errors and its window kept its size (a window larger than the screen is shrunk by the window manager, so such a project is captured with `sw`, on a 2560x1600 Xvfb). Otherwise it tries `sw`, then `sw-gl46`. `Testing/out/<project>/methods.txt` says why a method was rejected. `--capture METHOD` with `--update-golden` sets the method, e.g. `--capture sw` to create goldens while the desktop is locked. To choose again, run `--update-golden --capture METHOD --only NAME`. The manifest column `linux_capture` is no longer used.
 
 `hw` needs the desktop session to be unlocked and on screen. A locked session (light-locker switches to the greeter) stops the GPU rendering for it. During a run the screen saver and DPMS are switched off and restored at the end. If the display is not available, `hw` projects are reported as skipped, and new projects are not given a method rather than falling back to software.
 
-`golden.json` next to each golden records the platform, method, renderer, OpenGL/Vulkan version, date and commit it was made with.
+`golden.json` next to each golden records the platform, machine, method, renderer, OpenGL/Vulkan version, date and commit it was made with.
 
 ## Files
 
@@ -73,12 +87,15 @@ The method is chosen when a project's Linux golden is first created and is recor
 | `regress.py` | The runner |
 | `make_manifest.py` | Regenerates `manifest.csv` from the solution (Windows) or adds the Linux projects (`--linux`); hand-edited columns are kept |
 | `manifest.csv` | One row per application: how to launch it on each platform, frames to capture, tolerances, tier, status |
+| `machines.csv` | The machines that have goldens and how to recognize them (see "Machines") |
 | `shim/` | Wrapper headers for GLFW and freeglut (see below) |
-| `goldens/windows/<project>/fNNNN.png` | Golden images made on Windows (NVIDIA GeForce GTX 1650) |
-| `goldens/linux/<project>/fNNNN.png` | Golden images made on Linux (Intel HD Graphics 3000, or llvmpipe/lavapipe) |
+| `goldens/windows/<project>/fNNNN.png` | Golden images made on the Windows PC (NVIDIA GeForce GTX 1650) |
+| `goldens/linux-t420/<project>/fNNNN.png` | Golden images made on the ThinkPad T420 (Intel HD Graphics 3000, or llvmpipe/lavapipe) |
+| `goldens/linux-ideapad/<project>/fNNNN.png` | Golden images made on the IdeaPad |
+| `results/<machine>.md` | Summary of the last run on each machine, to commit |
 | `out/` | Captures, logs and reports of the last run. Not committed |
 
-The manifest columns `project`, `exe`, `cwd`, `status` and `note` describe the Windows project. `linux_dir` (the directory of its Makefile), `linux_cwd`, `linux_status`, `linux_capture` and `linux_note` describe the Linux one. A row may have only one of them: some rows are Windows only, and the rows named `linux_*` are Linux only.
+The manifest columns `project`, `exe`, `cwd`, `status` and `note` describe the Windows project. `linux_dir` (the directory of its Makefile), `linux_cwd`, `linux_status` and `linux_note` describe the Linux one (`linux_capture` is no longer used). A row may have only one of them: some rows are Windows only, and the rows named `linux_*` are Linux only.
 
 Status (`status` on Windows, `linux_status` on Linux) is `ok` (runs by default), `todo` (runs only with `--only`) or `skip` (never runs; the reason is in the note).
 
@@ -100,7 +117,7 @@ python Testing/regress.py --audit 3 --only MyNewProject                     # is
 python Testing/regress.py --update-golden --only MyNewProject               # create its golden, then look at it
 ```
 
-Then enable it with `python Testing/regress.py --enable MyNewProject`. A project that exists on both platforms should have one row with both sets of columns, so that its captures are compared across platforms.
+Then enable it with `python Testing/regress.py --enable MyNewProject`. A project that exists on both platforms should have one row with both sets of columns, so that its captures are compared with the goldens of every machine.
 
 ## How the test mode gets into the applications
 

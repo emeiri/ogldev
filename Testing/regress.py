@@ -5,19 +5,19 @@
 #   python Testing/regress.py --update-golden --only Name1
 #   python Testing/regress.py --coverage
 #
-# Each project is launched in its test mode (see Include/regress_hook.h), the
-# frames it captured are compared with the goldens of this platform,
-# Testing/goldens/<platform>/<project>/fNNNN.png, and with the goldens of the
-# other platform using a larger tolerance. The result goes to
-# Testing/out/report.html and Testing/out/results.json, and every run leaves a
-# readable Testing/out/run_<date>_<time>.log with the status of each project.
+# The runner detects the computer it runs on from Testing/machines.csv (or
+# --machine NAME). Each project is launched in its test mode (see
+# Include/regress_hook.h), the frames it captured are compared strictly with the
+# goldens of this machine, Testing/goldens/<machine>/<project>/fNNNN.png, and with
+# the goldens of every other machine using a larger tolerance. The result goes to
+# Testing/out/report.html and Testing/out/results.json, every run leaves a
+# readable Testing/out/run_<date>_<time>.log with the status of each project, and
+# Testing/results/<machine>.md summarizes the run per golden set (to commit).
 #
 # On Linux a project is captured either on the GPU of the desktop session
 # ('hw') or with Mesa's software renderers on a virtual X server ('sw').
-# The method is chosen when the golden is first created and recorded in the
-# manifest (linux_capture), and later runs always use it. A golden set of its
-# own (--gpu NAME, e.g. a second Linux machine) keeps its methods in its
-# golden.json files instead and leaves the manifest alone.
+# The method is chosen when the golden is first created and recorded in its
+# golden.json, and later runs on that machine always use it.
 #
 # Needs: pip install pillow numpy (on Linux: apt install python3-pil python3-numpy xvfb mesa-utils)
 
@@ -29,11 +29,12 @@ from PIL import Image
 REPO = Path(__file__).resolve().parent.parent
 TESTING = REPO / "Testing"
 MANIFEST = TESTING / "manifest.csv"
-OUT, GOLD = TESTING / "out", TESTING / "goldens"
+MACHINES = TESTING / "machines.csv"
+OUT, GOLD, RESULTS = TESTING / "out", TESTING / "goldens", TESTING / "results"
 DLL_DIR = REPO / "Windows" / "DLL"
 DEFAULT_SLN = REPO / "Windows" / "ogldev_vs_2026" / "ogldev_vs_2026.sln"
 DEFAULT_TOL, DEFAULT_MAX_BAD, DEFAULT_TIMEOUT = 8, 0.001, 120
-# Comparison with the goldens of the other platform (different GPU, driver and OS)
+# Comparison with the goldens of the other machines (different GPU, driver and maybe OS)
 DEFAULT_CROSS_TOL, DEFAULT_CROSS_MAX_BAD = 48, 0.02
 EXIT_CODES = {2: "capture failed", 3: "API error in strict mode"}
 
@@ -41,10 +42,13 @@ PLATFORM = "linux" if sys.platform.startswith("linux") else "windows"
 # --window: the size of the OpenGL windows in test mode (--test-window). By default
 # every project keeps the size it asks for, because many tutorials size their
 # viewport and projection from their own constants and draw only part of the
-# image into a smaller window. The comparison with the other platform scales
+# image into a smaller window. The comparison with the other machines scales
 # the larger image down.
 WINDOW = ""
-OTHER = "windows" if PLATFORM == "linux" else "linux"
+# This machine (a row of machines.csv) and its golden set, set by main()
+MACHINE, OWN = {}, ""
+# Every golden set: [{"name", "platform", "description"}], this machine's first
+SETS = []
 STATUS = "linux_status" if PLATFORM == "linux" else "status"
 NOTE = "linux_note" if PLATFORM == "linux" else "note"
 
@@ -62,8 +66,8 @@ XVFB_SIZE = (2560, 1600)
 #  Platform specific details of a manifest row
 # ---------------------------------------------------------------------------
 
-def on_platform(row):
-    return bool(row.get("linux_dir")) if PLATFORM == "linux" else bool(row.get("exe"))
+def on_platform(row, platform=PLATFORM):
+    return bool(row.get("linux_dir")) if platform == "linux" else bool(row.get("exe"))
 
 
 _targets = {}
@@ -82,10 +86,6 @@ def linux_target(linux_dir):
     return _targets[linux_dir]
 
 
-def on_other_platform(row):
-    return bool(row.get("exe")) if PLATFORM == "linux" else bool(row.get("linux_dir"))
-
-
 def exe_path(row):
     if PLATFORM == "linux":
         return REPO / row["linux_dir"] / linux_target(row["linux_dir"])
@@ -101,6 +101,81 @@ def cwd_path(row):
 def args_of(row):
     args = row["args"].split()
     return [a.replace("\\", "/") for a in args] if PLATFORM == "linux" else args
+
+
+# ---------------------------------------------------------------------------
+#  Machines and golden sets
+# ---------------------------------------------------------------------------
+
+def read_machines():
+    try:
+        with open(MACHINES, newline="") as f:
+            return [m for m in csv.DictReader(f) if m.get("name")]
+    except OSError:
+        return []
+
+
+def hardware_product():
+    # The vendor and model of the computer as its firmware reports them
+    parts = []
+    if PLATFORM == "linux":
+        for key in ("sys_vendor", "product_name", "product_version", "product_family"):
+            try:
+                parts.append((Path("/sys/class/dmi/id") / key).read_text().strip())
+            except OSError:
+                pass
+    else:
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"HARDWARE\DESCRIPTION\System\BIOS") as k:
+                for value in ("SystemManufacturer", "SystemProductName", "SystemVersion", "SystemFamily"):
+                    try:
+                        parts.append(str(winreg.QueryValueEx(k, value)[0]).strip())
+                    except OSError:
+                        pass
+        except OSError:
+            pass
+    return " ".join(p for p in parts if p)
+
+
+def detect_machine(machines, name):
+    # Returns (machines.csv row, how it was found). A row matches when its 'product'
+    # is part of the firmware's vendor and model, or else by its number of logical
+    # CPUs. A platform with a single machine and no criteria needs neither.
+    known = ", ".join(m["name"] for m in machines) or "none"
+    if name:
+        m = next((m for m in machines if m["name"] == name), None)
+        if m is None:
+            sys.exit(f"machine '{name}' is not in {MACHINES.relative_to(REPO)} (known: {known})")
+        if m["platform"] != PLATFORM:
+            sys.exit(f"machine '{name}' is a {m['platform']} machine, this is {PLATFORM}")
+        return m, "chosen with --machine or OGLDEV_MACHINE"
+    candidates = [m for m in machines if m["platform"] == PLATFORM]
+    if len(candidates) == 1 and not candidates[0].get("product") and not candidates[0].get("cpus"):
+        return candidates[0], f"the only {PLATFORM} machine"
+    product, cpus = hardware_product(), os.cpu_count()
+    by_product = [m for m in candidates if m.get("product") and m["product"].lower() in product.lower()]
+    if len(by_product) == 1:
+        return by_product[0], f"model '{product}'"
+    by_cpus = [m for m in (by_product or candidates) if m.get("cpus") and int(m["cpus"]) == cpus]
+    if len(by_cpus) == 1:
+        return by_cpus[0], f"{cpus} logical CPUs"
+    sys.exit(f"cannot tell which machine this is (model '{product or 'unknown'}', {cpus} logical CPUs).\n"
+             f"Add it to {MACHINES.relative_to(REPO)} or pass --machine NAME (known: {known})")
+
+
+def golden_sets(machines):
+    # This machine first, then the others in the order of machines.csv, then any
+    # other folder of Testing/goldens
+    sets = [{"name": m["name"], "platform": m["platform"], "description": m.get("description", "")}
+            for m in machines]
+    names = {s["name"] for s in sets}
+    if GOLD.exists():
+        for d in sorted(GOLD.iterdir()):
+            if d.is_dir() and d.name not in names:
+                sets.append({"name": d.name, "platform": "linux" if d.name.startswith("linux") else "windows",
+                             "description": ""})
+    return sorted(sets, key=lambda s: s["name"] != OWN)
 
 
 # ---------------------------------------------------------------------------
@@ -385,7 +460,7 @@ def fitted(a, g):
 
 
 def compare_cross(actual, golden, tol, max_bad, masks):
-    # The comparison with the other platform's golden, which may have another size.
+    # The comparison with another machine's golden, which may have another size.
     # Returns (ok, fraction of bad pixels, difference image, note).
     a, g = load(actual, masks), load(golden, masks)
     if a.shape == g.shape:
@@ -459,72 +534,101 @@ def read_info(outdir):
 
 
 def cross_off_reason(row):
-    # Why the other platform's golden is not compared, from the notes of the row
+    # Why the other machines' goldens are not compared, from the notes of the row
     for note in (row.get(NOTE, ""), row.get("note", ""), row.get("linux_note", "")):
         if "not compared" in note:
             return note.split(", so the")[0].strip()
     return "cross_max_bad=off in the manifest"
 
 
-def check(row, outdir, golden_set, update, method=""):
-    # Compares the captures with the goldens of this platform and of the other one.
-    # Returns the status, the golden folder of this platform and the frame names.
+def check(row, outdir, update, method=""):
+    # Compares the captures strictly with the goldens of this machine and, with a
+    # larger tolerance, with the goldens of every other machine. Returns the status,
+    # the result per golden set {name: [result, detail]} and the frame names. A
+    # result is pass, fail, updated, missing (no golden), n/a (the project doesn't
+    # exist on that machine's platform) or off (not compared, see cross_max_bad).
     meta = read_info(outdir)
-    own = golden_set or PLATFORM
     masks = parse_masks(row["mask"])
     tol = int(row["tol"] or DEFAULT_TOL)
     max_bad = float(row["max_bad"] or DEFAULT_MAX_BAD)
     cross_tol = int(row.get("cross_tol") or DEFAULT_CROSS_TOL)
-    # 'off': the image cannot match the other platform (e.g. it depends on rand())
+    # 'off': the image cannot match the other machines
     cross_off = row.get("cross_max_bad") == "off"
     cross_max_bad = 1.0 if cross_off else float(row.get("cross_max_bad") or DEFAULT_CROSS_MAX_BAD)
-    frames, cross_worst, cross_missing, cross_fail, cross_how = [], 0.0, False, None, ""
+    others = [s for s in SETS if s["name"] != OWN]
+    worst = {s["name"]: 0.0 for s in others}
+    how = {s["name"]: "" for s in others}
+    cross_fail = {}
+    own_fail, frames = "", []
     for f in frame_list(row):
         name = f"f{f:04d}.png"
         frames.append(name)
-        actual, golden, other = outdir / name, GOLD / own / row["name"] / name, GOLD / OTHER / row["name"] / name
+        actual, golden = outdir / name, GOLD / OWN / row["name"] / name
         if not actual.exists():
-            return f"FAIL (no capture for frame {f})", own, frames
+            return f"FAIL (no capture for frame {f})", {OWN: ["fail", f"no capture for frame {f}"]}, frames
         if update:
             golden.parent.mkdir(parents=True, exist_ok=True)
             # The applications write uncompressed PNGs, so recompress
             Image.open(actual).convert("RGB").save(golden, optimize=True)
+        elif own_fail:
+            pass                    # report the first frame that failed
         elif not golden.exists():
-            return f"FAIL (no golden for {own})", own, frames
+            own_fail = f"no golden for {OWN}"
         else:
             ok, bad, diff = compare(actual, golden, tol, max_bad, masks)
             if diff is not None:
                 Image.fromarray(diff).save(outdir / name.replace(".png", ".diff.png"))
             if not ok:
-                if diff is None:
-                    return f"FAIL (frame {f}: image size differs from the golden)", own, frames
-                return f"FAIL (frame {f}: {bad:.2%} of pixels differ)", own, frames
-        # The other platform: a larger tolerance, and a missing golden is not an error
+                own_fail = f"frame {f}: image size differs from the golden" if diff is None else \
+                           f"frame {f}: {bad:.2%} of pixels differ"
+        # The other machines: a larger tolerance, and a missing golden is not an error
         if cross_off:
             continue
-        if not other.exists():
-            cross_missing = True
-            continue
-        ok, bad, diff, how = compare_cross(actual, other, cross_tol, cross_max_bad, masks)
-        Image.fromarray(diff).save(outdir / name.replace(".png", ".xdiff.png"))
-        cross_worst = max(cross_worst, bad)
-        cross_how = cross_how or how
-        if not ok and cross_fail is None:
-            cross_fail = f"frame {f}: {bad:.2%} of pixels differ from"
+        for s in others:
+            other = GOLD / s["name"] / row["name"] / name
+            if not other.exists():
+                continue
+            ok, bad, diff, h = compare_cross(actual, other, cross_tol, cross_max_bad, masks)
+            Image.fromarray(diff).save(outdir / name.replace(".png", f".{s['name']}.xdiff.png"))
+            worst[s["name"]] = max(worst[s["name"]], bad)
+            how[s["name"]] = how[s["name"]] or h
+            if not ok and s["name"] not in cross_fail:
+                cross_fail[s["name"]] = f"frame {f}: {bad:.2%} of pixels differ"
     if update:
-        golden_info = dict(meta, platform=PLATFORM, created=f"{datetime.datetime.now():%Y-%m-%d %H:%M}",
+        golden_info = dict(meta, platform=PLATFORM, machine=OWN, created=f"{datetime.datetime.now():%Y-%m-%d %H:%M}",
                            commit=git("log", "-1", "--format=%h"))
         if method:
             golden_info["method"] = method
-        (GOLD / own / row["name"] / "golden.json").write_text(json.dumps(golden_info, indent=1) + "\n")
+        (GOLD / OWN / row["name"] / "golden.json").write_text(json.dumps(golden_info, indent=1) + "\n")
+
+    sets = {OWN: ["updated" if update else "missing" if own_fail.startswith("no golden") else
+                  "fail" if own_fail else "pass", own_fail]}
+    for s in others:
+        n, extra = s["name"], f", {how[s['name']]}" if how[s["name"]] else ""
+        if cross_off:
+            sets[n] = ["off", cross_off_reason(row)]
+        elif n in cross_fail:
+            sets[n] = ["fail", cross_fail[n] + extra]
+        elif any((GOLD / n / row["name"] / fr).exists() for fr in frames):
+            sets[n] = ["pass", f"{worst[n]:.2%} differ{extra}"]
+        else:
+            sets[n] = ["missing" if on_platform(row, s["platform"]) else "n/a", ""]
+
+    if own_fail:
+        return f"FAIL ({own_fail})", sets, frames
     if cross_fail:
-        text = f"{cross_fail} the {OTHER} golden (other platform{', ' + cross_how if cross_how else ''})"
-        return (f"UPDATED, but {text}" if update else f"FAIL ({text})"), own, frames
-    note = f" ({OTHER} golden not compared: {cross_off_reason(row)})" if cross_off else \
-        f" ({PLATFORM} only)" if cross_missing and not on_other_platform(row) else \
-        f" (no {OTHER} golden)" if cross_missing else \
-        f" ({OTHER} golden: {cross_worst:.2%} differ{', ' + cross_how if cross_how else ''})"
-    return ("UPDATED" if update else "PASS") + note, own, frames
+        text = "; ".join(f"{cross_fail[n]} from the {n} golden (other machine{', ' + how[n] if how[n] else ''})"
+                         for n in cross_fail)
+        return (f"UPDATED, but {text}" if update else f"FAIL ({text})"), sets, frames
+    if cross_off:
+        note = f" (other goldens not compared: {cross_off_reason(row)})"
+    else:
+        parts = [f"{n} golden: {v[1]}" for n, v in sets.items() if n != OWN and v[0] == "pass"]
+        parts += [f"no {n} golden" for n, v in sets.items() if v[0] == "missing"]
+        if not parts and others:
+            parts = [f"{PLATFORM} only"]
+        note = f" ({'; '.join(parts)})" if parts else ""
+    return ("UPDATED" if update else "PASS") + note, sets, frames
 
 
 def audit(row, outdir, runs, strict, timeout, env=None):
@@ -603,7 +707,7 @@ def choose_method(row, outdir, displays, opt):
 
 # The order in which the categories appear in the summary of the run log
 CATEGORIES = ["Passed", "Golden updated", "Deterministic", "Flaky (passed on retry)", "Failed comparison",
-              "Failed comparison with the other platform", "No golden", "Not deterministic",
+              "Failed comparison with another machine", "No golden", "Not deterministic",
               "Skipped (no hardware display)", "Crashed or exited with an error", "Timed out", "Capture failed",
               "API error (strict mode)", "No capture method", "Did not build", "Could not launch"]
 
@@ -616,7 +720,7 @@ def categorize(status):
             return category
     for text, category in (("not built", "Did not build"), ("timeout", "Timed out"),
                            ("cannot launch", "Could not launch"), ("no golden", "No golden"),
-                           ("other platform", "Failed comparison with the other platform"),
+                           ("other machine", "Failed comparison with another machine"),
                            ("pixels differ", "Failed comparison"), ("image size differs", "Failed comparison"),
                            ("not deterministic", "Not deterministic"), ("no capture method", "No capture method"),
                            ("no capture", "Capture failed"),
@@ -668,7 +772,85 @@ def build(sln, rows):
     return f"FAILED for {len(failed)} manifest project(s), see {errors.relative_to(REPO)}", failed
 
 
-def write_run_log(started, opt, mode, build_line, rows, selected, results, missing):
+# The columns of the summary per golden set. This machine's goldens count the
+# outcome of each project; another machine's goldens count the comparisons.
+SET_COLUMNS = ["Passed", "Failed", "Flaky", "No golden", "Not compared", "Skipped"]
+
+
+def set_counts(results, name):
+    counts = dict.fromkeys(SET_COLUMNS, 0)
+    for r in results:
+        result = r.get("sets", {}).get(name, ["not run", ""])[0]
+        column = {"pass": "Passed", "updated": "Passed", "fail": "Failed", "error": "Failed",
+                  "flaky": "Flaky", "missing": "No golden", "skipped": "Skipped"}.get(result, "Not compared")
+        counts[column] += 1
+    return counts
+
+
+def set_problems(results, name):
+    # (project, problem) for the projects that failed, were flaky or were skipped with this golden set
+    own = name == OWN
+    problems = []
+    for r in results:
+        result, detail = r.get("sets", {}).get(name, ["not run", ""])
+        if result in ("fail", "error") or (own and result in ("flaky", "skipped")):
+            problems.append((r["name"], detail or r["status"]))
+    return problems
+
+
+def summary_lines(started, mode, how_found, rows, selected, results):
+    # A Markdown summary of the run per golden set, this machine's first
+    seconds = int((datetime.datetime.now() - started).total_seconds())
+    modified = [l for l in git("status", "--porcelain", "--untracked-files=no", "--ignore-submodules").splitlines() if l]
+    gpus = sorted({r["renderer"] for r in results if r.get("renderer")})
+    not_run = [r for r in rows if r not in selected]
+    skipped = sum(r[STATUS] == "skip" for r in not_run)
+    todo = sum(r[STATUS] == "todo" for r in not_run)
+    failed = any(r["status"].startswith("FAIL") for r in results)
+    desc = MACHINE.get("description") or OWN
+
+    lines = [f"# Regression results: {OWN}", "",
+             f"Testing executed on **{desc}** (golden set `{OWN}`, {PLATFORM}, detected by {how_found}).", "",
+             f"- Date: {started:%Y-%m-%d %H:%M} (took {seconds // 60}m {seconds % 60:02d}s)",
+             f"- Commit: `{git('log', '-1', '--format=%h') or 'unknown'}` {git('log', '-1', '--format=%s')}"
+             f" ({git('rev-parse', '--abbrev-ref', 'HEAD') or 'unknown'}"
+             + (f", {len(modified)} uncommitted modified file(s)" if modified else "") + ")",
+             f"- GPU: {', '.join(gpus) or 'unknown'}",
+             f"- Mode: {mode}",
+             f"- Projects: {len(results)} run, {len(not_run)} not run ({skipped} excluded in the manifest, "
+             f"{todo} not enabled yet, {len(not_run) - skipped - todo} not selected)",
+             f"- Result: **{'FAILED' if failed else 'OK'}**", "",
+             "## Results per golden set", "",
+             "| Golden set | Machine | Compared with | Run | " + " | ".join(SET_COLUMNS) + " |",
+             "|---|---|---|--:|" + "--:|" * len(SET_COLUMNS)]
+    for s in SETS:
+        own = s["name"] == OWN
+        counts = set_counts(results, s["name"])
+        cells = [str(counts[c]) if own or c not in ("Flaky", "Skipped") else "-" for c in SET_COLUMNS]
+        label = f"**{s['name']}** (this machine)" if own else s["name"]
+        lines.append(f"| {label} | {s['description'] or '-'} | {'strict tolerance' if own else 'cross tolerance'} "
+                     f"| {len(results)} | " + " | ".join(cells) + " |")
+    lines += ["", f"The `{OWN}` row counts the outcome of each project; the other rows count how its captures "
+              "compare with that machine's goldens. *Not compared*: the project doesn't exist on that platform, "
+              "the manifest turns the comparison off (`cross_max_bad`), or the project produced no capture.", ""]
+
+    for s in SETS:
+        problems = set_problems(results, s["name"])
+        if problems:
+            lines += [f"## Problems with the `{s['name']}` goldens", "", "| Project | Problem |", "|---|---|"]
+            lines += [f"| {p} | {d.replace('|', '/')} |" for p, d in problems]
+            lines.append("")
+    return lines
+
+
+def write_summary(lines):
+    RESULTS.mkdir(exist_ok=True)
+    path = RESULTS / f"{OWN}.md"
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def write_run_log(started, opt, mode, build_line, rows, selected, results, missing, how_found):
     finished = datetime.datetime.now()
     seconds = int((finished - started).total_seconds())
     modified = [l for l in git("status", "--porcelain", "--untracked-files=no", "--ignore-submodules").splitlines() if l]
@@ -692,8 +874,9 @@ def write_run_log(started, opt, mode, build_line, rows, selected, results, missi
              f"Git commit:  {commit}",
              f"Git branch:  {git('rev-parse', '--abbrev-ref', 'HEAD') or 'unknown'}"
              + (f"  (+ {len(modified)} uncommitted modified file(s))" if modified else ""),
-             f"Machine:     {socket.gethostname()}",
+             f"Machine:     {OWN} ({MACHINE.get('description') or '-'}, detected by {how_found}), host {socket.gethostname()}",
              f"Platform:    {PLATFORM}",
+             f"Goldens:     {', '.join(s['name'] for s in SETS)}",
              f"GPU:         {', '.join(gpus) or 'unknown'}"]
     if methods:
         lines.append("Capture:     " + ", ".join(f"{m} {n}" for m, n in sorted(methods.items())))
@@ -714,6 +897,11 @@ def write_run_log(started, opt, mode, build_line, rows, selected, results, missi
               f"  {'Not selected for this run':40}{len(not_run) - len(skipped) - len(todo):5}",
               f"{'Projects missing from the manifest':42}{len(missing):5}", "",
               "Result:      " + ("FAILED" if any(r["status"].startswith("FAIL") for r in results) else "OK"), ""]
+    if any(r.get("sets") for r in results):
+        lines += ["Per golden set", "--------------"]
+        lines += [f"{s['name']:20}" + "  ".join(f"{c} {n}" for c, n in set_counts(results, s["name"]).items()
+                                                if n and (s["name"] == OWN or c not in ("Flaky", "Skipped")))
+                  for s in SETS] + [""]
 
     if bad:
         lines += ["Problems", "--------"]
@@ -758,8 +946,8 @@ def set_status(rows, enable, disable):
                 print(f"{name:32} {row[STATUS] or '-'} -> {status}")
                 row[STATUS] = status
                 changed += 1
-            if status == "ok" and row[STATUS] == "ok" and not any((GOLD / PLATFORM / name).glob("f*.png")):
-                print(f"{'':32} note: it has no {PLATFORM} golden yet (--update-golden --only {name})")
+            if status == "ok" and row[STATUS] == "ok" and not any((GOLD / OWN / name).glob("f*.png")):
+                print(f"{'':32} note: it has no {OWN} golden yet (--update-golden --only {name})")
     if changed:
         write_manifest(rows)
     print(f"{changed} row(s) changed in {MANIFEST.relative_to(REPO)}")
@@ -767,25 +955,28 @@ def set_status(rows, enable, disable):
 
 
 def write_report(results):
+    others = [s["name"] for s in SETS if s["name"] != OWN]
     with open(OUT / "report.html", "w") as f:
         f.write("<meta charset=utf-8><title>Regression report</title>"
-                "<table border=1 cellpadding=4><tr><th>frame<th>status<th>golden<th>actual<th>difference x8"
-                f"<th>{OTHER} golden<th>difference x8")
+                f"<table border=1 cellpadding=4><tr><th>frame<th>status<th>{OWN} golden<th>actual<th>difference x8"
+                + "".join(f"<th>{html.escape(o)} golden<th>difference x8" for o in others))
         for r in results:
             for name in r["frames"] or [""]:
                 base = f"{r['name']}/{name}"
                 f.write(f"<tr><td>{html.escape(base)}<td>{html.escape(r['status'])}")
                 if not name:
-                    f.write(f"<td colspan=5><a href='{html.escape(r['name'])}/log.txt'>log</a>")
+                    f.write(f"<td colspan={3 + 2 * len(others)}><a href='{html.escape(r['name'])}/log.txt'>log</a>")
                     continue
-                f.write(f"<td><img src='../goldens/{r['gpu']}/{html.escape(base)}' width=260>"
+                f.write(f"<td><img src='../goldens/{OWN}/{html.escape(base)}' width=260>"
                         f"<td><img src='{html.escape(base)}' width=260>"
                         f"<td><img src='{html.escape(base.replace('.png', '.diff.png'))}' width=260>")
-                if r.get("cross_off"):
-                    f.write(f"<td colspan=2>not compared with the {OTHER} golden")
-                else:
-                    f.write(f"<td><img src='../goldens/{OTHER}/{html.escape(base)}' width=260>"
-                            f"<td><img src='{html.escape(base.replace('.png', '.xdiff.png'))}' width=260>")
+                for o in others:
+                    result = r.get("sets", {}).get(o, ["not run", ""])[0]
+                    if result in ("pass", "fail"):
+                        f.write(f"<td><img src='../goldens/{html.escape(o)}/{html.escape(base)}' width=260>"
+                                f"<td><img src='{html.escape(base.replace('.png', f'.{o}.xdiff.png'))}' width=260>")
+                    else:
+                        f.write(f"<td colspan=2>{html.escape(result)}")
 
 
 def main():
@@ -796,7 +987,8 @@ def main():
     ap.add_argument("--update-golden", action="store_true")
     ap.add_argument("--retries", type=int, default=1)
     ap.add_argument("--strict", action="store_true")
-    ap.add_argument("--gpu", help="use the goldens in Testing/goldens/GPU instead of Testing/goldens/<platform>")
+    ap.add_argument("--machine", default=os.environ.get("OGLDEV_MACHINE"),
+                    help="the name of this machine in Testing/machines.csv (default: detected)")
     ap.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)
     ap.add_argument("--build", metavar="SLN", nargs="?", const=str(DEFAULT_SLN))
     ap.add_argument("--coverage", action="store_true")
@@ -814,6 +1006,13 @@ def main():
         sys.exit("--window takes WIDTHxHEIGHT or 'native'")
     if opt.capture and not (opt.update_golden or opt.audit):
         sys.exit("--capture is only used with --update-golden or --audit")
+
+    global MACHINE, OWN, SETS
+    machines = read_machines()
+    MACHINE, how_found = detect_machine(machines, opt.machine)
+    OWN = MACHINE["name"]
+    SETS = golden_sets(machines)
+    print(f"machine: {OWN} ({MACHINE.get('description') or '-'}, detected by {how_found})", flush=True)
 
     with open(MANIFEST, newline="") as f:
         all_rows = list(csv.DictReader(f))
@@ -849,17 +1048,12 @@ def main():
         # Restore the screen saver settings and stop Xvfb also when the run is killed
         for sig in (signal.SIGTERM, signal.SIGHUP):
             signal.signal(sig, lambda *_: sys.exit(1))
-    results, failed, manifest_changed = [], 0, False
-
-    # A golden set other than the platform's own (--gpu) belongs to another machine:
-    # it records its capture methods in its golden.json files, not in the manifest
-    own_set = not opt.gpu or opt.gpu == PLATFORM
+    results, failed = [], 0
 
     def recorded_method(r):
-        if own_set:
-            return r.get("linux_capture", "")
+        # Linux: the capture method of this machine's golden of the project
         try:
-            return json.loads((GOLD / opt.gpu / r["name"] / "golden.json").read_text()).get("method", "")
+            return json.loads((GOLD / OWN / r["name"] / "golden.json").read_text()).get("method", "")
         except (OSError, ValueError):
             return ""
 
@@ -872,7 +1066,7 @@ def main():
         if opt.update_golden and (opt.capture or not method):
             return None, "", None          # choose_method() decides
         if not method:
-            return None, "", f"FAIL (no golden for {PLATFORM}: create it with --update-golden)"
+            return None, "", f"FAIL (no golden for {OWN}: create it with --update-golden)"
         env, reason = displays.for_method(method)
         if env is None:
             return None, method, f"SKIP ({method} capture: {reason})"
@@ -896,48 +1090,51 @@ def main():
                 results.append({"name": r["name"], "status": status, "method": method})
                 print(f"{r['name']:32} {status}", flush=True)
             print(f"{len(selected)} audited, {failed} failed")
-            log = write_run_log(started, opt, f"determinism audit, {opt.audit} runs per project", build_line, rows, selected, results, missing)
+            log = write_run_log(started, opt, f"determinism audit, {opt.audit} runs per project", build_line, rows,
+                                selected, results, missing, how_found)
             print(f"log: {log.relative_to(REPO)}")
             return 1 if failed else 0
 
         for r in selected:
             outdir, attempt = OUT / r["name"], 0
             env, method, status = environment(r, outdir)
-            gpu, frames = opt.gpu or PLATFORM, []
+            frames, sets = [], {}
             while status is None:
                 attempt += 1
                 if r["name"] in not_built:
                     code = "not built"
                 elif PLATFORM == "linux" and env is None:
-                    # First golden on Linux: find the capture method and keep it
+                    # First golden on this Linux machine: find the capture method
+                    # (check() records it in the golden.json)
                     method, code = choose_method(r, outdir, displays, opt)
                     if isinstance(code, str) and code.startswith("SKIP"):
                         status = code
                         break
-                    if own_set and method and method != r.get("linux_capture"):
-                        r["linux_capture"] = method
-                        manifest_changed = True
                     if method:
                         env, _ = displays.for_method(method)
                 else:
                     code = run_once(r, outdir, opt.strict, opt.timeout, env)
                 if code != 0:
-                    status = fail_status(code)
+                    status, frames = fail_status(code), []
+                    sets = {OWN: ["error", status[6:-1]]}
                 else:
-                    status, gpu, frames = check(r, outdir, opt.gpu, opt.update_golden, method)
+                    status, sets, frames = check(r, outdir, opt.update_golden, method)
                 if not status.startswith("FAIL") or attempt > opt.retries or opt.update_golden or code == "not built":
                     break
                 status = None
+            if status.startswith("SKIP"):
+                sets = {OWN: ["skipped", status[6:-1]]}
+            elif not sets:
+                # environment() refused to run it: no golden on this Linux machine
+                sets = {OWN: ["missing" if "no golden" in status else "error", status[6:-1]]}
             if attempt > 1 and not status.startswith("FAIL"):
                 status = "FLAKY (passed on retry)"
+                sets[OWN] = ["flaky", f"passed on attempt {attempt}"]
             failed += status.startswith("FAIL")
-            results.append({"name": r["name"], "status": status, "gpu": gpu, "frames": frames,
+            results.append({"name": r["name"], "status": status, "gpu": OWN, "frames": frames, "sets": sets,
                             "method": method, "cross_off": r.get("cross_max_bad") == "off", "renderer": read_info(outdir).get("renderer", "")})
             print(f"{r['name']:32} {status}" + (f"  [{method}]" if method else ""), flush=True)
     finally:
-        if manifest_changed:
-            write_manifest(all_rows)
-            print(f"recorded the capture method of the new goldens in {MANIFEST.relative_to(REPO)}")
         if displays:
             displays.close()
 
@@ -948,9 +1145,15 @@ def main():
     print(f"{len(results)} run, {failed} failed, {flaky} flaky" + (f", {skipped_hw} skipped (no hardware display)" if skipped_hw else ""))
     if skipped_hw and displays:
         print(f"hardware display: {displays.hw_reason}")
-    mode = "update goldens" if opt.update_golden else "compare with goldens"
-    log = write_run_log(started, opt, mode + (", strict" if opt.strict else ""), build_line, rows, selected, results, missing)
+    mode = ("update goldens" if opt.update_golden else "compare with goldens") + (", strict" if opt.strict else "")
+    log = write_run_log(started, opt, mode, build_line, rows, selected, results, missing, how_found)
+    summary = summary_lines(started, mode, how_found, rows, selected, results)
+    with open(log, "a", encoding="utf-8") as f:
+        f.write("\n" + "\n".join(summary) + "\n")
+    path = write_summary(summary)
+    print("\n" + "\n".join(summary))
     print(f"log: {log.relative_to(REPO)}")
+    print(f"summary: {path.relative_to(REPO)}")
     return 1 if failed else 0
 
 
