@@ -31,12 +31,14 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
+#define GROUND_HEIGHT 0.5f    // the box rests on the ground when its center is at this height
+
 static void PhysicsUpdateListener(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation)
 {
     //GLM_PRINT_VEC3("", Pos);
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
-    if (Pos.y >= 0.5f) {
+    if (Pos.y >= GROUND_HEIGHT) {
         pSceneObject->SetPosition(Pos);
     }
 }
@@ -88,39 +90,33 @@ public:
        // m_pScene->GetConfig()->ControlSkybox(true);
        // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
 
-        m_pCarSceneObject1 = m_pScene->CreateSceneObject(pModel);
-        m_pCarSceneObject1->SetPosition(0.0f, 0.5f, 0.0);
-        m_pScene->AddToRenderList(m_pCarSceneObject1);
+        m_pBoxSceneObject = m_pScene->CreateSceneObject(pModel);
+        m_pBoxSceneObject->SetPosition(m_startPos.x, m_startPos.y, m_startPos.z);
+        m_pScene->AddToRenderList(m_pBoxSceneObject);
 
-        m_pCarSceneObject2 = m_pScene->CreateSceneObject(pModel);
-        m_pCarSceneObject2->SetPosition(0.0f, 150.0f, 3.0);
-        m_pScene->AddToRenderList(m_pCarSceneObject2);
+        m_pScene->SetCamera(Vector3f(0.0f, 7.0f, -25.0f), Vector3f(0.0f, 0.05f, 1.0f));
 
-        m_pCarSceneObject1->SetRotation(0.0f, -90.0f, 0.0f);
+        // Gravity is applied as a global force on every physics step
+        m_physicsSystem.Init(100, 0, PhysicsUpdateListener, Physics::GRAVITY);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 60.0f, -100.0f), Vector3f(0.0f, -0.3f, 1.0f));
-
-        m_physicsSystem.Init(100, 0, PhysicsUpdateListener, glm::vec3(0.0f));
-
-        m_pPointMass1 = m_physicsSystem.AllocPointMass();
-        m_pPointMass1->Init(5.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
-
-        m_pPointMass2 = m_physicsSystem.AllocPointMass();
-        m_pPointMass2->Init(1.0f, m_pCarSceneObject2->GetGLMPos(), Physics::GRAVITY, m_pCarSceneObject2);
+        m_pPointMass = m_physicsSystem.AllocPointMass();
+        m_pPointMass->Init(1.0f, m_startPos, glm::vec3(0.0f), m_pBoxSceneObject);
 
         m_pRenderingSystem->Execute();
     }
 
 
     void OnFrameChild(double DeltaTime)
-    {  
+    {
         m_physicsSystem.Update(DeltaTime);
 
-        if (glm::length(m_pPointMass2->GetLinearVelocity()) > 1.0f) {
-          //  m_pPointMass2->ResetSumForces();
+        // When the box reaches the ground reset it back to the starting position
+        if (m_pPointMass->GetPos().y <= GROUND_HEIGHT) {
+            m_pPointMass->SetPos(m_startPos);
+            m_pPointMass->SetLinearVelocity(glm::vec3(0.0f));
+            m_pBoxSceneObject->SetPosition(m_startPos.x, m_startPos.y, m_startPos.z);
         }
-      //  m_pCarSceneObject1->RotateBy(0.0f, 0.5f, 0.0f);
-      //  m_pCarSceneObject1->TranslateBy(-0.7f * (float)DeltaTime, 0.0f, 0.0f);
+
         m_frameCount++;
     }
 
@@ -136,11 +132,10 @@ private:
 
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLight;
-    SceneObject* m_pCarSceneObject1 = NULL;
-    SceneObject* m_pCarSceneObject2 = NULL;
+    SceneObject* m_pBoxSceneObject = NULL;
+    glm::vec3 m_startPos = glm::vec3(0.0f, 15.0f, 0.0f);
     Physics::System m_physicsSystem;
-    Physics::PointMass* m_pPointMass1 = NULL;
-    Physics::PointMass* m_pPointMass2 = NULL;
+    Physics::PointMass* m_pPointMass = NULL;
     int m_frameCount = 0;
 };
 
