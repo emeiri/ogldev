@@ -317,7 +317,11 @@ void CoreScene::SSAOGUI()
         SSAOParams& ssoaParams = m_config.GetSSAOParams();
 
         bool EnableSSAO = m_config.IsSSAOEnabled();
-        ImGui::Checkbox("SSAO Enable", &EnableSSAO);
+        if (ImGui::Checkbox("SSAO Enable", &EnableSSAO) && EnableSSAO) {
+            // SSAO is not supported together with HDR/bloom
+            m_config.ControlBloom(false);
+            m_config.ControlHDR(false);
+        }
         m_config.ControlSSAO(EnableSSAO);
         ImGui::SliderFloat("SSAO Scale", &ssoaParams.scale, 0.0f, 2.0f);
         ImGui::SliderFloat("SSAO Bias", &ssoaParams.bias, 0.0f, 0.3f);
@@ -478,7 +482,9 @@ void CoreScene::HDRAndToneMappingGUI()
 {
     if (ImGui::TreeNode("HDR & Tone Mapping")) {
         bool EnableHDR = m_config.IsHDREnabled();
-        ImGui::Checkbox("HDR Enabled", &EnableHDR);
+        if (ImGui::Checkbox("HDR Enabled", &EnableHDR) && EnableHDR) {
+            m_config.ControlSSAO(false);    // SSAO is not supported together with HDR
+        }
         m_config.ControlHDR(EnableHDR);
 
         float AverageLuminance = 0.0f;
@@ -503,7 +509,9 @@ void CoreScene::HDRAndToneMappingGUI()
         m_config.ControlGammaCorrection(EnableGamma);
 
         bool EnableBloom = m_config.IsBloomEnabled();
-        ImGui::Checkbox("Bloom Enabled", &EnableBloom);
+        if (ImGui::Checkbox("Bloom Enabled", &EnableBloom) && EnableBloom) {
+            m_config.ControlSSAO(false);    // bloom requires HDR which is not supported together with SSAO
+        }
         m_config.ControlBloom(EnableBloom);
 
         if (EnableBloom) {
